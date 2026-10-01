@@ -29,9 +29,9 @@ No git history touches these paths yet (one commit, no fixes), so likelihood com
 
 | Risk | Story | What could go wrong | Source | Likelihood | Impact | Level | Cases |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| R-001 | US-00-001 | A cross-reference ("as set out in clause 7.2") or a decimal ("3.5 percent") in clause text is taken for a heading, so answers later cite the wrong text | AC-US-00-001-2, AC-US-00-001-3, new code, TASK-001 review findings 3 to 5 | M | M | Medium | TC-0005, TC-0006, TC-0008, TC-0025, TC-0026, TC-0027, TC-0028 |
+| R-001 | US-00-001 | A cross-reference ("as set out in clause 7.2") or a decimal ("3.5 percent") in clause text is taken for a heading, so answers later cite the wrong text | AC-US-00-001-2, AC-US-00-001-3, new code, TASK-001 review findings 3 to 5 | M | M | Medium | TC-0005, TC-0006, TC-0008, TC-0025, TC-0026, TC-0027, TC-0028, TC-0032, TC-0033 |
 | R-002 | US-00-001 | pypdf breaks lines or hyphenates differently from the source, so stored clause text drifts from truth.json and quotes later fail | AC-US-00-001-2, ADR-0006, new integration | M | M | Medium | TC-0004, TC-0007 |
 | R-003 | US-00-001 | Loading the same file twice creates two contracts, so every reminder is sent twice | AC-US-00-001-5 | L | M | Low | TC-0014 |
-| R-004 | US-00-001 | A scanned, corrupt or non-PDF file is half stored or crashes the command, leaving a contract with no clauses | AC-US-00-001-4, AC-US-00-001-6, external input, TASK-001 review finding 2 | M | M | Medium | TC-0011, TC-0017, TC-0018, TC-0024, TC-0029, TC-0030, TC-0031 |
+| R-004 | US-00-001 | A scanned, corrupt or non-PDF file is half stored or crashes the command, leaving a contract with no clauses | AC-US-00-001-4, AC-US-00-001-6, external input, TASK-001 review finding 2 | M | M | Medium | TC-0011, TC-0017, TC-0018, TC-0024, TC-0029, TC-0030, TC-0031, TC-0034 |
 | R-005 | US-00-001 | Migration 0001 fails on the vector extension or its downgrade leaves objects behind, blocking every later task and CI | review T3, T1, change size | M | M | Medium | TC-0020, TC-0021 |
 | R-006 | US-00-001 | Integration tests stop rolling back, so rows leak between tests and failures become random | review T4 | L | M | Low | TC-0023 |

@@ -6,8 +6,8 @@ Version: v1   Author: unattributed
 ## 1. Headline
 
 Scenarios: 8
-test-cases: 6 ACs, 6 with cases, 31 live cases, 31 with oracles, 6 risks (high 0, medium 4, low 2), 0 threats traced from 0 threat models, 0 problems
-test-types: unit 8, integration 23, e2e 0, manual 0; by machine 31 (automated 31, planned 0), by hand 0
+test-cases: 6 ACs, 6 with cases, 34 live cases, 34 with oracles, 6 risks (high 0, medium 4, low 2), 0 threats traced from 0 threat models, 0 problems
+test-types: unit 10, integration 24, e2e 0, manual 0; by machine 34 (automated 34, planned 0), by hand 0
 
 ## 2. Risk summary
 
@@ -23,8 +23,8 @@ Medium: 4 (R-001, R-002, R-004, R-005; US-00-001)   Low: 2
 | --- | --- | --- | --- | --- | --- |
 | TS-US-00-001-1 | US-00-001 | Generated lease loaded | every contract becomes clauses that answers can later cite exactly | TC-0001, TC-0004 | machine |
 | TS-US-00-001-2 | US-00-001 | Short contract with explicit type | short contracts load as well as long ones | TC-0003, TC-0013 | machine |
-| TS-US-00-001-3 | US-00-001 | Bad files refused | a bad file never becomes a contract with missing text | TC-0002, TC-0011, TC-0012, TC-0017, TC-0018, TC-0019, TC-0029, TC-0030, TC-0031 | machine |
-| TS-US-00-001-4 | US-00-001 | Stray numbers in clause text | clause boundaries follow the contract's own numbering, not stray numbers in its text | TC-0005, TC-0006, TC-0007, TC-0025, TC-0026, TC-0027, TC-0028 | machine |
+| TS-US-00-001-3 | US-00-001 | Bad files refused | a bad file never becomes a contract with missing text | TC-0002, TC-0011, TC-0012, TC-0017, TC-0018, TC-0019, TC-0029, TC-0030, TC-0031, TC-0034 | machine |
+| TS-US-00-001-4 | US-00-001 | Stray numbers in clause text | clause boundaries follow the contract's own numbering, not stray numbers in its text | TC-0005, TC-0006, TC-0007, TC-0025, TC-0026, TC-0027, TC-0028, TC-0032, TC-0033 | machine |
 | TS-US-00-001-5 | US-00-001 | Clause lookup | a citation always resolves to exactly one clause's text, or says it does not exist | TC-0008, TC-0009, TC-0010 | machine |
 | TS-US-00-001-6 | US-00-001 | Duplicate files | one file is one contract, so reminders are never doubled | TC-0014, TC-0015, TC-0016 | machine |
 | TS-US-00-001-7 | US-00-001 | Untrusted file bytes | a malformed file ends in a message, never a traceback or a partial write | TC-0017, TC-0018, TC-0024 | machine |
