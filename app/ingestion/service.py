@@ -7,19 +7,17 @@ with half its clauses (TC-0024). The caller owns the outer transaction.
 
 import hashlib
 import json
-import re
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
 import anyio
 import structlog
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import DomainError, NotFoundError
 from app.db.repositories import contracts as repo
-from app.domain.contracts import Clause, NewContract
+from app.domain.contracts import Clause, ContractRefusedError, NewContract
 from app.ingestion.pdf import read_pdf
 from app.ingestion.splitter import split_clauses
 
@@ -56,7 +54,11 @@ class FileMissingError(DomainError):
     code = "file_missing"
 
 
-CONSTRAINT = re.compile(r'constraint "([^"]+)"')
+class FileUnreadableError(DomainError):
+    """The path exists but cannot be read as a file (a directory, no permission)."""
+
+    status_code = 422
+    code = "file_unreadable"
 
 
 @dataclass(frozen=True)
@@ -76,6 +78,8 @@ async def _type_and_title(path: Path, contract_type: str | None) -> tuple[str, s
             data = json.loads(await truth.read_text())
         except ValueError as exc:
             raise InvalidContractError(f"{truth.name}: not valid JSON") from exc
+        except OSError as exc:
+            raise InvalidContractError(f"{truth.name}: cannot be read ({exc.strerror})") from exc
         if not isinstance(data, dict):
             raise InvalidContractError(f"{truth.name}: not valid JSON")
         kind, title = data.get("contract_type"), data.get("title")
@@ -97,6 +101,8 @@ async def ingest_file(
         data = await anyio.Path(path).read_bytes()
     except FileNotFoundError as exc:
         raise FileMissingError(f"File not found: {path.name}") from exc
+    except OSError as exc:
+        raise FileUnreadableError(f"Cannot read {path.name}: {exc.strerror}") from exc
     sha256 = hashlib.sha256(data).hexdigest()
     existing = await repo.find_by_sha256(session, sha256)
     if existing:
@@ -122,12 +128,10 @@ async def ingest_file(
                 ),
             )
             await repo.insert_clauses(session, contract_id, found)
-    except IntegrityError as exc:
-        match = CONSTRAINT.search(str(exc.orig))
-        constraint = match[1] if match else "unknown constraint"
-        log.warning("contract_refused", file=path.name, constraint=constraint)
+    except ContractRefusedError as exc:
+        log.warning("contract_refused", file=path.name, constraint=exc.constraint)
         raise InvalidContractError(
-            f"Contract could not be stored: {path.name} ({constraint})"
+            f"Contract could not be stored: {path.name} ({exc.constraint})"
         ) from exc
     log.info("contract_loaded", file=path.name, contract_id=str(contract_id), clauses=len(found))
     return IngestResult(contract_id=contract_id, title=title, created=True)

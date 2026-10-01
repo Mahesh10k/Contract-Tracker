@@ -3,6 +3,8 @@
 import uuid
 from dataclasses import dataclass
 
+from app.core.errors import DomainError
+
 
 @dataclass(frozen=True)
 class Clause:
@@ -31,3 +33,14 @@ class NewContract:
     file_sha256: str
     full_text: str
     page_count: int
+
+
+class ContractRefusedError(DomainError):
+    """The database refused a contract or clause row; `constraint` names the rule."""
+
+    status_code = 422
+    code = "contract_refused"
+
+    def __init__(self, constraint: str) -> None:
+        super().__init__(f"refused by {constraint}", details={"constraint": constraint})
+        self.constraint = constraint

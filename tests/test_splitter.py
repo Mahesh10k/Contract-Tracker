@@ -97,3 +97,29 @@ def test_heading_only_parent_clause_takes_its_heading_as_body() -> None:
     clauses = split_clauses(text)
 
     assert clauses[0] == Clause(number="2", heading="Term", body="Term")
+
+
+def test_a_date_wrapped_to_a_line_start_inside_clause_1_stays_in_its_body() -> None:
+    # TASK-001 re-review finding 1: the preamble rule restarted clause 1 here.
+    text = (
+        "1 Parties\nThis Lease is made on\n"
+        "1 March 2026 between Acme and Beta.\n2 Term\nThree years."
+    )
+
+    clauses = split_clauses(text)
+
+    assert [(c.number, c.heading) for c in clauses] == [("1", "Parties"), ("2", "Term")]
+    assert "1 March 2026 between Acme and Beta." in clauses[0].body
+
+
+def test_a_dotted_list_inside_undotted_clauses_is_body_text() -> None:
+    # TASK-001 re-review finding 2: "1." list items took over clause 1 and swallowed "2 Term".
+    text = (
+        "1 Parties\nThe parties are:\n1. Harbor Properties LLC\n"
+        "2. Acme Analytics Inc\n2 Term\nThree years."
+    )
+
+    clauses = split_clauses(text)
+
+    assert [(c.number, c.heading) for c in clauses] == [("1", "Parties"), ("2", "Term")]
+    assert "2. Acme Analytics Inc" in clauses[0].body

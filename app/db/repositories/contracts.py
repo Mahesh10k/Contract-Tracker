@@ -3,10 +3,17 @@
 import uuid
 
 from sqlalchemy import insert, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.tables import clauses, contracts
-from app.domain.contracts import Clause, NewContract, StoredContract
+from app.domain.contracts import Clause, ContractRefusedError, NewContract, StoredContract
+
+
+def _refused(exc: IntegrityError) -> ContractRefusedError:
+    """The constraint asyncpg reports on the cause of the error, never parsed from its text."""
+    name = getattr(getattr(exc.orig, "__cause__", None), "constraint_name", None)
+    return ContractRefusedError(name or "unknown constraint")
 
 
 async def find_by_sha256(session: AsyncSession, sha256: str) -> StoredContract | None:
@@ -21,18 +28,21 @@ async def find_by_sha256(session: AsyncSession, sha256: str) -> StoredContract |
 
 async def insert_contract(session: AsyncSession, contract: NewContract) -> uuid.UUID:
     """Insert one contract row and return its id."""
-    result = await session.execute(
-        insert(contracts)
-        .values(
-            title=contract.title,
-            contract_type=contract.contract_type,
-            source_filename=contract.source_filename,
-            file_sha256=contract.file_sha256,
-            full_text=contract.full_text,
-            page_count=contract.page_count,
+    try:
+        result = await session.execute(
+            insert(contracts)
+            .values(
+                title=contract.title,
+                contract_type=contract.contract_type,
+                source_filename=contract.source_filename,
+                file_sha256=contract.file_sha256,
+                full_text=contract.full_text,
+                page_count=contract.page_count,
+            )
+            .returning(contracts.c.id)
         )
-        .returning(contracts.c.id)
-    )
+    except IntegrityError as exc:
+        raise _refused(exc) from exc
     contract_id: uuid.UUID = result.scalar_one()
     return contract_id
 
@@ -41,19 +51,22 @@ async def insert_clauses(
     session: AsyncSession, contract_id: uuid.UUID, found: list[Clause]
 ) -> None:
     """Insert the clauses of one contract, positions from 1 in document order."""
-    await session.execute(
-        insert(clauses),
-        [
-            {
-                "contract_id": contract_id,
-                "clause_number": c.number,
-                "heading": c.heading,
-                "body": c.body,
-                "position": position,
-            }
-            for position, c in enumerate(found, start=1)
-        ],
-    )
+    try:
+        await session.execute(
+            insert(clauses),
+            [
+                {
+                    "contract_id": contract_id,
+                    "clause_number": c.number,
+                    "heading": c.heading,
+                    "body": c.body,
+                    "position": position,
+                }
+                for position, c in enumerate(found, start=1)
+            ],
+        )
+    except IntegrityError as exc:
+        raise _refused(exc) from exc
 
 
 async def find_clause(session: AsyncSession, contract_id: uuid.UUID, number: str) -> Clause | None:

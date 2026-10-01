@@ -13,6 +13,7 @@ from app.ingestion.pdf import NoTextLayerError, UnreadablePdfError
 from app.ingestion.service import (
     ContractTypeRequiredError,
     FileMissingError,
+    FileUnreadableError,
     InvalidContractError,
     NoClausesError,
     get_clause,
@@ -24,6 +25,8 @@ from evals.contracts.truth import load_truth
 from tests.pdf_fixtures import image_only_pdf, text_pdf
 
 pytestmark = pytest.mark.integration
+# Committed by make contracts; generate() rewrites the same bytes in each test run.
+LEASE_01_TRUTH = Path(__file__).parents[2] / "data" / "contracts" / "lease-01.truth.json"
 
 
 @pytest.fixture(scope="module")
@@ -53,8 +56,18 @@ async def test_tc0001_generated_lease_is_stored_with_title_type_and_text(
     row = (await session.execute(select(contracts))).one()
     assert result.created is True
     assert (row.title, row.contract_type) == (truth["title"], "lease")
-    assert [c["heading"] for c in truth["clauses"] if c["heading"] not in row.full_text] == []
     assert await count(session, contracts) == 1
+
+
+@pytest.mark.parametrize("heading", [c["heading"] for c in load_truth(LEASE_01_TRUTH)["clauses"]])
+async def test_tc0001_full_text_holds_every_clause_heading(
+    session: AsyncSession, generated: Path, heading: str
+) -> None:
+    await ingest_file(session, generated / "lease-01.pdf")
+
+    full_text = await session.scalar(select(contracts.c.full_text))
+
+    assert heading in (full_text or "")
 
 
 async def test_tc0002_pdf_without_truth_and_type_is_refused(
@@ -281,3 +294,16 @@ async def test_loading_logs_the_contract_and_its_clause_count(
 
     events = [(e["event"], e.get("clauses")) for e in logs]
     assert events == [("contract_loaded", 12), ("contract_already_loaded", None)]
+
+
+async def test_a_directory_given_as_a_file_is_refused_with_a_message(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    # TASK-001 re-review finding 4: IsADirectoryError escaped as a traceback.
+    folder = tmp_path / "contracts"
+    folder.mkdir()
+
+    with pytest.raises(FileUnreadableError) as raised:
+        await ingest_file(session, folder, contract_type="lease")
+
+    assert raised.value.message.startswith("Cannot read contracts:")
