@@ -11,7 +11,7 @@ for a given seed, so files can be committed and cache keys stay stable.
 """
 
 import calendar
-import random
+import hashlib
 import sys
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -102,20 +102,36 @@ def _long_date(d: date) -> str:
     return f"{d.day} {calendar.month_name[d.month]} {d.year}"
 
 
-def choose_terms(rng: random.Random, contract_type: str, n: int) -> Terms:
-    """Draw one contract's terms from the seeded random source."""
+def pick[T](options: list[T], seed: int, *key: str) -> T:
+    """Choose one option from a hash of (seed, key), the same choice on every run.
+
+    A hash rather than a seeded random generator: the choice is reproducible
+    without a pseudo-random generator, so no security lint needs silencing.
+    """
+    digest = hashlib.sha256(":".join([str(seed), *key]).encode()).digest()
+    return options[int.from_bytes(digest[:8], "big") % len(options)]
+
+
+def choose_terms(seed: int, contract_type: str, n: int) -> Terms:
+    """Choose one contract's terms; each field is picked independently by name."""
     contract_id = f"{contract_type}-{n:02d}"
     return Terms(
         contract_id=contract_id,
         contract_type=contract_type,
-        party_a=rng.choice(FIRST_PARTY[contract_type]),
-        party_b=rng.choice(SECOND_PARTY),
-        start=date(rng.choice([2024, 2025, 2026]), rng.randint(1, 12), 1),
-        years=rng.choice(sorted(YEARS_TEXT)),
-        notice=None if contract_id in UNPARSEABLE_NOTICE else rng.choice(NOTICE),
-        auto_renewal=rng.random() < 0.5,
-        law=rng.choice(LAWS),
-        cap=rng.choice(CAPS),
+        party_a=pick(FIRST_PARTY[contract_type], seed, contract_id, "party_a"),
+        party_b=pick(SECOND_PARTY, seed, contract_id, "party_b"),
+        start=date(
+            pick([2024, 2025, 2026], seed, contract_id, "year"),
+            pick(list(range(1, 13)), seed, contract_id, "month"),
+            1,
+        ),
+        years=pick(sorted(YEARS_TEXT), seed, contract_id, "years"),
+        notice=None
+        if contract_id in UNPARSEABLE_NOTICE
+        else pick(NOTICE, seed, contract_id, "notice"),
+        auto_renewal=pick([True, False], seed, contract_id, "auto_renewal"),
+        law=pick(LAWS, seed, contract_id, "law"),
+        cap=pick(CAPS, seed, contract_id, "cap"),
     )
 
 
@@ -268,11 +284,10 @@ def render_pdf(title: str, clauses: list[TruthClause]) -> bytes:
 def generate(out_dir: Path, seed: int = SEED) -> list[Path]:
     """Write 18 contract PDFs and their truth.json files to `out_dir`; return the truth paths."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    rng = random.Random(seed)  # noqa: S311  (synthetic test data, not security)
     written = []
     for contract_type in TYPES:
         for n in range(1, 7):
-            terms = choose_terms(rng, contract_type, n)
+            terms = choose_terms(seed, contract_type, n)
             title = f"{TITLES[contract_type]} {n:02d}"
             clauses, fields = clauses_and_fields(terms)
             truth: Truth = {

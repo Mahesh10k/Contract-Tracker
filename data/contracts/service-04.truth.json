@@ -2,15 +2,15 @@
   "id": "service-04",
   "title": "Services Agreement 04",
   "contract_type": "service",
-  "start": "2024-10-01",
-  "term_years": 1,
+  "start": "2024-04-01",
+  "term_years": 5,
   "holdout": false,
   "expected_review": [],
   "clauses": [
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Clearwater Cleaning Ltd and Beta Logistics LLC."
+      "body": "This Agreement is made between Bluebell Security Inc and Beta Logistics LLC."
     },
     {
       "number": "2",
@@ -20,12 +20,12 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 October 2024."
+      "body": "The term commences on 1 April 2024."
     },
     {
       "number": "2.2",
       "heading": "Duration",
-      "body": "The term is one (1) year from the commencement date."
+      "body": "The term is five (5) years from the commencement date."
     },
     {
       "number": "2.3",
@@ -45,7 +45,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim."
+      "body": "The liability of either party is capped at USD 50,000."
     },
     {
       "number": "5",
@@ -60,28 +60,28 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term."
+      "body": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term."
     },
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of England and Wales."
+      "body": "This Agreement is governed by the laws of the State of New York."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Clearwater Cleaning Ltd and Beta Logistics LLC",
-      "quote": "This Agreement is made between Clearwater Cleaning Ltd and Beta Logistics LLC.",
+      "value": "Bluebell Security Inc and Beta Logistics LLC",
+      "quote": "This Agreement is made between Bluebell Security Inc and Beta Logistics LLC.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 October 2024",
-      "quote": "The term commences on 1 October 2024.",
+      "value": "1 April 2024",
+      "quote": "The term commences on 1 April 2024.",
       "clause": "2.1"
     },
     "term": {
-      "value": "one (1) year",
-      "quote": "The term is one (1) year from the commencement date.",
+      "value": "five (5) years",
+      "quote": "The term is five (5) years from the commencement date.",
       "clause": "2.2"
     },
     "auto_renewal": {
@@ -100,8 +100,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "the fees paid in the twelve (12) months before the claim",
-      "quote": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim.",
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
       "clause": "4"
     },
     "termination_rights": {
@@ -110,26 +110,47 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "not less than thirty days",
-      "quote": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term.",
+      "value": "three (3) months",
+      "quote": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
-      "value": "England and Wales",
-      "quote": "This Agreement is governed by the laws of England and Wales.",
+      "value": "the State of New York",
+      "quote": "This Agreement is governed by the laws of the State of New York.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2025-09-30",
-    "notice_deadline": "2025-08-31",
+    "expiry": "2029-03-31",
+    "notice_deadline": "2028-12-31",
     "renewal": null,
-    "escalation_dates": [],
+    "escalation_dates": [
+      "2025-04-01",
+      "2026-04-01",
+      "2027-04-01",
+      "2028-04-01"
+    ],
     "payment_dates": [
+      "2024-04-01",
+      "2024-07-01",
       "2024-10-01",
       "2025-01-01",
       "2025-04-01",
-      "2025-07-01"
+      "2025-07-01",
+      "2025-10-01",
+      "2026-01-01",
+      "2026-04-01",
+      "2026-07-01",
+      "2026-10-01",
+      "2027-01-01",
+      "2027-04-01",
+      "2027-07-01",
+      "2027-10-01",
+      "2028-01-01",
+      "2028-04-01",
+      "2028-07-01",
+      "2028-10-01",
+      "2029-01-01"
     ]
   }
 }

@@ -2,7 +2,7 @@
   "id": "vendor-03",
   "title": "Supply Agreement 03",
   "contract_type": "vendor",
-  "start": "2026-08-01",
+  "start": "2025-05-01",
   "term_years": 3,
   "holdout": true,
   "expected_review": [],
@@ -10,7 +10,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Meridian Parts LLC and Delta Foods Inc."
+      "body": "This Agreement is made between Meridian Parts LLC and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -20,7 +20,7 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 August 2026."
+      "body": "The term commences on 1 May 2025."
     },
     {
       "number": "2.2",
@@ -45,7 +45,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at two times the annual fees."
+      "body": "The liability of either party is capped at USD 50,000."
     },
     {
       "number": "5",
@@ -60,23 +60,23 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term."
+      "body": "Either party may end this Agreement at expiry by giving sixty (60) days written notice before the end of the term."
     },
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of England and Wales."
+      "body": "This Agreement is governed by the laws of the State of Delaware."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Meridian Parts LLC and Delta Foods Inc",
-      "quote": "This Agreement is made between Meridian Parts LLC and Delta Foods Inc.",
+      "value": "Meridian Parts LLC and Acme Analytics Inc",
+      "quote": "This Agreement is made between Meridian Parts LLC and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 August 2026",
-      "quote": "The term commences on 1 August 2026.",
+      "value": "1 May 2025",
+      "quote": "The term commences on 1 May 2025.",
       "clause": "2.1"
     },
     "term": {
@@ -100,8 +100,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "two times the annual fees",
-      "quote": "The liability of either party is capped at two times the annual fees.",
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
       "clause": "4"
     },
     "termination_rights": {
@@ -110,22 +110,37 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "three (3) months",
-      "quote": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term.",
+      "value": "sixty (60) days",
+      "quote": "Either party may end this Agreement at expiry by giving sixty (60) days written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
-      "value": "England and Wales",
-      "quote": "This Agreement is governed by the laws of England and Wales.",
+      "value": "the State of Delaware",
+      "quote": "This Agreement is governed by the laws of the State of Delaware.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2029-07-31",
-    "notice_deadline": "2029-04-30",
+    "expiry": "2028-04-30",
+    "notice_deadline": "2028-03-01",
     "renewal": null,
     "escalation_dates": [],
     "payment_dates": [
+      "2025-05-15",
+      "2025-06-15",
+      "2025-07-15",
+      "2025-08-15",
+      "2025-09-15",
+      "2025-10-15",
+      "2025-11-15",
+      "2025-12-15",
+      "2026-01-15",
+      "2026-02-15",
+      "2026-03-15",
+      "2026-04-15",
+      "2026-05-15",
+      "2026-06-15",
+      "2026-07-15",
       "2026-08-15",
       "2026-09-15",
       "2026-10-15",
@@ -146,22 +161,7 @@
       "2028-01-15",
       "2028-02-15",
       "2028-03-15",
-      "2028-04-15",
-      "2028-05-15",
-      "2028-06-15",
-      "2028-07-15",
-      "2028-08-15",
-      "2028-09-15",
-      "2028-10-15",
-      "2028-11-15",
-      "2028-12-15",
-      "2029-01-15",
-      "2029-02-15",
-      "2029-03-15",
-      "2029-04-15",
-      "2029-05-15",
-      "2029-06-15",
-      "2029-07-15"
+      "2028-04-15"
     ]
   }
 }

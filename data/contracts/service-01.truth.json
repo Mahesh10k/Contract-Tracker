@@ -3,14 +3,14 @@
   "title": "Services Agreement 01",
   "contract_type": "service",
   "start": "2024-08-01",
-  "term_years": 3,
+  "term_years": 2,
   "holdout": false,
   "expected_review": [],
   "clauses": [
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Summit IT Services LLC and Delta Foods Inc."
+      "body": "This Agreement is made between Bluebell Security Inc and Delta Foods Inc."
     },
     {
       "number": "2",
@@ -25,7 +25,7 @@
     {
       "number": "2.2",
       "heading": "Duration",
-      "body": "The term is three (3) years from the commencement date."
+      "body": "The term is two (2) years from the commencement date."
     },
     {
       "number": "2.3",
@@ -70,8 +70,8 @@
   ],
   "fields": {
     "parties": {
-      "value": "Summit IT Services LLC and Delta Foods Inc",
-      "quote": "This Agreement is made between Summit IT Services LLC and Delta Foods Inc.",
+      "value": "Bluebell Security Inc and Delta Foods Inc",
+      "quote": "This Agreement is made between Bluebell Security Inc and Delta Foods Inc.",
       "clause": "1"
     },
     "effective_date": {
@@ -80,8 +80,8 @@
       "clause": "2.1"
     },
     "term": {
-      "value": "three (3) years",
-      "quote": "The term is three (3) years from the commencement date.",
+      "value": "two (2) years",
+      "quote": "The term is two (2) years from the commencement date.",
       "clause": "2.2"
     },
     "auto_renewal": {
@@ -121,12 +121,11 @@
     }
   },
   "expected": {
-    "expiry": "2027-07-31",
-    "notice_deadline": "2027-04-30",
+    "expiry": "2026-07-31",
+    "notice_deadline": "2026-04-30",
     "renewal": null,
     "escalation_dates": [
-      "2025-08-01",
-      "2026-08-01"
+      "2025-08-01"
     ],
     "payment_dates": [
       "2024-08-01",
@@ -136,11 +135,7 @@
       "2025-08-01",
       "2025-11-01",
       "2026-02-01",
-      "2026-05-01",
-      "2026-08-01",
-      "2026-11-01",
-      "2027-02-01",
-      "2027-05-01"
+      "2026-05-01"
     ]
   }
 }

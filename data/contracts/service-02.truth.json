@@ -2,7 +2,7 @@
   "id": "service-02",
   "title": "Services Agreement 02",
   "contract_type": "service",
-  "start": "2024-11-01",
+  "start": "2024-10-01",
   "term_years": 3,
   "holdout": false,
   "expected_review": [
@@ -12,7 +12,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Bluebell Security Inc and Delta Foods Inc."
+      "body": "This Agreement is made between Summit IT Services LLC and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -22,7 +22,7 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 November 2024."
+      "body": "The term commences on 1 October 2024."
     },
     {
       "number": "2.2",
@@ -47,7 +47,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim."
+      "body": "The liability of either party is capped at USD 50,000."
     },
     {
       "number": "5",
@@ -67,18 +67,18 @@
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of England and Wales."
+      "body": "This Agreement is governed by the laws of the State of New York."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Bluebell Security Inc and Delta Foods Inc",
-      "quote": "This Agreement is made between Bluebell Security Inc and Delta Foods Inc.",
+      "value": "Summit IT Services LLC and Acme Analytics Inc",
+      "quote": "This Agreement is made between Summit IT Services LLC and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 November 2024",
-      "quote": "The term commences on 1 November 2024.",
+      "value": "1 October 2024",
+      "quote": "The term commences on 1 October 2024.",
       "clause": "2.1"
     },
     "term": {
@@ -102,8 +102,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "the fees paid in the twelve (12) months before the claim",
-      "quote": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim.",
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
       "clause": "4"
     },
     "termination_rights": {
@@ -117,32 +117,32 @@
       "clause": "7"
     },
     "governing_law": {
-      "value": "England and Wales",
-      "quote": "This Agreement is governed by the laws of England and Wales.",
+      "value": "the State of New York",
+      "quote": "This Agreement is governed by the laws of the State of New York.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2027-10-31",
+    "expiry": "2027-09-30",
     "notice_deadline": null,
     "renewal": null,
     "escalation_dates": [
-      "2025-11-01",
-      "2026-11-01"
+      "2025-10-01",
+      "2026-10-01"
     ],
     "payment_dates": [
-      "2024-11-01",
-      "2025-02-01",
-      "2025-05-01",
-      "2025-08-01",
-      "2025-11-01",
-      "2026-02-01",
-      "2026-05-01",
-      "2026-08-01",
-      "2026-11-01",
-      "2027-02-01",
-      "2027-05-01",
-      "2027-08-01"
+      "2024-10-01",
+      "2025-01-01",
+      "2025-04-01",
+      "2025-07-01",
+      "2025-10-01",
+      "2026-01-01",
+      "2026-04-01",
+      "2026-07-01",
+      "2026-10-01",
+      "2027-01-01",
+      "2027-04-01",
+      "2027-07-01"
     ]
   }
 }

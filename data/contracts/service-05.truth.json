@@ -2,15 +2,15 @@
   "id": "service-05",
   "title": "Services Agreement 05",
   "contract_type": "service",
-  "start": "2026-10-01",
-  "term_years": 5,
+  "start": "2026-04-01",
+  "term_years": 1,
   "holdout": false,
   "expected_review": [],
   "clauses": [
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Clearwater Cleaning Ltd and Cedar Health Ltd."
+      "body": "This Agreement is made between Bluebell Security Inc and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -20,12 +20,12 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 October 2026."
+      "body": "The term commences on 1 April 2026."
     },
     {
       "number": "2.2",
       "heading": "Duration",
-      "body": "The term is five (5) years from the commencement date."
+      "body": "The term is one (1) year from the commencement date."
     },
     {
       "number": "2.3",
@@ -45,7 +45,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at two times the annual fees."
+      "body": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim."
     },
     {
       "number": "5",
@@ -60,28 +60,28 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Agreement at expiry by giving sixty (60) days written notice before the end of the term."
+      "body": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term."
     },
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of the State of California."
+      "body": "This Agreement is governed by the laws of England and Wales."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Clearwater Cleaning Ltd and Cedar Health Ltd",
-      "quote": "This Agreement is made between Clearwater Cleaning Ltd and Cedar Health Ltd.",
+      "value": "Bluebell Security Inc and Acme Analytics Inc",
+      "quote": "This Agreement is made between Bluebell Security Inc and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 October 2026",
-      "quote": "The term commences on 1 October 2026.",
+      "value": "1 April 2026",
+      "quote": "The term commences on 1 April 2026.",
       "clause": "2.1"
     },
     "term": {
-      "value": "five (5) years",
-      "quote": "The term is five (5) years from the commencement date.",
+      "value": "one (1) year",
+      "quote": "The term is one (1) year from the commencement date.",
       "clause": "2.2"
     },
     "auto_renewal": {
@@ -100,8 +100,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "two times the annual fees",
-      "quote": "The liability of either party is capped at two times the annual fees.",
+      "value": "the fees paid in the twelve (12) months before the claim",
+      "quote": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim.",
       "clause": "4"
     },
     "termination_rights": {
@@ -110,47 +110,26 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "sixty (60) days",
-      "quote": "Either party may end this Agreement at expiry by giving sixty (60) days written notice before the end of the term.",
+      "value": "not less than thirty days",
+      "quote": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
-      "value": "the State of California",
-      "quote": "This Agreement is governed by the laws of the State of California.",
+      "value": "England and Wales",
+      "quote": "This Agreement is governed by the laws of England and Wales.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2031-09-30",
-    "notice_deadline": "2031-08-01",
+    "expiry": "2027-03-31",
+    "notice_deadline": "2027-03-01",
     "renewal": null,
-    "escalation_dates": [
-      "2027-10-01",
-      "2028-10-01",
-      "2029-10-01",
-      "2030-10-01"
-    ],
+    "escalation_dates": [],
     "payment_dates": [
+      "2026-04-01",
+      "2026-07-01",
       "2026-10-01",
-      "2027-01-01",
-      "2027-04-01",
-      "2027-07-01",
-      "2027-10-01",
-      "2028-01-01",
-      "2028-04-01",
-      "2028-07-01",
-      "2028-10-01",
-      "2029-01-01",
-      "2029-04-01",
-      "2029-07-01",
-      "2029-10-01",
-      "2030-01-01",
-      "2030-04-01",
-      "2030-07-01",
-      "2030-10-01",
-      "2031-01-01",
-      "2031-04-01",
-      "2031-07-01"
+      "2027-01-01"
     ]
   }
 }

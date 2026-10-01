@@ -2,15 +2,15 @@
   "id": "lease-03",
   "title": "Lease Agreement 03",
   "contract_type": "lease",
-  "start": "2024-11-01",
-  "term_years": 5,
+  "start": "2024-06-01",
+  "term_years": 3,
   "holdout": true,
   "expected_review": [],
   "clauses": [
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Lease is made between Harbor Properties LLC and Delta Foods Inc."
+      "body": "This Lease is made between Northgate Realty Inc and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -20,12 +20,12 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 November 2024."
+      "body": "The term commences on 1 June 2024."
     },
     {
       "number": "2.2",
       "heading": "Duration",
-      "body": "The term is five (5) years from the commencement date."
+      "body": "The term is three (3) years from the commencement date."
     },
     {
       "number": "2.3",
@@ -45,7 +45,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at USD 50,000."
+      "body": "The liability of either party is capped at two times the annual fees."
     },
     {
       "number": "5",
@@ -60,28 +60,28 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term."
+      "body": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term."
     },
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Lease is governed by the laws of England and Wales."
+      "body": "This Lease is governed by the laws of the State of New York."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Harbor Properties LLC and Delta Foods Inc",
-      "quote": "This Lease is made between Harbor Properties LLC and Delta Foods Inc.",
+      "value": "Northgate Realty Inc and Acme Analytics Inc",
+      "quote": "This Lease is made between Northgate Realty Inc and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 November 2024",
-      "quote": "The term commences on 1 November 2024.",
+      "value": "1 June 2024",
+      "quote": "The term commences on 1 June 2024.",
       "clause": "2.1"
     },
     "term": {
-      "value": "five (5) years",
-      "quote": "The term is five (5) years from the commencement date.",
+      "value": "three (3) years",
+      "quote": "The term is three (3) years from the commencement date.",
       "clause": "2.2"
     },
     "auto_renewal": {
@@ -100,8 +100,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "USD 50,000",
-      "quote": "The liability of either party is capped at USD 50,000.",
+      "value": "two times the annual fees",
+      "quote": "The liability of either party is capped at two times the annual fees.",
       "clause": "4"
     },
     "termination_rights": {
@@ -110,27 +110,30 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "not less than thirty days",
-      "quote": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term.",
+      "value": "sixty (60) days",
+      "quote": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
-      "value": "England and Wales",
-      "quote": "This Lease is governed by the laws of England and Wales.",
+      "value": "the State of New York",
+      "quote": "This Lease is governed by the laws of the State of New York.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2029-10-31",
-    "notice_deadline": "2029-10-01",
-    "renewal": "2029-11-01",
+    "expiry": "2027-05-31",
+    "notice_deadline": "2027-04-01",
+    "renewal": "2027-06-01",
     "escalation_dates": [
-      "2025-11-01",
-      "2026-11-01",
-      "2027-11-01",
-      "2028-11-01"
+      "2025-06-01",
+      "2026-06-01"
     ],
     "payment_dates": [
+      "2024-06-01",
+      "2024-07-01",
+      "2024-08-01",
+      "2024-09-01",
+      "2024-10-01",
       "2024-11-01",
       "2024-12-01",
       "2025-01-01",
@@ -161,36 +164,7 @@
       "2027-02-01",
       "2027-03-01",
       "2027-04-01",
-      "2027-05-01",
-      "2027-06-01",
-      "2027-07-01",
-      "2027-08-01",
-      "2027-09-01",
-      "2027-10-01",
-      "2027-11-01",
-      "2027-12-01",
-      "2028-01-01",
-      "2028-02-01",
-      "2028-03-01",
-      "2028-04-01",
-      "2028-05-01",
-      "2028-06-01",
-      "2028-07-01",
-      "2028-08-01",
-      "2028-09-01",
-      "2028-10-01",
-      "2028-11-01",
-      "2028-12-01",
-      "2029-01-01",
-      "2029-02-01",
-      "2029-03-01",
-      "2029-04-01",
-      "2029-05-01",
-      "2029-06-01",
-      "2029-07-01",
-      "2029-08-01",
-      "2029-09-01",
-      "2029-10-01"
+      "2027-05-01"
     ]
   }
 }

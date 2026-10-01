@@ -2,7 +2,7 @@
   "id": "vendor-02",
   "title": "Supply Agreement 02",
   "contract_type": "vendor",
-  "start": "2026-10-01",
+  "start": "2024-06-01",
   "term_years": 5,
   "holdout": false,
   "expected_review": [],
@@ -10,7 +10,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Meridian Parts LLC and Acme Analytics Inc."
+      "body": "This Agreement is made between Brightpath Supplies Inc and Delta Foods Inc."
     },
     {
       "number": "2",
@@ -20,7 +20,7 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 October 2026."
+      "body": "The term commences on 1 June 2024."
     },
     {
       "number": "2.2",
@@ -30,7 +30,7 @@
     {
       "number": "2.3",
       "heading": "Renewal",
-      "body": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7."
+      "body": "This Agreement does not renew automatically."
     },
     {
       "number": "3",
@@ -60,23 +60,23 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term."
+      "body": "Either party may end this Agreement at expiry by giving ninety (90) days written notice before the end of the term."
     },
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of the State of New York."
+      "body": "This Agreement is governed by the laws of the State of California."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Meridian Parts LLC and Acme Analytics Inc",
-      "quote": "This Agreement is made between Meridian Parts LLC and Acme Analytics Inc.",
+      "value": "Brightpath Supplies Inc and Delta Foods Inc",
+      "quote": "This Agreement is made between Brightpath Supplies Inc and Delta Foods Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 October 2026",
-      "quote": "The term commences on 1 October 2026.",
+      "value": "1 June 2024",
+      "quote": "The term commences on 1 June 2024.",
       "clause": "2.1"
     },
     "term": {
@@ -85,8 +85,8 @@
       "clause": "2.2"
     },
     "auto_renewal": {
-      "value": "renews automatically for successive one-year terms",
-      "quote": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7.",
+      "value": "does not renew automatically",
+      "quote": "This Agreement does not renew automatically.",
       "clause": "2.3"
     },
     "payment_terms": {
@@ -110,22 +110,50 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "three (3) months",
-      "quote": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term.",
+      "value": "ninety (90) days",
+      "quote": "Either party may end this Agreement at expiry by giving ninety (90) days written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
-      "value": "the State of New York",
-      "quote": "This Agreement is governed by the laws of the State of New York.",
+      "value": "the State of California",
+      "quote": "This Agreement is governed by the laws of the State of California.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2031-09-30",
-    "notice_deadline": "2031-06-30",
-    "renewal": "2031-10-01",
+    "expiry": "2029-05-31",
+    "notice_deadline": "2029-03-02",
+    "renewal": null,
     "escalation_dates": [],
     "payment_dates": [
+      "2024-06-15",
+      "2024-07-15",
+      "2024-08-15",
+      "2024-09-15",
+      "2024-10-15",
+      "2024-11-15",
+      "2024-12-15",
+      "2025-01-15",
+      "2025-02-15",
+      "2025-03-15",
+      "2025-04-15",
+      "2025-05-15",
+      "2025-06-15",
+      "2025-07-15",
+      "2025-08-15",
+      "2025-09-15",
+      "2025-10-15",
+      "2025-11-15",
+      "2025-12-15",
+      "2026-01-15",
+      "2026-02-15",
+      "2026-03-15",
+      "2026-04-15",
+      "2026-05-15",
+      "2026-06-15",
+      "2026-07-15",
+      "2026-08-15",
+      "2026-09-15",
       "2026-10-15",
       "2026-11-15",
       "2026-12-15",
@@ -157,35 +185,7 @@
       "2029-02-15",
       "2029-03-15",
       "2029-04-15",
-      "2029-05-15",
-      "2029-06-15",
-      "2029-07-15",
-      "2029-08-15",
-      "2029-09-15",
-      "2029-10-15",
-      "2029-11-15",
-      "2029-12-15",
-      "2030-01-15",
-      "2030-02-15",
-      "2030-03-15",
-      "2030-04-15",
-      "2030-05-15",
-      "2030-06-15",
-      "2030-07-15",
-      "2030-08-15",
-      "2030-09-15",
-      "2030-10-15",
-      "2030-11-15",
-      "2030-12-15",
-      "2031-01-15",
-      "2031-02-15",
-      "2031-03-15",
-      "2031-04-15",
-      "2031-05-15",
-      "2031-06-15",
-      "2031-07-15",
-      "2031-08-15",
-      "2031-09-15"
+      "2029-05-15"
     ]
   }
 }

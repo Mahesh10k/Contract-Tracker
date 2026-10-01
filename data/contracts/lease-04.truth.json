@@ -2,7 +2,7 @@
   "id": "lease-04",
   "title": "Lease Agreement 04",
   "contract_type": "lease",
-  "start": "2026-09-01",
+  "start": "2026-04-01",
   "term_years": 1,
   "holdout": false,
   "expected_review": [],
@@ -10,7 +10,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Lease is made between Oakline Estates Ltd and Delta Foods Inc."
+      "body": "This Lease is made between Oakline Estates Ltd and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -20,7 +20,7 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 September 2026."
+      "body": "The term commences on 1 April 2026."
     },
     {
       "number": "2.2",
@@ -45,7 +45,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at USD 50,000."
+      "body": "The liability of either party is capped at two times the annual fees."
     },
     {
       "number": "5",
@@ -60,7 +60,7 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term."
+      "body": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term."
     },
     {
       "number": "8",
@@ -70,13 +70,13 @@
   ],
   "fields": {
     "parties": {
-      "value": "Oakline Estates Ltd and Delta Foods Inc",
-      "quote": "This Lease is made between Oakline Estates Ltd and Delta Foods Inc.",
+      "value": "Oakline Estates Ltd and Acme Analytics Inc",
+      "quote": "This Lease is made between Oakline Estates Ltd and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 September 2026",
-      "quote": "The term commences on 1 September 2026.",
+      "value": "1 April 2026",
+      "quote": "The term commences on 1 April 2026.",
       "clause": "2.1"
     },
     "term": {
@@ -100,8 +100,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "USD 50,000",
-      "quote": "The liability of either party is capped at USD 50,000.",
+      "value": "two times the annual fees",
+      "quote": "The liability of either party is capped at two times the annual fees.",
       "clause": "4"
     },
     "termination_rights": {
@@ -110,8 +110,8 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "not less than thirty days",
-      "quote": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term.",
+      "value": "sixty (60) days",
+      "quote": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
@@ -121,23 +121,23 @@
     }
   },
   "expected": {
-    "expiry": "2027-08-31",
-    "notice_deadline": "2027-08-01",
-    "renewal": "2027-09-01",
+    "expiry": "2027-03-31",
+    "notice_deadline": "2027-01-30",
+    "renewal": "2027-04-01",
     "escalation_dates": [],
     "payment_dates": [
+      "2026-04-01",
+      "2026-05-01",
+      "2026-06-01",
+      "2026-07-01",
+      "2026-08-01",
       "2026-09-01",
       "2026-10-01",
       "2026-11-01",
       "2026-12-01",
       "2027-01-01",
       "2027-02-01",
-      "2027-03-01",
-      "2027-04-01",
-      "2027-05-01",
-      "2027-06-01",
-      "2027-07-01",
-      "2027-08-01"
+      "2027-03-01"
     ]
   }
 }

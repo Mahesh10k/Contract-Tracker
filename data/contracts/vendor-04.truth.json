@@ -2,8 +2,8 @@
   "id": "vendor-04",
   "title": "Supply Agreement 04",
   "contract_type": "vendor",
-  "start": "2025-07-01",
-  "term_years": 2,
+  "start": "2025-12-01",
+  "term_years": 3,
   "holdout": false,
   "expected_review": [
     "notice_period"
@@ -12,7 +12,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Agreement is made between Meridian Parts LLC and Delta Foods Inc."
+      "body": "This Agreement is made between Copperleaf Trading Ltd and Acme Analytics Inc."
     },
     {
       "number": "2",
@@ -22,12 +22,12 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 July 2025."
+      "body": "The term commences on 1 December 2025."
     },
     {
       "number": "2.2",
       "heading": "Duration",
-      "body": "The term is two (2) years from the commencement date."
+      "body": "The term is three (3) years from the commencement date."
     },
     {
       "number": "2.3",
@@ -47,7 +47,7 @@
     {
       "number": "4",
       "heading": "Limitation of Liability",
-      "body": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim."
+      "body": "The liability of either party is capped at USD 50,000."
     },
     {
       "number": "5",
@@ -67,23 +67,23 @@
     {
       "number": "8",
       "heading": "Governing Law",
-      "body": "This Agreement is governed by the laws of England and Wales."
+      "body": "This Agreement is governed by the laws of the State of New York."
     }
   ],
   "fields": {
     "parties": {
-      "value": "Meridian Parts LLC and Delta Foods Inc",
-      "quote": "This Agreement is made between Meridian Parts LLC and Delta Foods Inc.",
+      "value": "Copperleaf Trading Ltd and Acme Analytics Inc",
+      "quote": "This Agreement is made between Copperleaf Trading Ltd and Acme Analytics Inc.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 July 2025",
-      "quote": "The term commences on 1 July 2025.",
+      "value": "1 December 2025",
+      "quote": "The term commences on 1 December 2025.",
       "clause": "2.1"
     },
     "term": {
-      "value": "two (2) years",
-      "quote": "The term is two (2) years from the commencement date.",
+      "value": "three (3) years",
+      "quote": "The term is three (3) years from the commencement date.",
       "clause": "2.2"
     },
     "auto_renewal": {
@@ -102,8 +102,8 @@
       "clause": "3.1"
     },
     "liability_cap": {
-      "value": "the fees paid in the twelve (12) months before the claim",
-      "quote": "The liability of either party is capped at the fees paid in the twelve (12) months before the claim.",
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
       "clause": "4"
     },
     "termination_rights": {
@@ -117,22 +117,17 @@
       "clause": "7"
     },
     "governing_law": {
-      "value": "England and Wales",
-      "quote": "This Agreement is governed by the laws of England and Wales.",
+      "value": "the State of New York",
+      "quote": "This Agreement is governed by the laws of the State of New York.",
       "clause": "8"
     }
   },
   "expected": {
-    "expiry": "2027-06-30",
+    "expiry": "2028-11-30",
     "notice_deadline": null,
-    "renewal": "2027-07-01",
+    "renewal": "2028-12-01",
     "escalation_dates": [],
     "payment_dates": [
-      "2025-07-15",
-      "2025-08-15",
-      "2025-09-15",
-      "2025-10-15",
-      "2025-11-15",
       "2025-12-15",
       "2026-01-15",
       "2026-02-15",
@@ -151,7 +146,24 @@
       "2027-03-15",
       "2027-04-15",
       "2027-05-15",
-      "2027-06-15"
+      "2027-06-15",
+      "2027-07-15",
+      "2027-08-15",
+      "2027-09-15",
+      "2027-10-15",
+      "2027-11-15",
+      "2027-12-15",
+      "2028-01-15",
+      "2028-02-15",
+      "2028-03-15",
+      "2028-04-15",
+      "2028-05-15",
+      "2028-06-15",
+      "2028-07-15",
+      "2028-08-15",
+      "2028-09-15",
+      "2028-10-15",
+      "2028-11-15"
     ]
   }
 }

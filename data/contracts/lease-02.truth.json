@@ -2,7 +2,7 @@
   "id": "lease-02",
   "title": "Lease Agreement 02",
   "contract_type": "lease",
-  "start": "2026-08-01",
+  "start": "2026-02-01",
   "term_years": 2,
   "holdout": false,
   "expected_review": [],
@@ -10,7 +10,7 @@
     {
       "number": "1",
       "heading": "Parties",
-      "body": "This Lease is made between Northgate Realty Inc and Delta Foods Inc."
+      "body": "This Lease is made between Harbor Properties LLC and Cedar Health Ltd."
     },
     {
       "number": "2",
@@ -20,7 +20,7 @@
     {
       "number": "2.1",
       "heading": "Commencement",
-      "body": "The term commences on 1 August 2026."
+      "body": "The term commences on 1 February 2026."
     },
     {
       "number": "2.2",
@@ -60,7 +60,7 @@
     {
       "number": "7",
       "heading": "Notice of Non-Renewal",
-      "body": "Either party may end this Lease at expiry by giving ninety (90) days written notice before the end of the term."
+      "body": "Either party may end this Lease at expiry by giving three (3) months written notice before the end of the term."
     },
     {
       "number": "8",
@@ -70,13 +70,13 @@
   ],
   "fields": {
     "parties": {
-      "value": "Northgate Realty Inc and Delta Foods Inc",
-      "quote": "This Lease is made between Northgate Realty Inc and Delta Foods Inc.",
+      "value": "Harbor Properties LLC and Cedar Health Ltd",
+      "quote": "This Lease is made between Harbor Properties LLC and Cedar Health Ltd.",
       "clause": "1"
     },
     "effective_date": {
-      "value": "1 August 2026",
-      "quote": "The term commences on 1 August 2026.",
+      "value": "1 February 2026",
+      "quote": "The term commences on 1 February 2026.",
       "clause": "2.1"
     },
     "term": {
@@ -110,8 +110,8 @@
       "clause": "5"
     },
     "notice_period": {
-      "value": "ninety (90) days",
-      "quote": "Either party may end this Lease at expiry by giving ninety (90) days written notice before the end of the term.",
+      "value": "three (3) months",
+      "quote": "Either party may end this Lease at expiry by giving three (3) months written notice before the end of the term.",
       "clause": "7"
     },
     "governing_law": {
@@ -121,13 +121,19 @@
     }
   },
   "expected": {
-    "expiry": "2028-07-31",
-    "notice_deadline": "2028-05-02",
+    "expiry": "2028-01-31",
+    "notice_deadline": "2027-10-31",
     "renewal": null,
     "escalation_dates": [
-      "2027-08-01"
+      "2027-02-01"
     ],
     "payment_dates": [
+      "2026-02-01",
+      "2026-03-01",
+      "2026-04-01",
+      "2026-05-01",
+      "2026-06-01",
+      "2026-07-01",
       "2026-08-01",
       "2026-09-01",
       "2026-10-01",
@@ -145,13 +151,7 @@
       "2027-10-01",
       "2027-11-01",
       "2027-12-01",
-      "2028-01-01",
-      "2028-02-01",
-      "2028-03-01",
-      "2028-04-01",
-      "2028-05-01",
-      "2028-06-01",
-      "2028-07-01"
+      "2028-01-01"
     ]
   }
 }
