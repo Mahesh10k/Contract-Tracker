@@ -37,6 +37,7 @@ FIELDS = (
 SEED = 2026
 TERMINATION = "either party may terminate for material breach on thirty (30) days written notice"
 TYPES = ("lease", "vendor", "service")
+CONTRACT_IDS = tuple(f"{kind}-{n:02d}" for kind in TYPES for n in range(1, 7))
 # Never used while tuning prompts: the honest score (design note, holdout split).
 HOLDOUT = frozenset({"lease-03", "lease-06", "vendor-03", "vendor-06", "service-06"})
 # Deliberately unparseable notice periods: they must land in needs_review (AC-US-00-003-6).
