@@ -1,0 +1,8 @@
+# Code ownership.
+#
+# GitHub reads this file to request reviews from code owners. No owner is
+# assigned yet (one developer, handle not chosen on 2026-10-01). Add a line
+# such as the one below with your GitHub handle, then enable "Require review
+# from Code Owners" in the branch protection settings if you want it enforced.
+#
+# *   @your-github-handle

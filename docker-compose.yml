@@ -1,0 +1,23 @@
+# Local services for ContractTracker (ADR-0003, ADR-0010).
+services:
+  postgres:
+    # Postgres 16 with the pgvector extension (ADR-0003); the stock postgres:16 image has no pgvector.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: contract-tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: ["${POSTGRES_PORT:-5432}:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+  mailhog:
+    # Captures reminder email locally; nothing reaches a real inbox (ADR-0010).
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "${SMTP_PORT:-1025}:1025"
+      - "${MAILHOG_UI_PORT:-8025}:8025"
+volumes:
+  pgdata: {}
