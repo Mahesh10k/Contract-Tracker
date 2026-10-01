@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from sqlalchemy import FromClause, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from structlog.testing import capture_logs
 
 from app.core.errors import NotFoundError
 from app.db.tables import clauses, contracts
@@ -220,3 +221,30 @@ async def test_tc0024_failure_while_storing_clauses_leaves_nothing(
 
     assert await count(session, contracts) == 0
     assert await count(session, clauses) == 0
+
+
+async def test_truth_json_with_an_unknown_type_is_refused_with_a_message(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    write(tmp_path, "lorry-01.pdf", text_pdf("1 Parties\nA and B."))
+    (tmp_path / "lorry-01.truth.json").write_text('{"contract_type": "lorry", "title": "Lorry 01"}')
+
+    with pytest.raises(InvalidContractError) as raised:
+        await ingest_file(session, tmp_path / "lorry-01.pdf")
+
+    assert (
+        raised.value.message
+        == "lorry-01.truth.json: contract_type must be lease, vendor or service"
+    )
+    assert await count(session, contracts) == 0
+
+
+async def test_loading_logs_the_contract_and_its_clause_count(
+    session: AsyncSession, generated: Path
+) -> None:
+    with capture_logs() as logs:
+        await ingest_file(session, generated / "lease-01.pdf")
+        await ingest_file(session, generated / "lease-01.pdf")
+
+    events = [(e["event"], e.get("clauses")) for e in logs]
+    assert events == [("contract_loaded", 12), ("contract_already_loaded", None)]

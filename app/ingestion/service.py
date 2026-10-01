@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import anyio
+import structlog
 from sqlalchemy import insert, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +23,8 @@ from app.ingestion.pdf import read_pdf
 from app.ingestion.splitter import Clause, split_clauses
 
 CONTRACT_TYPES = ("lease", "vendor", "service")
+
+log = structlog.get_logger()
 
 
 class ContractTypeRequiredError(DomainError):
@@ -52,7 +55,12 @@ async def _type_and_title(path: Path, contract_type: str | None) -> tuple[str, s
     truth = anyio.Path(path.with_name(f"{path.stem}.truth.json"))
     if await truth.exists():
         data = json.loads(await truth.read_text())
-        return str(data["contract_type"]), str(data["title"])
+        kind, title = data.get("contract_type"), data.get("title")
+        if kind not in CONTRACT_TYPES or not isinstance(title, str):
+            raise InvalidContractError(
+                f"{truth.name}: contract_type must be lease, vendor or service"
+            )
+        return str(kind), title
     if contract_type not in CONTRACT_TYPES:
         raise ContractTypeRequiredError("Contract type required: --type lease, vendor or service")
     return contract_type, path.stem
@@ -70,6 +78,7 @@ async def ingest_file(
         )
     ).first()
     if existing:
+        log.info("contract_already_loaded", file=path.name, contract_id=str(existing.id))
         return IngestResult(contract_id=existing.id, title=existing.title, created=False)
 
     kind, title = await _type_and_title(path, contract_type)
@@ -92,7 +101,9 @@ async def ingest_file(
             contract_id: uuid.UUID = inserted.scalar_one()
             await session.execute(insert(clauses), _clause_rows(contract_id, found))
     except IntegrityError as exc:
+        log.warning("contract_refused", file=path.name, reason="integrity")
         raise InvalidContractError(f"Contract could not be stored: {path.name}") from exc
+    log.info("contract_loaded", file=path.name, contract_id=str(contract_id), clauses=len(found))
     return IngestResult(contract_id=contract_id, title=title, created=True)
 
 
