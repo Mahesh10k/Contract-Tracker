@@ -106,7 +106,8 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        # pgvector build of Postgres 16: migration 0001 runs CREATE EXTENSION vector (ADR-0003).
+        image: pgvector/pgvector:pg16
         env: { POSTGRES_DB: app_test, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
         ports: ["5432:5432"]
         options: --health-cmd "pg_isready -U postgres" --health-interval 5s --health-retries 10
