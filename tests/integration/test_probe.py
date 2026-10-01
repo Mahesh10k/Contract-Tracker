@@ -6,7 +6,7 @@ Retargeted from the scaffold's schema_probe table to contracts when migration
 
 import pytest
 from sqlalchemy import func, insert, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from app.db.tables import contracts
 
@@ -28,17 +28,21 @@ async def test_tc0022_contracts_table_exists_and_is_empty(session: AsyncSession)
     assert count == 0
 
 
-async def test_tc0023_insert_is_rolled_back_between_tests_a(session: AsyncSession) -> None:
-    await session.execute(insert(contracts).values(**PROBE))
+async def test_tc0023_a_rolled_back_insert_is_invisible_to_the_next_connection(
+    engine: AsyncEngine,
+) -> None:
+    # Same begin-then-rollback pattern as the session fixture, in one test, so the
+    # proof does not depend on test order.
+    async with engine.connect() as first:
+        transaction = await first.begin()
+        await first.execute(insert(contracts).values(**PROBE))
+        await transaction.rollback()
 
-    count = await session.scalar(select(func.count()).select_from(contracts))
-
-    assert count == 1
-
-
-async def test_tc0023_insert_is_rolled_back_between_tests_b(session: AsyncSession) -> None:
-    count = await session.scalar(
-        select(func.count()).select_from(contracts).where(contracts.c.title == "Isolation probe")
-    )
+    async with engine.connect() as second:
+        count = await second.scalar(
+            select(func.count())
+            .select_from(contracts)
+            .where(contracts.c.title == "Isolation probe")
+        )
 
     assert count == 0

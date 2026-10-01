@@ -12,11 +12,14 @@ from app.db.tables import clauses, contracts
 from app.ingestion.pdf import NoTextLayerError, UnreadablePdfError
 from app.ingestion.service import (
     ContractTypeRequiredError,
+    FileMissingError,
     InvalidContractError,
+    NoClausesError,
     get_clause,
     ingest_file,
 )
-from evals.contracts.generate import generate
+from app.ingestion.splitter import Clause
+from evals.contracts.generate import CONTRACT_IDS, generate
 from evals.contracts.truth import load_truth
 from tests.pdf_fixtures import image_only_pdf, text_pdf
 
@@ -28,11 +31,6 @@ def generated(tmp_path_factory: pytest.TempPathFactory) -> Path:
     out = tmp_path_factory.mktemp("contracts")
     generate(out)
     return out
-
-
-@pytest.fixture(scope="module")
-def truth_paths(generated: Path) -> list[Path]:
-    return sorted(generated.glob("*.truth.json"))
 
 
 def write(tmp_path: Path, name: str, data: bytes) -> Path:
@@ -82,23 +80,20 @@ async def test_tc0003_one_page_one_clause_contract_is_stored(
     assert list(await session.scalars(select(clauses.c.clause_number))) == ["1"]
 
 
+@pytest.mark.parametrize("contract_id", CONTRACT_IDS)
 async def test_tc0004_every_generated_contract_stores_its_truth_clauses(
-    session: AsyncSession, truth_paths: list[Path]
+    session: AsyncSession, generated: Path, contract_id: str
 ) -> None:
-    mismatched = []
-    for truth_path in truth_paths:
-        truth = load_truth(truth_path)
-        result = await ingest_file(session, truth_path.with_name(f"{truth['id']}.pdf"))
-        stored = await session.execute(
-            select(clauses.c.clause_number, clauses.c.heading)
-            .where(clauses.c.contract_id == result.contract_id)
-            .order_by(clauses.c.position)
-        )
-        if [tuple(r) for r in stored] != [(c["number"], c["heading"]) for c in truth["clauses"]]:
-            mismatched.append(truth["id"])
+    truth = load_truth(generated / f"{contract_id}.truth.json")
 
-    assert mismatched == []
-    assert await count(session, contracts) == 18
+    result = await ingest_file(session, generated / f"{contract_id}.pdf")
+
+    stored = await session.execute(
+        select(clauses.c.clause_number, clauses.c.heading)
+        .where(clauses.c.contract_id == result.contract_id)
+        .order_by(clauses.c.position)
+    )
+    assert [tuple(r) for r in stored] == [(c["number"], c["heading"]) for c in truth["clauses"]]
 
 
 async def test_tc0008_clause_7_2_is_returned_without_its_neighbours(
@@ -211,16 +206,54 @@ async def test_tc0016_file_with_one_different_character_is_a_new_contract(
 
 
 async def test_tc0024_failure_while_storing_clauses_leaves_nothing(
-    session: AsyncSession, tmp_path: Path
+    session: AsyncSession, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    text = "1 Parties\nA and B.\n2 Term\n\n3 Payment\nMonthly."
-    path = write(tmp_path, "blank-clause.pdf", text_pdf(text))
+    # The splitter never yields an empty body, so the refusal is injected at its seam.
+    refused = [Clause("1", "Parties", "A and B."), Clause("2", "Term", " ")]
+    monkeypatch.setattr("app.ingestion.service.split_clauses", lambda _text: refused)
+    path = write(tmp_path, "blank-clause.pdf", text_pdf("1 Parties\nA and B."))
 
-    with pytest.raises(InvalidContractError):
+    with pytest.raises(InvalidContractError) as raised:
         await ingest_file(session, path, contract_type="lease")
 
+    assert raised.value.message == (
+        "Contract could not be stored: blank-clause.pdf (chk_clauses_body_not_blank)"
+    )
     assert await count(session, contracts) == 0
     assert await count(session, clauses) == 0
+
+
+async def test_pdf_with_no_numbered_clauses_is_refused_with_a_message(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    path = write(tmp_path, "plain.pdf", text_pdf("This agreement has no numbered clauses at all."))
+
+    with pytest.raises(NoClausesError) as raised:
+        await ingest_file(session, path, contract_type="lease")
+
+    assert raised.value.message == "No numbered clauses found in plain.pdf"
+    assert await count(session, contracts) == 0
+
+
+async def test_missing_file_is_refused_with_a_message(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    with pytest.raises(FileMissingError) as raised:
+        await ingest_file(session, tmp_path / "typo.pdf", contract_type="lease")
+
+    assert raised.value.message == "File not found: typo.pdf"
+
+
+async def test_malformed_truth_json_is_refused_with_a_message(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    write(tmp_path, "lease-77.pdf", text_pdf("1 Parties\nA and B."))
+    (tmp_path / "lease-77.truth.json").write_text("{not json")
+
+    with pytest.raises(InvalidContractError) as raised:
+        await ingest_file(session, tmp_path / "lease-77.pdf")
+
+    assert raised.value.message == "lease-77.truth.json: not valid JSON"
 
 
 async def test_truth_json_with_an_unknown_type_is_refused_with_a_message(

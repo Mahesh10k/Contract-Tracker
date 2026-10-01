@@ -66,3 +66,17 @@ async def test_tc0014_second_load_reports_already_loaded(
 
     assert code == 0
     assert "Already loaded as Lease Agreement 01" in capsys.readouterr().out
+
+
+async def test_missing_file_does_not_stop_the_other_files(
+    factory: async_sessionmaker[AsyncSession], tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # TASK-001 review finding 2: a missing path used to end the run with a traceback.
+    generate(tmp_path)
+
+    code = await run([tmp_path / "typo.pdf", tmp_path / "lease-01.pdf"], None, factory)
+
+    output = capsys.readouterr()
+    assert code == 1
+    assert "typo.pdf: File not found: typo.pdf" in output.err
+    assert "lease-01.pdf: Loaded Lease Agreement 01" in output.out

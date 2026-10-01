@@ -61,3 +61,39 @@ def test_tc0007_heading_hyphenated_across_lines_is_rejoined() -> None:
         Clause(number="12.10", heading="Limitation of Liability", body="Capped at fees.")
     ]
     assert not clauses[0].heading.endswith("-")
+
+
+def test_a_date_line_before_clause_1_is_preamble_not_a_clause() -> None:
+    # TASK-001 review finding 3: "1 March 2026" used to become clause 1.
+    text = "1 March 2026\n1 Parties\nAcme and Beta.\n2 Term\nThree years."
+
+    clauses = split_clauses(text)
+
+    assert [(c.number, c.heading) for c in clauses] == [("1", "Parties"), ("2", "Term")]
+
+
+def test_a_numbered_address_before_clause_1_is_not_a_clause() -> None:
+    # TASK-001 review finding 3: "100 Main Street" used to swallow the contract.
+    text = "100 Main Street\n1 Parties\nAcme and Beta.\n2 Term\nThree years."
+
+    clauses = split_clauses(text)
+
+    assert [c.number for c in clauses] == ["1", "2"]
+
+
+def test_heading_with_a_trailing_dot_after_the_number_is_a_heading() -> None:
+    # TASK-001 review finding 5: TC-0003's documented data is "1. Services".
+    text = "1. Services\nCleaning of the offices.\n2. Fees\nMonthly."
+
+    clauses = split_clauses(text)
+
+    assert [(c.number, c.heading) for c in clauses] == [("1", "Services"), ("2", "Fees")]
+
+
+def test_heading_only_parent_clause_takes_its_heading_as_body() -> None:
+    # TASK-001 review finding 4: an empty body made the database refuse the contract.
+    text = "2 Term\n2.1 Commencement\nStarts 1 March 2026."
+
+    clauses = split_clauses(text)
+
+    assert clauses[0] == Clause(number="2", heading="Term", body="Term")

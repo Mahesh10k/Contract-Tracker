@@ -8,7 +8,7 @@ import pytest
 
 from app.ingestion.pdf import read_pdf
 from app.ingestion.splitter import split_clauses
-from evals.contracts.generate import FIELDS, generate
+from evals.contracts.generate import CONTRACT_IDS, FIELDS, HOLDOUT, UNPARSEABLE_NOTICE, generate
 from evals.contracts.truth import Truth, load_truth
 
 
@@ -48,28 +48,35 @@ def test_every_contract_has_all_ten_fields(truths: dict[str, Truth]) -> None:
     assert {tuple(sorted(t["fields"])) for t in truths.values()} == {tuple(sorted(FIELDS))}
 
 
-def test_every_quote_is_inside_the_clause_it_cites(truths: dict[str, Truth]) -> None:
-    misplaced = [
-        (cid, name)
-        for cid, t in truths.items()
-        for name, field in t["fields"].items()
-        if field["quote"] not in {c["number"]: c["body"] for c in t["clauses"]}[field["clause"]]
-    ]
+@pytest.mark.parametrize("contract_id", CONTRACT_IDS)
+@pytest.mark.parametrize("field", FIELDS)
+def test_every_quote_is_inside_the_clause_it_cites(
+    truths: dict[str, Truth], contract_id: str, field: str
+) -> None:
+    truth = truths[contract_id]
+    cited = truth["fields"][field]
+    bodies = {c["number"]: c["body"] for c in truth["clauses"]}
 
-    assert misplaced == []
+    assert cited["quote"] in bodies[cited["clause"]]
 
 
 def test_five_contracts_are_held_out(truths: dict[str, Truth]) -> None:
-    assert sum(1 for t in truths.values() if t["holdout"]) == 5
+    held = sorted(cid for cid, t in truths.items() if t["holdout"])
+
+    assert held == sorted(HOLDOUT)
 
 
-def test_two_contracts_expect_their_notice_period_in_review(
-    truths: dict[str, Truth],
+def test_two_contracts_expect_their_notice_period_in_review(truths: dict[str, Truth]) -> None:
+    held = sorted(cid for cid, t in truths.items() if t["expected_review"] == ["notice_period"])
+
+    assert held == sorted(UNPARSEABLE_NOTICE)
+
+
+@pytest.mark.parametrize("contract_id", sorted(UNPARSEABLE_NOTICE))
+def test_unparseable_contracts_expect_no_notice_deadline(
+    truths: dict[str, Truth], contract_id: str
 ) -> None:
-    held = [cid for cid, t in truths.items() if t["expected_review"] == ["notice_period"]]
-
-    assert len(held) == 2
-    assert all(truths[cid]["expected"]["notice_deadline"] is None for cid in held)
+    assert truths[contract_id]["expected"]["notice_deadline"] is None
 
 
 def test_lease_01_dates_follow_its_stated_terms(truths: dict[str, Truth]) -> None:
@@ -79,14 +86,11 @@ def test_lease_01_dates_follow_its_stated_terms(truths: dict[str, Truth]) -> Non
     assert len(expected["payment_dates"]) == truths["lease-01"]["term_years"] * 12
 
 
-def test_tc0004_pdf_round_trip_gives_the_truth_clauses(out_dir: Path) -> None:
-    mismatched = []
-    for truth_path in sorted(out_dir.glob("*.truth.json")):
-        truth = load_truth(truth_path)
-        pdf = truth_path.with_name(truth_path.name.replace(".truth.json", ".pdf"))
-        got = [(c.number, c.heading) for c in split_clauses(read_pdf(pdf.read_bytes()).text)]
-        want = [(c["number"], c["heading"]) for c in truth["clauses"]]
-        if got != want:
-            mismatched.append(truth_path.name)
+@pytest.mark.parametrize("contract_id", CONTRACT_IDS)
+def test_tc0004_pdf_round_trip_gives_the_truth_clauses(out_dir: Path, contract_id: str) -> None:
+    truth = load_truth(out_dir / f"{contract_id}.truth.json")
+    pdf = read_pdf((out_dir / f"{contract_id}.pdf").read_bytes())
 
-    assert mismatched == []
+    got = [(c.number, c.heading) for c in split_clauses(pdf.text)]
+
+    assert got == [(c["number"], c["heading"]) for c in truth["clauses"]]

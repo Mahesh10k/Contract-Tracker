@@ -52,3 +52,14 @@ def test_tc0018_truncated_pdf_is_unreadable() -> None:
 def test_tc0019_empty_file_is_unreadable() -> None:
     with pytest.raises(UnreadablePdfError):
         read_pdf(b"")
+
+
+@pytest.mark.parametrize("offset", [143, 305, 403, 492])
+def test_corrupt_byte_that_breaks_pypdf_internals_is_unreadable(offset: int) -> None:
+    # TASK-001 review finding 2: these offsets raised AttributeError, NotImplementedError,
+    # ValueError and KeyError out of pypdf instead of "Not a readable PDF".
+    data = bytearray(text_pdf("1 Parties\nAcme and Beta.\n2 Term\nThree years."))
+    data[offset] ^= 0xFF
+
+    with pytest.raises(UnreadablePdfError):
+        read_pdf(bytes(data))

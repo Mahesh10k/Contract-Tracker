@@ -8,7 +8,6 @@ import io
 from dataclasses import dataclass
 
 from pypdf import PdfReader
-from pypdf.errors import PdfReadError
 
 from app.core.errors import DomainError
 
@@ -40,7 +39,10 @@ def read_pdf(data: bytes) -> PdfText:
     try:
         reader = PdfReader(io.BytesIO(data))
         pages = [page.extract_text() or "" for page in reader.pages]
-    except PdfReadError as exc:
+    # The bytes are untrusted, and pypdf raises far more than PdfReadError on
+    # hostile input (AttributeError, KeyError, ValueError, NotImplementedError,
+    # DependencyError for AES): every parser failure means "not readable".
+    except Exception as exc:  # parser boundary; mapped to one domain error
         raise UnreadablePdfError("Not a readable PDF") from exc
     text = "\n".join(pages)
     if not text.strip():
