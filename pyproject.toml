@@ -113,5 +113,7 @@ source = ["app"]
 
 [tool.coverage.report]
 fail_under = 80
+# Exact comparison: with the default precision 0, coverage rounds 79.55 up to 80 and passes.
+precision = 2
 show_missing = true
 skip_covered = false
