@@ -7,15 +7,20 @@ contracts". `make help` lists every command; `make check` is the gate.
 
 ## What exists today
 
-The Bearing `python-api` skeleton only: a FastAPI app with `/healthz` and
-`/readyz`, settings, structured logging, Alembic with a probe migration, and
-their tests. No ContractTracker feature is built yet.
+- TASK-001 (ingestion): `make contracts` writes 18 synthetic contracts and their
+  `truth.json` answer keys to `data/contracts/` (deterministic; committed).
+  `make ingest FILES="data/contracts/*.pdf"` loads PDFs as contracts and numbered
+  clauses; a PDF without truth.json needs `TYPE=lease|vendor|service`.
+- Migration 0001 creates the full schema from `docs/design/schema.sql`.
+- The Bearing `python-api` skeleton: FastAPI app with `/healthz` and `/readyz`,
+  settings, structured logging, Alembic.
 
 ```
 cp .env.example .env
 make setup            # needs uv; installs Python 3.12 deps and git hooks
-make db && make migrate
-make dev              # http://localhost:8080 (/healthz, /readyz, /docs)
+make db && make migrate   # add POSTGRES_PORT=55432 to every db command if 5432 is taken
+make contracts && make ingest FILES="data/contracts/*.pdf"
+make check            # unit gates; make test-integration needs make db
 ```
 
 `docker compose up -d` starts Postgres 16 with pgvector on 5432 and MailHog
@@ -34,8 +39,6 @@ Built task by task from `docs/product/backlog.md`:
 | TASK-005 | reminders and web UI |
 | TASK-006 | final evals, traceability, README demo |
 
-The planned schema is `docs/design/schema.sql`; it replaces the probe
-migration in TASK-001.
 
 ## Documents
 

@@ -22,7 +22,7 @@ define need_tool
 command -v $(UV) >/dev/null || $(call skip,$(1),uv); $(UV) run --quiet $(2) --version >/dev/null 2>&1 || $(call skip,$(1),$(2))
 endef
 
-.PHONY: help setup dev check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
+.PHONY: help setup dev contracts ingest check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -36,6 +36,13 @@ setup: ## Install Python 3.12, dependencies (writes uv.lock) and git hooks
 
 dev: ## Run the API locally with reload (reads .env if present)
 	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run uvicorn app.main:create_app --factory --reload --host 0.0.0.0 --port "$${PORT:-8080}"
+
+contracts: ## Write the 18 synthetic contracts and their truth.json answer keys to data/contracts (deterministic)
+	$(UV) run python -m evals.contracts.generate data/contracts
+
+ingest: ## Load contract PDFs: make ingest FILES="data/contracts/*.pdf" [TYPE=lease|vendor|service]
+	@[ -n "$(FILES)" ] || { echo "usage: make ingest FILES=\"data/contracts/*.pdf\" [TYPE=lease]" >&2; exit 2; }
+	DATABASE_URL=$(DATABASE_URL) $(UV) run python -m app.ingestion.cli $(FILES) $(if $(TYPE),--type $(TYPE))
 
 format: ## Format
 	$(UV) run ruff format .
@@ -54,10 +61,10 @@ lint: ## ruff check
 	$(UV) run ruff check . && echo "lint: $$n files checked"
 
 typecheck: ## mypy strict
-	@n=$$(git ls-files -co --exclude-standard 'app/*.py' 'tests/*.py' | wc -l | tr -d ' '); \
+	@n=$$(git ls-files -co --exclude-standard 'app/*.py' 'evals/*.py' 'tests/*.py' | wc -l | tr -d ' '); \
 	[ "$$n" -gt 0 ] || { echo "typecheck: 0 python files, nothing checked" >&2; exit 1; }; \
 	$(call need_tool,typecheck,mypy); \
-	$(UV) run mypy app tests && echo "typecheck: $$n files checked"
+	$(UV) run mypy app evals tests && echo "typecheck: $$n files checked"
 
 test: ## Unit tests with coverage (integration tests excluded)
 	@n=$$(git ls-files -co --exclude-standard 'tests/test_*.py' 'tests/**/test_*.py' | grep -v '^tests/integration/' | wc -l | tr -d ' '); \
