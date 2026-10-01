@@ -19,6 +19,8 @@ contracts". `make help` lists every command; `make check` is the gate.
 cp .env.example .env
 make setup            # needs uv; installs Python 3.12 deps and git hooks
 make db && make migrate   # add POSTGRES_PORT=55432 to every db command if 5432 is taken
+# A database migrated on main before TASK-001 holds the old probe migration:
+# run make db-reset once (it deletes local data) before make migrate.
 make contracts && make ingest FILES="data/contracts/*.pdf"
 make check            # unit gates; make test-integration needs make db
 ```
