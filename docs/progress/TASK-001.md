@@ -10,7 +10,7 @@
 - Acceptance criteria: 9
 
 ## Next
-- definition-of-done, branch-review, merge-request
+- address review comments
 
 ## Done
 - none
