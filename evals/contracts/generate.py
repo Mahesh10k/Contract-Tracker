@@ -286,27 +286,28 @@ def generate(out_dir: Path, seed: int = SEED) -> list[Path]:
     """Write 18 contract PDFs and their truth.json files to `out_dir`; return the truth paths."""
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
-    for contract_type in TYPES:
-        for n in range(1, 7):
-            terms = choose_terms(seed, contract_type, n)
-            title = f"{TITLES[contract_type]} {n:02d}"
-            clauses, fields = clauses_and_fields(terms)
-            truth: Truth = {
-                "id": terms.contract_id,
-                "title": title,
-                "contract_type": contract_type,
-                "start": terms.start.isoformat(),
-                "term_years": terms.years,
-                "holdout": terms.contract_id in HOLDOUT,
-                "expected_review": ["notice_period"] if terms.notice is None else [],
-                "clauses": clauses,
-                "fields": fields,
-                "expected": expected_dates(terms),
-            }
-            (out_dir / f"{terms.contract_id}.pdf").write_bytes(render_pdf(title, clauses))
-            path = out_dir / f"{terms.contract_id}.truth.json"
-            path.write_bytes(TRUTH.dump_json(truth, indent=2) + b"\n")
-            written.append(path)
+    for contract_id in CONTRACT_IDS:
+        contract_type, number = contract_id.rsplit("-", 1)
+        n = int(number)
+        terms = choose_terms(seed, contract_type, n)
+        title = f"{TITLES[contract_type]} {n:02d}"
+        clauses, fields = clauses_and_fields(terms)
+        truth: Truth = {
+            "id": terms.contract_id,
+            "title": title,
+            "contract_type": contract_type,
+            "start": terms.start.isoformat(),
+            "term_years": terms.years,
+            "holdout": terms.contract_id in HOLDOUT,
+            "expected_review": ["notice_period"] if terms.notice is None else [],
+            "clauses": clauses,
+            "fields": fields,
+            "expected": expected_dates(terms),
+        }
+        (out_dir / f"{terms.contract_id}.pdf").write_bytes(render_pdf(title, clauses))
+        path = out_dir / f"{terms.contract_id}.truth.json"
+        path.write_bytes(TRUTH.dump_json(truth, indent=2) + b"\n")
+        written.append(path)
     return written
 
 
