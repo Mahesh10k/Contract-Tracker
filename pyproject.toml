@@ -20,6 +20,8 @@ dependencies = [
   "opentelemetry-sdk>=1.44,<2",
   "opentelemetry-exporter-otlp-proto-http>=1.44,<2",
   "opentelemetry-instrumentation-fastapi>=0.65b0,<1",
+  "pypdf>=6,<7",
+  "fpdf2>=2.8,<3",
 ]
 
 [dependency-groups]
@@ -41,7 +43,7 @@ package = false
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["app", "tests"]
+src = ["app", "evals", "tests"]
 extend-exclude = [".venv"]
 
 [tool.ruff.lint]
@@ -76,14 +78,14 @@ ignore = [
 "app/core/telemetry.py" = ["PLC0415"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "evals"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
 warn_unreachable = true
 plugins = ["pydantic.mypy"]
-files = ["app", "tests"]
+files = ["app", "evals", "tests"]
 
 [tool.pydantic-mypy]
 # init_typed stays off: Settings is built from strings, exactly as the environment provides them.
