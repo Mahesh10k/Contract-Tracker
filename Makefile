@@ -131,11 +131,11 @@ migrate-verify: ## Every Down runs and restores the schema: up, snapshot, down, 
 	diff -u $(STATE)/schema-up.txt $(STATE)/schema-all.txt || { echo "migrate-verify: running every downgrade and every upgrade again changed the schema" >&2; exit 1; }; \
 	echo "migrate-verify: $$n migrations, every downgrade ran, $$o schema objects identical after down and up"
 
-migrate-new: ## Autogenerate the next migration: make migrate-new name=add_invoices
+migrate-new: ## Start the next hand-written migration: make migrate-new name=add_index (no autogenerate, decision D4)
 	@[ -n "$(name)" ] || { echo "usage: make migrate-new name=add_invoices" >&2; exit 2; }
 	@id=$$(printf '%04d' $$(( $$(ls alembic/versions/*.py 2>/dev/null | wc -l) + 1 ))); \
-	DATABASE_URL=$(DATABASE_URL) $(UV) run alembic revision --autogenerate --rev-id "$$id" -m "$(name)" && \
-	echo "migrate-new: alembic/versions/$${id}_$(name).py written; read every line before committing"
+	DATABASE_URL=$(DATABASE_URL) $(UV) run alembic revision --rev-id "$$id" -m "$(name)" && \
+	echo "migrate-new: alembic/versions/$${id}_$(name).py written; write upgrade and downgrade by hand"
 
 doctor: ## Environment diagnostics
 	@echo "uv:        $$(command -v $(UV) >/dev/null && $(UV) --version || echo missing)"
