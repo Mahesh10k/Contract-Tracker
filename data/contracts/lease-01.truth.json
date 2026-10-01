@@ -1,0 +1,143 @@
+{
+  "id": "lease-01",
+  "title": "Lease Agreement 01",
+  "contract_type": "lease",
+  "start": "2026-09-01",
+  "term_years": 1,
+  "holdout": false,
+  "expected_review": [],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Lease is made between Harbor Properties LLC and Cedar Health Ltd."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 September 2026."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is one (1) year from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Lease does not renew automatically."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable monthly in advance on the first day of each month."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Charges increase by 3.5 percent on each anniversary of the commencement date."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at two times the annual fees."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Lease is governed by the laws of the State of California."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Harbor Properties LLC and Cedar Health Ltd",
+      "quote": "This Lease is made between Harbor Properties LLC and Cedar Health Ltd.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 September 2026",
+      "quote": "The term commences on 1 September 2026.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "one (1) year",
+      "quote": "The term is one (1) year from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "does not renew automatically",
+      "quote": "This Lease does not renew automatically.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "monthly in advance on the first day of each month",
+      "quote": "Charges are payable monthly in advance on the first day of each month.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "3.5 percent on each anniversary of the commencement date",
+      "quote": "Charges increase by 3.5 percent on each anniversary of the commencement date.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "two times the annual fees",
+      "quote": "The liability of either party is capped at two times the annual fees.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "sixty (60) days",
+      "quote": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "the State of California",
+      "quote": "This Lease is governed by the laws of the State of California.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2027-08-31",
+    "notice_deadline": "2027-07-02",
+    "renewal": null,
+    "escalation_dates": [],
+    "payment_dates": [
+      "2026-09-01",
+      "2026-10-01",
+      "2026-11-01",
+      "2026-12-01",
+      "2027-01-01",
+      "2027-02-01",
+      "2027-03-01",
+      "2027-04-01",
+      "2027-05-01",
+      "2027-06-01",
+      "2027-07-01",
+      "2027-08-01"
+    ]
+  }
+}
