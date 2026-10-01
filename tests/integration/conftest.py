@@ -2,6 +2,7 @@
 
 import os
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
@@ -20,12 +21,19 @@ async def engine() -> AsyncIterator[AsyncEngine]:
         await engine.dispose()
 
 
-@pytest.fixture
-async def session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
-    """A session inside a transaction that is always rolled back."""
+@asynccontextmanager
+async def rolled_back_session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
+    """A session inside a transaction that is always rolled back (TC-0023 tests this)."""
     async with engine.connect() as connection:
         transaction = await connection.begin()
         try:
             yield AsyncSession(bind=connection, expire_on_commit=False)
         finally:
             await transaction.rollback()
+
+
+@pytest.fixture
+async def session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
+    """Each integration test runs in a rolled-back transaction."""
+    async with rolled_back_session(engine) as session:
+        yield session

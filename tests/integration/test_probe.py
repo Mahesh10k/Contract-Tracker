@@ -9,6 +9,7 @@ from sqlalchemy import func, insert, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from app.db.tables import contracts
+from tests.integration.conftest import rolled_back_session
 
 pytestmark = pytest.mark.integration
 
@@ -28,18 +29,14 @@ async def test_tc0022_contracts_table_exists_and_is_empty(session: AsyncSession)
     assert count == 0
 
 
-async def test_tc0023_a_rolled_back_insert_is_invisible_to_the_next_connection(
+async def test_tc0023_an_insert_made_through_the_test_session_is_rolled_back(
     engine: AsyncEngine,
 ) -> None:
-    # Same begin-then-rollback pattern as the session fixture, in one test, so the
-    # proof does not depend on test order.
-    async with engine.connect() as first:
-        transaction = await first.begin()
-        await first.execute(insert(contracts).values(**PROBE))
-        await transaction.rollback()
+    async with rolled_back_session(engine) as session:
+        await session.execute(insert(contracts).values(**PROBE))
 
-    async with engine.connect() as second:
-        count = await second.scalar(
+    async with engine.connect() as later:
+        count = await later.scalar(
             select(func.count())
             .select_from(contracts)
             .where(contracts.c.title == "Isolation probe")
