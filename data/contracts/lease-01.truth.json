@@ -1,0 +1,157 @@
+{
+  "id": "lease-01",
+  "title": "Lease Agreement 01",
+  "contract_type": "lease",
+  "start": "2025-01-01",
+  "term_years": 2,
+  "holdout": false,
+  "expected_review": [],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Lease is made between Northgate Realty Inc and Delta Foods Inc."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 January 2025."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is two (2) years from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Lease does not renew automatically."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable monthly in advance on the first day of each month."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Charges increase by 3.5 percent on each anniversary of the commencement date."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at USD 50,000."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Lease is governed by the laws of England and Wales."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Northgate Realty Inc and Delta Foods Inc",
+      "quote": "This Lease is made between Northgate Realty Inc and Delta Foods Inc.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 January 2025",
+      "quote": "The term commences on 1 January 2025.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "two (2) years",
+      "quote": "The term is two (2) years from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "does not renew automatically",
+      "quote": "This Lease does not renew automatically.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "monthly in advance on the first day of each month",
+      "quote": "Charges are payable monthly in advance on the first day of each month.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "3.5 percent on each anniversary of the commencement date",
+      "quote": "Charges increase by 3.5 percent on each anniversary of the commencement date.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "not less than thirty days",
+      "quote": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "England and Wales",
+      "quote": "This Lease is governed by the laws of England and Wales.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2026-12-31",
+    "notice_deadline": "2026-12-01",
+    "renewal": null,
+    "escalation_dates": [
+      "2026-01-01"
+    ],
+    "payment_dates": [
+      "2025-01-01",
+      "2025-02-01",
+      "2025-03-01",
+      "2025-04-01",
+      "2025-05-01",
+      "2025-06-01",
+      "2025-07-01",
+      "2025-08-01",
+      "2025-09-01",
+      "2025-10-01",
+      "2025-11-01",
+      "2025-12-01",
+      "2026-01-01",
+      "2026-02-01",
+      "2026-03-01",
+      "2026-04-01",
+      "2026-05-01",
+      "2026-06-01",
+      "2026-07-01",
+      "2026-08-01",
+      "2026-09-01",
+      "2026-10-01",
+      "2026-11-01",
+      "2026-12-01"
+    ]
+  }
+}

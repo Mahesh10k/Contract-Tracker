@@ -1,0 +1,191 @@
+{
+  "id": "vendor-01",
+  "title": "Supply Agreement 01",
+  "contract_type": "vendor",
+  "start": "2024-06-01",
+  "term_years": 5,
+  "holdout": false,
+  "expected_review": [],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Agreement is made between Brightpath Supplies Inc and Beta Logistics LLC."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 June 2024."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is five (5) years from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable monthly on the fifteenth day of each month."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Prices are fixed for the term and do not increase."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at two times the annual fees."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Agreement is governed by the laws of the State of New York."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Brightpath Supplies Inc and Beta Logistics LLC",
+      "quote": "This Agreement is made between Brightpath Supplies Inc and Beta Logistics LLC.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 June 2024",
+      "quote": "The term commences on 1 June 2024.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "five (5) years",
+      "quote": "The term is five (5) years from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "renews automatically for successive one-year terms",
+      "quote": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "monthly on the fifteenth day of each month",
+      "quote": "Charges are payable monthly on the fifteenth day of each month.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "fixed for the term",
+      "quote": "Prices are fixed for the term and do not increase.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "two times the annual fees",
+      "quote": "The liability of either party is capped at two times the annual fees.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "not less than thirty days",
+      "quote": "Either party may end this Agreement at expiry by giving not less than thirty days written notice before the end of the term.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "the State of New York",
+      "quote": "This Agreement is governed by the laws of the State of New York.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2029-05-31",
+    "notice_deadline": "2029-05-01",
+    "renewal": "2029-06-01",
+    "escalation_dates": [],
+    "payment_dates": [
+      "2024-06-15",
+      "2024-07-15",
+      "2024-08-15",
+      "2024-09-15",
+      "2024-10-15",
+      "2024-11-15",
+      "2024-12-15",
+      "2025-01-15",
+      "2025-02-15",
+      "2025-03-15",
+      "2025-04-15",
+      "2025-05-15",
+      "2025-06-15",
+      "2025-07-15",
+      "2025-08-15",
+      "2025-09-15",
+      "2025-10-15",
+      "2025-11-15",
+      "2025-12-15",
+      "2026-01-15",
+      "2026-02-15",
+      "2026-03-15",
+      "2026-04-15",
+      "2026-05-15",
+      "2026-06-15",
+      "2026-07-15",
+      "2026-08-15",
+      "2026-09-15",
+      "2026-10-15",
+      "2026-11-15",
+      "2026-12-15",
+      "2027-01-15",
+      "2027-02-15",
+      "2027-03-15",
+      "2027-04-15",
+      "2027-05-15",
+      "2027-06-15",
+      "2027-07-15",
+      "2027-08-15",
+      "2027-09-15",
+      "2027-10-15",
+      "2027-11-15",
+      "2027-12-15",
+      "2028-01-15",
+      "2028-02-15",
+      "2028-03-15",
+      "2028-04-15",
+      "2028-05-15",
+      "2028-06-15",
+      "2028-07-15",
+      "2028-08-15",
+      "2028-09-15",
+      "2028-10-15",
+      "2028-11-15",
+      "2028-12-15",
+      "2029-01-15",
+      "2029-02-15",
+      "2029-03-15",
+      "2029-04-15",
+      "2029-05-15"
+    ]
+  }
+}

@@ -1,24 +1,45 @@
-"""The migration pipeline produced the schema the models describe."""
+"""The migration pipeline produced the schema, and each test is rolled back.
+
+Retargeted from the scaffold's schema_probe table to contracts when migration
+0001 replaced the probe (review T4, TC-0022, TC-0023).
+"""
 
 import pytest
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, insert, select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from app.db.models import SchemaProbe
+from app.db.tables import contracts
+from tests.integration.conftest import rolled_back_session
 
 pytestmark = pytest.mark.integration
 
+PROBE = {
+    "title": "Isolation probe",
+    "contract_type": "lease",
+    "source_filename": "probe.pdf",
+    "file_sha256": "0" * 64,
+    "full_text": "1 Parties\nA and B.",
+    "page_count": 1,
+}
 
-async def test_probe_table_exists_and_is_empty(session: AsyncSession) -> None:
-    count = await session.scalar(select(func.count()).select_from(SchemaProbe))
+
+async def test_tc0022_contracts_table_exists_and_is_empty(session: AsyncSession) -> None:
+    count = await session.scalar(select(func.count()).select_from(contracts))
 
     assert count == 0
 
 
-async def test_insert_is_rolled_back_between_tests(session: AsyncSession) -> None:
-    session.add(SchemaProbe())
-    await session.flush()
+async def test_tc0023_an_insert_made_through_the_test_session_is_rolled_back(
+    engine: AsyncEngine,
+) -> None:
+    async with rolled_back_session(engine) as session:
+        await session.execute(insert(contracts).values(**PROBE))
 
-    count = await session.scalar(select(func.count()).select_from(SchemaProbe))
+    async with engine.connect() as later:
+        count = await later.scalar(
+            select(func.count())
+            .select_from(contracts)
+            .where(contracts.c.title == "Isolation probe")
+        )
 
-    assert count == 1
+    assert count == 0

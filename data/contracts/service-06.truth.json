@@ -1,0 +1,135 @@
+{
+  "id": "service-06",
+  "title": "Services Agreement 06",
+  "contract_type": "service",
+  "start": "2026-12-01",
+  "term_years": 1,
+  "holdout": true,
+  "expected_review": [],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Agreement is made between Clearwater Cleaning Ltd and Delta Foods Inc."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 December 2026."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is one (1) year from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable quarterly in advance on the first day of each quarter."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Charges increase by 2 percent on each anniversary of the commencement date."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at USD 50,000."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Agreement at expiry by giving ninety (90) days written notice before the end of the term."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Agreement is governed by the laws of the State of California."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Clearwater Cleaning Ltd and Delta Foods Inc",
+      "quote": "This Agreement is made between Clearwater Cleaning Ltd and Delta Foods Inc.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 December 2026",
+      "quote": "The term commences on 1 December 2026.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "one (1) year",
+      "quote": "The term is one (1) year from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "renews automatically for successive one-year terms",
+      "quote": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "quarterly in advance on the first day of each quarter",
+      "quote": "Charges are payable quarterly in advance on the first day of each quarter.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "2 percent on each anniversary of the commencement date",
+      "quote": "Charges increase by 2 percent on each anniversary of the commencement date.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "ninety (90) days",
+      "quote": "Either party may end this Agreement at expiry by giving ninety (90) days written notice before the end of the term.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "the State of California",
+      "quote": "This Agreement is governed by the laws of the State of California.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2027-11-30",
+    "notice_deadline": "2027-09-01",
+    "renewal": "2027-12-01",
+    "escalation_dates": [],
+    "payment_dates": [
+      "2026-12-01",
+      "2027-03-01",
+      "2027-06-01",
+      "2027-09-01"
+    ]
+  }
+}

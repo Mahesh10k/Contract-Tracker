@@ -1,0 +1,148 @@
+{
+  "id": "service-02",
+  "title": "Services Agreement 02",
+  "contract_type": "service",
+  "start": "2024-10-01",
+  "term_years": 3,
+  "holdout": false,
+  "expected_review": [
+    "notice_period"
+  ],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Agreement is made between Summit IT Services LLC and Acme Analytics Inc."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 October 2024."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is three (3) years from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Agreement does not renew automatically."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable quarterly in advance on the first day of each quarter."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Charges increase by 2 percent on each anniversary of the commencement date."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at USD 50,000."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Agreement at expiry by giving written notice upon completion of phase two of the works."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Agreement is governed by the laws of the State of New York."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Summit IT Services LLC and Acme Analytics Inc",
+      "quote": "This Agreement is made between Summit IT Services LLC and Acme Analytics Inc.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 October 2024",
+      "quote": "The term commences on 1 October 2024.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "three (3) years",
+      "quote": "The term is three (3) years from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "does not renew automatically",
+      "quote": "This Agreement does not renew automatically.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "quarterly in advance on the first day of each quarter",
+      "quote": "Charges are payable quarterly in advance on the first day of each quarter.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "2 percent on each anniversary of the commencement date",
+      "quote": "Charges increase by 2 percent on each anniversary of the commencement date.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "USD 50,000",
+      "quote": "The liability of either party is capped at USD 50,000.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "upon completion of phase two of the works",
+      "quote": "Either party may end this Agreement at expiry by giving written notice upon completion of phase two of the works.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "the State of New York",
+      "quote": "This Agreement is governed by the laws of the State of New York.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2027-09-30",
+    "notice_deadline": null,
+    "renewal": null,
+    "escalation_dates": [
+      "2025-10-01",
+      "2026-10-01"
+    ],
+    "payment_dates": [
+      "2024-10-01",
+      "2025-01-01",
+      "2025-04-01",
+      "2025-07-01",
+      "2025-10-01",
+      "2026-01-01",
+      "2026-04-01",
+      "2026-07-01",
+      "2026-10-01",
+      "2027-01-01",
+      "2027-04-01",
+      "2027-07-01"
+    ]
+  }
+}

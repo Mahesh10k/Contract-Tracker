@@ -1,15 +1,20 @@
 """${message}
 
-Revision: ${up_revision}
-Revises: ${down_revision | comma,n}
-Created: ${create_date}
+Migration: ${up_revision}_<name>               Task: <TASK-ID>
+Store: postgres                                Phase: expand | migrate | contract (n of m)
+Purpose: <one sentence: what changes and why>
+Locks: <lock taken, on which table, how long; lock_timeout>
+Rows: <table size and backfill plan, or "none">
+Index: <one entry per new WHERE or ORDER BY shape, or "none: no new shape">
+Retention / PII: <window or none>; <personal-data fields or "no PII">
+Down: <what it reverts>; Down loses: <DATA LOST, or "nothing">; tested in: make migrate-verify
 
-Index decision: <state which filters this serves, or "none">.
+Revises: ${down_revision | comma,n}    Created: ${create_date}
+Hand-written (decision D4): write upgrade and downgrade below; never autogenerate.
 """
 
 from collections.abc import Sequence
 
-import sqlalchemy as sa
 from alembic import op
 ${imports if imports else ""}
 
@@ -21,9 +26,9 @@ depends_on: str | Sequence[str] | None = ${repr(depends_on)}
 
 def upgrade() -> None:
     """Apply this migration."""
-    ${upgrades if upgrades else "pass"}
+    ${upgrades if upgrades else "op.execute(\"SELECT 1\")  # replace with the real change"}
 
 
 def downgrade() -> None:
     """Undo this migration. It must work; `make migrate-down` proves it."""
-    ${downgrades if downgrades else "pass"}
+    ${downgrades if downgrades else "op.execute(\"SELECT 1\")  # replace with the real undo"}
