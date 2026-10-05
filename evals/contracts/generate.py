@@ -37,7 +37,63 @@ FIELDS = (
 SEED = 2026
 TERMINATION = "either party may terminate for material breach on thirty (30) days written notice"
 TYPES = ("lease", "vendor", "service")
-CONTRACT_IDS = tuple(f"{kind}-{n:02d}" for kind in TYPES for n in range(1, 7))
+BASE_IDS = tuple(f"{kind}-{n:02d}" for kind in TYPES for n in range(1, 7))
+# Planted hard cases (US-02-005, TASK-007), added beside the 18 so their bytes,
+# answers and cached replies never change (AC-US-02-005-7).
+HARD_CASES = {
+    "lease-07": "relative-date",
+    "vendor-07": "notice-elsewhere",
+    "service-07": "amendment",
+    "lease-08": "page-break",
+    "vendor-08": "no-renewal",
+}
+CONTRACT_IDS = (*BASE_IDS, *HARD_CASES)
+# Relative commencement (Q-031: the anchor is in the same sentence): (offset months, anchor).
+RELATIVE_START = {
+    "lease-07": (2, date(2026, 1, 1)),
+    "vendor-07": (3, date(2025, 6, 1)),
+    "service-07": (1, date(2025, 11, 1)),
+}
+MONTHS_TEXT = {1: "one (1) month", 2: "two (2) months", 3: "three (3) months"}
+# Long enough that clause 6 of the page-break contract continues onto page 2 (REQ-035).
+CONFIDENTIALITY = [
+    "Each party keeps the other party's information confidential.",
+    "Confidential information includes prices, plans, customer lists and any document marked "
+    "confidential, whether given before or after the date of this agreement.",
+    "A party may share confidential information with its employees, auditors and advisers who "
+    "need to know it, provided each of them is bound by duties of confidence no weaker than "
+    "these.",
+    "These duties do not apply to information that is public through no fault of the "
+    "receiving party, or that the receiving party already held without any duty of "
+    "confidence.",
+    "A party compelled by law or by a court to disclose confidential information may do so, "
+    "but must first tell the other party, where the law allows, so that it can seek "
+    "protection.",
+    "On request, and in any case when this agreement ends, each party returns or destroys the "
+    "other party's confidential information and confirms in writing that it has done so.",
+    "Copies held in routine electronic backups may be kept until they are overwritten in the "
+    "normal course, and stay subject to these duties for as long as they are held.",
+    "Each party protects the other party's confidential information with at least the care "
+    "it uses for its own information of the same kind, and never less than reasonable care.",
+    "A party that learns of any use or disclosure of confidential information in breach of "
+    "this clause tells the other party promptly and helps it to limit the harm.",
+    "Damages may not be an adequate remedy for a breach of this clause, so the injured party "
+    "may also seek an injunction or other relief from a court without proving special harm.",
+    "Nothing in this clause grants either party a licence or any other right in the other "
+    "party's confidential information, except the limited right to use it for this agreement.",
+    "Neither party announces this agreement or uses the other party's name in publicity "
+    "without the other party's written consent, which may be refused without reason.",
+    "Each party keeps a record of the people to whom it has given the other party's "
+    "confidential information and shows that record to the other party on request.",
+    "Where a party uses a subcontractor, it stays responsible for that subcontractor keeping "
+    "the other party's confidential information as this clause requires.",
+    "Confidential information stays the property of the party that disclosed it, and the "
+    "receiving party gains no right in it by holding it, copying it or building on it for the "
+    "purposes of this agreement.",
+    "A breach of this clause by either party is a material breach for the purposes of clause 5.",
+    "The duties in this clause survive the end of this agreement for five years, and for "
+    "trade secrets for as long as the information remains a trade secret.",
+]
 # Never used while tuning prompts: the honest score (design note, holdout split).
 HOLDOUT = frozenset({"lease-03", "lease-06", "vendor-03", "vendor-06", "service-06"})
 # Deliberately unparseable notice periods: they must land in needs_review (AC-US-00-003-6).
@@ -97,6 +153,7 @@ class Terms:
     auto_renewal: bool
     law: str
     cap: str
+    hard_case: str | None = None
 
 
 def _long_date(d: date) -> str:
@@ -134,6 +191,98 @@ def choose_terms(seed: int, contract_type: str, n: int) -> Terms:
         law=pick(LAWS, seed, contract_id, "law"),
         cap=pick(CAPS, seed, contract_id, "cap"),
     )
+
+
+def choose_hard_terms(seed: int, contract_id: str) -> Terms:
+    """Terms of a planted contract: base choices, then what its hard case needs."""
+    contract_type, number = contract_id.rsplit("-", 1)
+    base = choose_terms(seed, contract_type, int(number))
+    kind = HARD_CASES[contract_id]
+    start = base.start
+    if contract_id in RELATIVE_START:
+        months, anchor = RELATIVE_START[contract_id]
+        start = months_after(anchor, months=months)
+    return Terms(
+        contract_id=contract_id,
+        contract_type=contract_type,
+        party_a=base.party_a,
+        party_b=base.party_b,
+        start=start,
+        # The amendment extends a two-year term by one year (Q-030).
+        years=3 if kind == "amendment" else base.years,
+        notice=("three (3) months", 3, "months")
+        if kind == "notice-elsewhere"
+        else base.notice or NOTICE[0],
+        auto_renewal=kind != "no-renewal" and (kind == "notice-elsewhere" or base.auto_renewal),
+        law=base.law,
+        cap=base.cap,
+        hard_case=kind,
+    )
+
+
+def plant(
+    t: Terms, rows: list[tuple[str, str, list[tuple[str | None, str, str]]]]
+) -> list[tuple[str, str, list[tuple[str | None, str, str]]]]:
+    """Rewrite the standard clause rows for the contract's hard case."""
+    doc = {"lease": "Lease", "vendor": "Agreement", "service": "Agreement"}[t.contract_type]
+    by_number = {number: (heading, sentences) for number, heading, sentences in rows}
+    if t.contract_id in RELATIVE_START:
+        months, anchor = RELATIVE_START[t.contract_id]
+        value = f"{MONTHS_TEXT[months]} after {_long_date(anchor)}"
+        by_number["2.1"] = (
+            "Commencement",
+            [
+                (
+                    "effective_date",
+                    value,
+                    f"The term commences {value}, the date this {doc} is signed.",
+                )
+            ],
+        )
+    if t.hard_case == "notice-elsewhere":
+        notice = t.notice[0] if t.notice else ""
+        heading, sentences = by_number["2.3"]
+        by_number["2.3"] = (
+            heading,
+            [
+                *sentences,
+                (
+                    "notice_period",
+                    notice,
+                    f"Notice to prevent renewal must be given {notice} before the end of the term.",
+                ),
+            ],
+        )
+        by_number["7"] = (
+            "Notice of Non-Renewal",
+            [(None, "", "Notices under this Agreement are given in writing to the other party.")],
+        )
+    if t.hard_case == "amendment":
+        by_number["2.2"] = (
+            "Duration",
+            [(None, "", f"The term is {YEARS_TEXT[2]} from the commencement date.")],
+        )
+        by_number["9"] = (
+            "Amendment",
+            [
+                (
+                    "term",
+                    YEARS_TEXT[3],
+                    f"By this amendment the term in clause 2.2 is extended to {YEARS_TEXT[3]} "
+                    "from the commencement date.",
+                )
+            ],
+        )
+    if t.hard_case == "page-break":
+        by_number["6"] = ("Confidentiality", [(None, "", s) for s in CONFIDENTIALITY])
+    if t.hard_case == "no-renewal":
+        del by_number["2.3"]
+        by_number["2"] = (
+            "Term",
+            [(None, "", "The term is set out in clause 2.1 and clause 2.2 below.")],
+        )
+    order = [n for n, _, _ in rows if n in by_number] + (["9"] if "9" in by_number else [])
+    return [(n, by_number[n][0], by_number[n][1]) for n in order]
 
 
 def clauses_and_fields(t: Terms) -> tuple[list[TruthClause], dict[str, TruthField]]:
@@ -227,6 +376,8 @@ def clauses_and_fields(t: Terms) -> tuple[list[TruthClause], dict[str, TruthFiel
             [("governing_law", t.law, f"This {doc} is governed by the laws of {t.law}.")],
         ),
     ]
+    if t.hard_case:
+        rows = plant(t, rows)
     clauses: list[TruthClause] = []
     fields: dict[str, TruthField] = {}
     for number, heading, sentences in rows:
@@ -283,15 +434,22 @@ def render_pdf(title: str, clauses: list[TruthClause]) -> bytes:
 
 
 def generate(out_dir: Path, seed: int = SEED) -> list[Path]:
-    """Write 18 contract PDFs and their truth.json files to `out_dir`; return the truth paths."""
+    """Write the contract PDFs and their truth.json files to `out_dir`; return the truth paths."""
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for contract_id in CONTRACT_IDS:
         contract_type, number = contract_id.rsplit("-", 1)
         n = int(number)
-        terms = choose_terms(seed, contract_type, n)
+        terms = (
+            choose_hard_terms(seed, contract_id)
+            if contract_id in HARD_CASES
+            else choose_terms(seed, contract_type, n)
+        )
         title = f"{TITLES[contract_type]} {n:02d}"
         clauses, fields = clauses_and_fields(terms)
+        review = [] if terms.notice is not None else ["notice_period"]
+        if "auto_renewal" not in fields:
+            review.append("auto_renewal")
         truth: Truth = {
             "id": terms.contract_id,
             "title": title,
@@ -299,11 +457,13 @@ def generate(out_dir: Path, seed: int = SEED) -> list[Path]:
             "start": terms.start.isoformat(),
             "term_years": terms.years,
             "holdout": terms.contract_id in HOLDOUT,
-            "expected_review": ["notice_period"] if terms.notice is None else [],
+            "expected_review": review,
             "clauses": clauses,
             "fields": fields,
             "expected": expected_dates(terms),
         }
+        if terms.hard_case:
+            truth["hard_case"] = terms.hard_case
         (out_dir / f"{terms.contract_id}.pdf").write_bytes(render_pdf(title, clauses))
         path = out_dir / f"{terms.contract_id}.truth.json"
         path.write_bytes(TRUTH.dump_json(truth, indent=2) + b"\n")

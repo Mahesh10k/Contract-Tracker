@@ -1,0 +1,158 @@
+{
+  "id": "lease-08",
+  "title": "Lease Agreement 08",
+  "contract_type": "lease",
+  "start": "2024-11-01",
+  "term_years": 2,
+  "holdout": false,
+  "expected_review": [],
+  "clauses": [
+    {
+      "number": "1",
+      "heading": "Parties",
+      "body": "This Lease is made between Northgate Realty Inc and Cedar Health Ltd."
+    },
+    {
+      "number": "2",
+      "heading": "Term",
+      "body": "The term is set out in clause 2.1 to clause 2.3 below."
+    },
+    {
+      "number": "2.1",
+      "heading": "Commencement",
+      "body": "The term commences on 1 November 2024."
+    },
+    {
+      "number": "2.2",
+      "heading": "Duration",
+      "body": "The term is two (2) years from the commencement date."
+    },
+    {
+      "number": "2.3",
+      "heading": "Renewal",
+      "body": "This Lease does not renew automatically."
+    },
+    {
+      "number": "3",
+      "heading": "Payment",
+      "body": "Charges are payable monthly in advance on the first day of each month."
+    },
+    {
+      "number": "3.1",
+      "heading": "Price Changes",
+      "body": "Charges increase by 3.5 percent on each anniversary of the commencement date."
+    },
+    {
+      "number": "4",
+      "heading": "Limitation of Liability",
+      "body": "The liability of either party is capped at two times the annual fees."
+    },
+    {
+      "number": "5",
+      "heading": "Termination",
+      "body": "Either party may terminate for material breach on thirty (30) days written notice."
+    },
+    {
+      "number": "6",
+      "heading": "Confidentiality",
+      "body": "Each party keeps the other party's information confidential. Confidential information includes prices, plans, customer lists and any document marked confidential, whether given before or after the date of this agreement. A party may share confidential information with its employees, auditors and advisers who need to know it, provided each of them is bound by duties of confidence no weaker than these. These duties do not apply to information that is public through no fault of the receiving party, or that the receiving party already held without any duty of confidence. A party compelled by law or by a court to disclose confidential information may do so, but must first tell the other party, where the law allows, so that it can seek protection. On request, and in any case when this agreement ends, each party returns or destroys the other party's confidential information and confirms in writing that it has done so. Copies held in routine electronic backups may be kept until they are overwritten in the normal course, and stay subject to these duties for as long as they are held. Each party protects the other party's confidential information with at least the care it uses for its own information of the same kind, and never less than reasonable care. A party that learns of any use or disclosure of confidential information in breach of this clause tells the other party promptly and helps it to limit the harm. Damages may not be an adequate remedy for a breach of this clause, so the injured party may also seek an injunction or other relief from a court without proving special harm. Nothing in this clause grants either party a licence or any other right in the other party's confidential information, except the limited right to use it for this agreement. Neither party announces this agreement or uses the other party's name in publicity without the other party's written consent, which may be refused without reason. Each party keeps a record of the people to whom it has given the other party's confidential information and shows that record to the other party on request. Where a party uses a subcontractor, it stays responsible for that subcontractor keeping the other party's confidential information as this clause requires. Confidential information stays the property of the party that disclosed it, and the receiving party gains no right in it by holding it, copying it or building on it for the purposes of this agreement. A breach of this clause by either party is a material breach for the purposes of clause 5. The duties in this clause survive the end of this agreement for five years, and for trade secrets for as long as the information remains a trade secret."
+    },
+    {
+      "number": "7",
+      "heading": "Notice of Non-Renewal",
+      "body": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term."
+    },
+    {
+      "number": "8",
+      "heading": "Governing Law",
+      "body": "This Lease is governed by the laws of the State of California."
+    }
+  ],
+  "fields": {
+    "parties": {
+      "value": "Northgate Realty Inc and Cedar Health Ltd",
+      "quote": "This Lease is made between Northgate Realty Inc and Cedar Health Ltd.",
+      "clause": "1"
+    },
+    "effective_date": {
+      "value": "1 November 2024",
+      "quote": "The term commences on 1 November 2024.",
+      "clause": "2.1"
+    },
+    "term": {
+      "value": "two (2) years",
+      "quote": "The term is two (2) years from the commencement date.",
+      "clause": "2.2"
+    },
+    "auto_renewal": {
+      "value": "does not renew automatically",
+      "quote": "This Lease does not renew automatically.",
+      "clause": "2.3"
+    },
+    "payment_terms": {
+      "value": "monthly in advance on the first day of each month",
+      "quote": "Charges are payable monthly in advance on the first day of each month.",
+      "clause": "3"
+    },
+    "escalation": {
+      "value": "3.5 percent on each anniversary of the commencement date",
+      "quote": "Charges increase by 3.5 percent on each anniversary of the commencement date.",
+      "clause": "3.1"
+    },
+    "liability_cap": {
+      "value": "two times the annual fees",
+      "quote": "The liability of either party is capped at two times the annual fees.",
+      "clause": "4"
+    },
+    "termination_rights": {
+      "value": "either party may terminate for material breach on thirty (30) days written notice",
+      "quote": "Either party may terminate for material breach on thirty (30) days written notice.",
+      "clause": "5"
+    },
+    "notice_period": {
+      "value": "not less than thirty days",
+      "quote": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term.",
+      "clause": "7"
+    },
+    "governing_law": {
+      "value": "the State of California",
+      "quote": "This Lease is governed by the laws of the State of California.",
+      "clause": "8"
+    }
+  },
+  "expected": {
+    "expiry": "2026-10-31",
+    "notice_deadline": "2026-10-01",
+    "renewal": null,
+    "escalation_dates": [
+      "2025-11-01"
+    ],
+    "payment_dates": [
+      "2024-11-01",
+      "2024-12-01",
+      "2025-01-01",
+      "2025-02-01",
+      "2025-03-01",
+      "2025-04-01",
+      "2025-05-01",
+      "2025-06-01",
+      "2025-07-01",
+      "2025-08-01",
+      "2025-09-01",
+      "2025-10-01",
+      "2025-11-01",
+      "2025-12-01",
+      "2026-01-01",
+      "2026-02-01",
+      "2026-03-01",
+      "2026-04-01",
+      "2026-05-01",
+      "2026-06-01",
+      "2026-07-01",
+      "2026-08-01",
+      "2026-09-01",
+      "2026-10-01"
+    ]
+  },
+  "hard_case": "page-break"
+}

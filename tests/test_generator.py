@@ -8,7 +8,14 @@ import pytest
 
 from app.ingestion.pdf import read_pdf
 from app.ingestion.splitter import split_clauses
-from evals.contracts.generate import CONTRACT_IDS, FIELDS, HOLDOUT, UNPARSEABLE_NOTICE, generate
+from evals.contracts.generate import (
+    BASE_IDS,
+    CONTRACT_IDS,
+    FIELDS,
+    HOLDOUT,
+    UNPARSEABLE_NOTICE,
+    generate,
+)
 from evals.contracts.truth import Truth, load_truth
 
 
@@ -26,8 +33,8 @@ def out_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return out
 
 
-def test_eighteen_contracts_six_of_each_type(truths: dict[str, Truth]) -> None:
-    assert Counter(t["contract_type"] for t in truths.values()) == {
+def test_eighteen_base_contracts_six_of_each_type(truths: dict[str, Truth]) -> None:
+    assert Counter(truths[cid]["contract_type"] for cid in BASE_IDS) == {
         "lease": 6,
         "vendor": 6,
         "service": 6,
@@ -44,11 +51,11 @@ def test_generation_is_byte_identical_across_runs(tmp_path: Path) -> None:
     assert first == second
 
 
-def test_every_contract_has_all_ten_fields(truths: dict[str, Truth]) -> None:
-    assert {tuple(sorted(t["fields"])) for t in truths.values()} == {tuple(sorted(FIELDS))}
+def test_every_base_contract_has_all_ten_fields(truths: dict[str, Truth]) -> None:
+    assert {tuple(sorted(truths[cid]["fields"])) for cid in BASE_IDS} == {tuple(sorted(FIELDS))}
 
 
-@pytest.mark.parametrize("contract_id", CONTRACT_IDS)
+@pytest.mark.parametrize("contract_id", BASE_IDS)
 @pytest.mark.parametrize("field", FIELDS)
 def test_every_quote_is_inside_the_clause_it_cites(
     truths: dict[str, Truth], contract_id: str, field: str
