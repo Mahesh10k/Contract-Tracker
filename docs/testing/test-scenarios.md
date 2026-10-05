@@ -86,6 +86,40 @@ Acceptance criteria: AC-US-02-006-1, AC-US-02-006-2, AC-US-02-006-3, AC-US-02-00
 Not applicable: Security: no input from users; Performance: six records; Accessibility: no screen.
 Invariants: every golden id has a truth.json; the key lists exactly the 5 fields of REQ-045 per contract.
 
+## US-00-010: Extract the 5 one-day fields; unreadable replies go to review
+
+Requirements: REQ-045, REQ-046
+Acceptance criteria: AC-US-00-010-1, AC-US-00-010-2, AC-US-00-010-3, AC-US-00-010-4
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-00-010-1 | Happy | A valid v2 reply gives 5 rows | the owner sees exactly the 5 fields the brief asks for | AC-US-00-010-1 | TC-0080 |
+| TS-US-00-010-2 | Error | A reply missing a field or adding one | a wrong shape never reaches storage | AC-US-00-010-1 | TC-0081, TC-0082 |
+| TS-US-00-010-3 | Error | Two invalid replies in a row | the contract is held for review, never dropped | AC-US-00-010-2 | TC-0083, TC-0084, TC-0089 |
+| TS-US-00-010-4 | Alternate | A timeout twice | only an unreadable reply goes to review; an outage stays an error to retry | AC-US-00-010-2 | TC-0085 |
+| TS-US-00-010-5 | Alternate | Invalid first reply, valid retry | one bad reply costs a retry, not a review | AC-US-00-010-3 | TC-0086 |
+| TS-US-00-010-6 | Edge | Notice period stated in clause 2.3 | the quote is checked where it was found | AC-US-00-010-4 | TC-0087, TC-0088, TC-0103 |
+
+Not applicable: Performance: one call per contract; Accessibility: no screen.
+Security: contract text is model input; v2 keeps v1's data-not-instructions rule and injection flag (Q-010).
+Invariants: every extracted contract has exactly 5 field rows; an accepted row has a quote found in its cited clause.
+
+## US-00-003: See the computed key dates and obligations
+
+Requirements: REQ-003, REQ-004, REQ-007, REQ-008, REQ-009, REQ-013
+Acceptance criteria: AC-US-00-003-1, AC-US-00-003-2, AC-US-00-003-3, AC-US-00-003-4, AC-US-00-003-6, AC-US-00-003-7
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-00-003-1 | Happy | Effective date plus term gives expiry | expiry is the last day of the term, computed in code | AC-US-00-003-1 | TC-0091, TC-0102 |
+| TS-US-00-003-2 | Edge | Leap years and month ends | a deadline never lands after the real one | AC-US-00-003-1, AC-US-00-003-3 | TC-0092, TC-0096 |
+| TS-US-00-003-3 | Happy | Notice in days and in months | days count days, months count calendar months | AC-US-00-003-2, AC-US-00-003-4 | TC-0094, TC-0095, TC-0097 |
+| TS-US-00-003-4 | Error | Text no parser understands | nothing is guessed; the field waits for a person | AC-US-00-003-6 | TC-0093, TC-0098, TC-0099 |
+| TS-US-00-003-5 | Happy | Each dated duty becomes one obligation with its clause | every deadline can be traced to the contract | AC-US-00-003-7 | TC-0100, TC-0101, TC-0104 |
+
+Not applicable: Security: no new input path; Performance: two dates per contract; Accessibility: no screen.
+Invariants: the LLM output is never a date; notice_deadline <= expiry.
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered
