@@ -48,3 +48,16 @@ def test_a_stored_reply_is_read_back_and_a_missing_one_is_none(tmp_path: Path) -
 
     assert cache.get("a" * 64) == {"content": "{}", "usage": {"prompt_tokens": 1}}
     assert cache.get("b" * 64) is None
+
+
+def test_a_truncated_cache_file_is_a_miss_not_a_crash(tmp_path: Path) -> None:
+    # TASK-002 review finding 6: a write killed half way left a file every run crashed on.
+    (tmp_path / f"{'c' * 64}.json").write_text('{"content": "{\\"answ')
+
+    assert ReplyCache(tmp_path).get("c" * 64) is None
+
+
+def test_put_leaves_only_the_reply_file(tmp_path: Path) -> None:
+    ReplyCache(tmp_path).put("d" * 64, {"content": "{}"})
+
+    assert [p.name for p in tmp_path.iterdir()] == [f"{'d' * 64}.json"]

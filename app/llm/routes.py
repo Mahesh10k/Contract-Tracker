@@ -12,6 +12,8 @@ from decimal import Decimal
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 TIMEOUT_S = 60.0
 PER_MILLION = Decimal(1_000_000)
+# llm_calls refuses a live call at zero cost (chk_llm_calls_live_call_costed).
+MIN_COST_USD = Decimal("0.000001")
 PRICES: dict[str, tuple[Decimal, Decimal]] = {
     "anthropic/claude-haiku-4.5": (Decimal("1.00"), Decimal("5.00")),
 }
@@ -31,4 +33,4 @@ def estimate_cost_usd(model: str, body: dict[str, object]) -> Decimal:
     of one micro-dollar keeps a live call from ever being recorded at zero.
     """
     input_tokens = len(json.dumps(body)) // 4
-    return max(cost_usd(model, input_tokens, 0), Decimal("0.000001"))
+    return max(cost_usd(model, input_tokens, 0), MIN_COST_USD)

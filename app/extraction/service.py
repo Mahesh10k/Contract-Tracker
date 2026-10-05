@@ -103,13 +103,14 @@ async def store(
 
 
 def check_field(name: str, reply: FieldReply, by_number: dict[str, StoredClause]) -> FieldRow:
-    """Accept a field only when its quote is in the clause it cites."""
+    """Accept a field only when its quote is non-empty and in the clause it cites."""
     clause = by_number.get(reply.clause_id or "")
+    quote = normalise_for_match(reply.quote or "")
     if reply.value is None or reply.quote is None:
         status, reason = "needs_review", "value_missing"
     elif clause is None:
         status, reason = "needs_review", "clause_not_found"
-    elif normalise_for_match(reply.quote) not in normalise_for_match(clause.body):
+    elif not quote or quote not in normalise_for_match(clause.body):
         status, reason = "needs_review", "quote_not_found"
     else:
         status, reason = "accepted", None

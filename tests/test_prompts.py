@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from app.core.errors import DomainError
 from app.prompts import PROMPTS_DIR, PromptError, load, render
 
 PROMPT_VERSIONS = sorted((p.parent.name, int(p.stem[1:])) for p in PROMPTS_DIR.glob("*/v*.md"))
@@ -95,3 +96,11 @@ def test_rendering_does_not_touch_braces_in_the_body() -> None:
 def test_loading_a_version_that_does_not_exist_fails_clearly(tmp_path: Path) -> None:
     with pytest.raises(PromptError, match="no prompt extract_fields v99"):
         load("extract_fields", 99)
+
+
+def test_a_render_failure_is_a_domain_error_the_command_reports() -> None:
+    # TASK-002 review finding 3: a contract over max_chars stopped the whole batch.
+    prompt = load("extract_fields", 1)
+
+    with pytest.raises(DomainError, match="contract is longer than 60000 characters"):
+        render(prompt, {"contract_title": "t", "contract": "x" * 60001})

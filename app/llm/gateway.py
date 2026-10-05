@@ -4,9 +4,11 @@ Order of checks, each before any spend: kill switch, reply cache (a replay
 costs nothing, so it works even after the budget stop), budget stop
 (USD 9, Q-007), API key. Then at most two attempts: a timeout, a 429, a 5xx
 or a reply that fails the schema (REQ-038) is retried once; a 400 is our
-bug and is never retried. Every attempt writes one ledger record; an attempt
-with no reported usage is recorded at an upper-bound estimate, so spend can
-be over-counted but never under-counted. Logs carry no prompt or reply text.
+bug and is never retried. The budget is checked again before the retry.
+Every attempt writes one ledger record; an attempt with no reported usage
+(including a 200 that is not JSON or has no choices) is recorded at an
+upper-bound estimate, so spend can be over-counted but never under-counted.
+Logs carry no prompt or reply text.
 """
 
 import os
@@ -22,7 +24,13 @@ from pydantic import BaseModel, SecretStr, ValidationError
 
 from app.core.errors import DomainError
 from app.llm.cache import ReplyCache, cache_key
-from app.llm.routes import OPENROUTER_URL, TIMEOUT_S, cost_usd, estimate_cost_usd
+from app.llm.routes import (
+    MIN_COST_USD,
+    OPENROUTER_URL,
+    TIMEOUT_S,
+    cost_usd,
+    estimate_cost_usd,
+)
 
 log = structlog.get_logger()
 
@@ -148,6 +156,8 @@ class Gateway:
             raise MissingApiKeyError("OPENROUTER_API_KEY is not set; cannot make a live call")
         reason = ""
         for attempt in (1, 2):
+            if attempt == 2 and await self.ledger.spent_usd() >= self.budget_stop_usd:
+                raise BudgetReachedError("LLM budget reached")
             try:
                 content = await self._attempt(req, key, body, attempt, self.api_key)
                 value = schema.model_validate_json(content)
@@ -244,18 +254,36 @@ class Gateway:
             raise GatewayFailedError(
                 f"{req.feature.capitalize()} failed: model request rejected ({status})"
             )
-        data = response.json()
-        usage = data.get("usage") or {}
+        try:
+            data = response.json()
+        except ValueError:
+            data = {}
+        usage = (data.get("usage") if isinstance(data, dict) else None) or {}
         tokens = (int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0)))
         reported = usage.get("cost")
-        cost = Decimal(str(reported)) if reported is not None else cost_usd(self.model, *tokens)
+        if reported is not None:
+            cost = Decimal(str(reported))
+        elif tokens != (0, 0):
+            cost = cost_usd(self.model, *tokens)
+        else:
+            cost = estimate
         await self._record(
-            req, key, cache_hit=False, tokens=tokens, cost=cost, status="200", attempt=attempt
+            req,
+            key,
+            cache_hit=False,
+            tokens=tokens,
+            cost=max(cost, MIN_COST_USD),
+            status="200",
+            attempt=attempt,
         )
-        choice = data["choices"][0]
+        try:
+            choice = data["choices"][0]
+            content = str(choice["message"]["content"])
+        except (KeyError, IndexError, TypeError) as exc:
+            raise _RetryableError("reply did not match the schema") from exc
         if choice.get("finish_reason") != "stop":
             raise _RetryableError("reply did not match the schema")
-        return str(choice["message"]["content"])
+        return content
 
     async def _record(
         self,

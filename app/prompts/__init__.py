@@ -12,12 +12,17 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.core.errors import DomainError
+
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 PLACEHOLDER = re.compile(r"\{\{(\w+)\}\}")
 
 
-class PromptError(ValueError):
+class PromptError(DomainError):
     """A prompt is missing or a variable is missing, unknown or too long."""
+
+    status_code = 422
+    code = "prompt_invalid"
 
 
 @dataclass(frozen=True)

@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 import httpx
 import pytest
 from pydantic import SecretStr
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.repositories.llm_calls import LlmCallLedger
@@ -231,6 +231,38 @@ async def test_tc0046_a_second_run_replays_the_cache_and_keeps_ten_rows(
 
     assert offline.requests == []
     assert len(await rows(session, contract)) == 10
+
+
+async def test_a_corrected_field_survives_re_extraction(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    # TASK-002 review finding 4: Q-018, the owner's correction always wins.
+    contract = await lease_01(session)
+    gateway = make_gateway(session, Transport(ok(perfect_reply("lease-01"))), tmp_path)
+    await extract_contract(session, gateway, contract)
+    await session.execute(
+        update(extractions)
+        .where(extractions.c.contract_id == contract, extractions.c.field_name == "term")
+        .values(status="corrected", corrected_value="five years", corrected_at=func.now())
+    )
+    before = (
+        await session.execute(
+            select(extractions).where(
+                extractions.c.field_name == "term", extractions.c.contract_id == contract
+            )
+        )
+    ).one()
+
+    await extract_contract(session, make_gateway(session, Transport(), tmp_path), contract)
+
+    after = (
+        await session.execute(
+            select(extractions).where(
+                extractions.c.field_name == "term", extractions.c.contract_id == contract
+            )
+        )
+    ).one()
+    assert after == before
 
 
 @pytest.mark.parametrize(

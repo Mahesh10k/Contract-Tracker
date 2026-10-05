@@ -8,6 +8,7 @@ offline.
 
 import hashlib
 import json
+import os
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -34,10 +35,15 @@ class ReplyCache:
         path = self.root / f"{key}.json"
         if not path.exists():
             return None
-        data: dict[str, object] = json.loads(path.read_text())
+        try:
+            data: dict[str, object] = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            return None  # a half-written file is a miss; the next good reply replaces it
         return data
 
     def put(self, key: str, reply: Mapping[str, object]) -> None:
         """Store `reply` under `key`."""
         self.root.mkdir(parents=True, exist_ok=True)
-        (self.root / f"{key}.json").write_text(json.dumps(reply, indent=2, sort_keys=True) + "\n")
+        partial = self.root / f".{key}.tmp"
+        partial.write_text(json.dumps(reply, indent=2, sort_keys=True) + "\n")
+        os.replace(partial, self.root / f"{key}.json")  # atomic: never a half-written reply

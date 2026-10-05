@@ -2,6 +2,8 @@
 
 from uuid import uuid4
 
+import pytest
+
 from app.domain.contracts import StoredClause
 from app.extraction.schema import FieldReply
 from app.extraction.service import check_field
@@ -65,3 +67,13 @@ def test_tc0044_a_quote_not_in_the_clause_is_held_but_keeps_the_clause_id() -> N
         "quote_not_found",
         NOTICE.id,
     )
+
+
+@pytest.mark.parametrize("quote", ["", "   ", "\n"])
+def test_an_empty_quote_is_not_grounding(quote: str) -> None:
+    # TASK-002 review finding 1: "" is a substring of every clause, so it was accepted.
+    reply = FieldReply(value="thirty (30) days", quote=quote, clause_id="2.3")
+
+    row = check_field("notice_period", reply, CLAUSES)
+
+    assert (row.status, row.review_reason) == ("needs_review", "quote_not_found")

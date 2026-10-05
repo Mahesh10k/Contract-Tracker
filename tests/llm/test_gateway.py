@@ -270,3 +270,48 @@ async def test_logs_never_carry_the_prompt_or_the_reply(tmp_path: Path) -> None:
 
     assert "Delaware" not in json.dumps(logs, default=str)
     assert [e["event"] for e in logs] == ["llm_call"]
+
+
+async def test_a_reply_with_no_usage_is_recorded_at_the_estimate_not_zero(tmp_path: Path) -> None:
+    # TASK-002 review finding 2: cost 0 broke chk_llm_calls_live_call_costed.
+    body = chat_reply(GOOD)
+    del body["usage"]
+    gateway, ledger = make(Replies(ok(body)), tmp_path)
+
+    await gateway.parse(REQ, Answer)
+
+    assert ledger.records[0].cost_usd > 0
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        httpx.Response(200, text="<html>bad gateway</html>"),
+        httpx.Response(200, json={"id": "gen-test", "usage": {"cost": 0.001}}),
+    ],
+    ids=["not-json", "no-choices"],
+)
+async def test_a_malformed_200_is_retried_and_paid_then_fails_with_a_reason(
+    tmp_path: Path, reply: httpx.Response
+) -> None:
+    # TASK-002 review finding 3: these escaped as JSONDecodeError or KeyError.
+    gateway, ledger = make(Replies(reply, reply), tmp_path)
+
+    with pytest.raises(GatewayFailedError) as raised:
+        await gateway.parse(REQ, Answer)
+
+    assert raised.value.message == "Extraction failed: reply did not match the schema"
+    assert [r.cost_usd > 0 for r in ledger.records] == [True, True]
+
+
+async def test_the_retry_is_refused_when_the_first_attempt_reaches_the_stop(
+    tmp_path: Path,
+) -> None:
+    # TASK-002 review finding 7: attempt 2 ran after spend had crossed USD 9.
+    replies = Replies(ok(chat_reply({"oops": 1}, cost=0.0135)))
+    gateway, _ = make(replies, tmp_path, ledger=InMemoryLedger(spent="8.99"))
+
+    with pytest.raises(BudgetReachedError):
+        await gateway.parse(REQ, Answer)
+
+    assert len(replies.requests) == 1
