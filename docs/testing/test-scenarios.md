@@ -41,6 +41,34 @@ Acceptance criteria: AC-US-00-002-1, AC-US-00-002-2, AC-US-00-002-3, AC-US-00-00
 Not applicable: Performance: about 18 calls per full run, no SLO in the PRD; Accessibility: no screen in this task (the retry button is US-00-007).
 Invariants: a contract has 10 extraction rows or none (TC-0056); every live call is recorded with its cost (TC-0051, TC-0055).
 
+## US-02-005: Plant hard cases in the golden set
+
+Requirements: REQ-031, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036
+Acceptance criteria: AC-US-02-005-1, AC-US-02-005-2, AC-US-02-005-3, AC-US-02-005-4, AC-US-02-005-5, AC-US-02-005-6, AC-US-02-005-7
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-02-005-1 | Happy | The set is regenerated with five planted contracts | the eval holds relative dates, notice elsewhere, an amendment, a page break and no renewal | AC-US-02-005-1, AC-US-02-005-2, AC-US-02-005-3, AC-US-02-005-4, AC-US-02-005-6 | TC-0057, TC-0058, TC-0059, TC-0060, TC-0062, TC-0064 |
+| TS-US-02-005-2 | Edge | A clause crosses the page break | splitting does not cut a clause at a page boundary | AC-US-02-005-5 | TC-0061, TC-0065 |
+| TS-US-02-005-3 | Error | Regeneration touches an existing contract | earlier answers and cached replies stay valid | AC-US-02-005-7 | TC-0063 |
+
+Not applicable: Security, Performance, Accessibility: generated test data only, no input, screen or SLO.
+Invariants: the 18 original contracts never change bytes (TC-0063).
+
+## US-00-009: See which page a clause is on
+
+Requirements: REQ-037
+Acceptance criteria: AC-US-00-009-1, AC-US-00-009-2, AC-US-00-009-3
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-00-009-1 | Happy | A clause on one page gets that page | a citation points at the page the clause is printed on | AC-US-00-009-1 | TC-0066 |
+| TS-US-00-009-2 | Edge | A clause or its heading crosses a page | a crossing clause is one clause with both pages | AC-US-00-009-2 | TC-0067, TC-0068, TC-0070 |
+| TS-US-00-009-3 | Alternate | Rows stored before migration 0002, or text with no pages | no page is guessed | AC-US-00-009-3 | TC-0069, TC-0071 |
+
+Not applicable: Security: no new input path; Performance: two integer columns; Accessibility: no screen (pages appear in the UI in TASK-005).
+Invariants: first_page <= last_page or both NULL (chk_clauses_pages_ordered).
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered

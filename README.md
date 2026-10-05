@@ -7,7 +7,9 @@ contracts". `make help` lists every command; `make check` is the gate.
 
 ## What exists today
 
-- TASK-001 (ingestion): `make contracts` writes 18 synthetic contracts and their
+- TASK-001 (ingestion): `make contracts` writes 23 synthetic contracts (18 standard, 5 planted hard
+  cases from TASK-007: relative dates, notice elsewhere, an amendment, a page
+  break, no renewal) and their
   `truth.json` answer keys to `data/contracts/` (deterministic; committed).
   `make ingest FILES="data/contracts/*.pdf"` loads PDFs as contracts and numbered
   clauses; a PDF without truth.json needs `TYPE=lease|vendor|service`.
@@ -20,7 +22,8 @@ contracts". `make help` lists every command; `make check` is the gate.
   needs `OPENROUTER_API_KEY` in `.env`; every attempt is logged in `llm_calls`
   and calls stop once recorded spend reaches `LLM_BUDGET_STOP_USD` (USD 9).
   Re-run the command to retry a failed contract.
-- Migration 0001 creates the full schema from `docs/design/schema.sql`.
+- Migration 0001 creates the full schema from `docs/design/schema.sql`;
+  0002 adds each clause's first and last page (TASK-007).
 - The Bearing `python-api` skeleton: FastAPI app with `/healthz` and `/readyz`,
   settings, structured logging, Alembic.
 

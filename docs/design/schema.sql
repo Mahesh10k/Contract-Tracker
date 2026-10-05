@@ -62,6 +62,8 @@ CREATE TABLE clauses (
     heading text NOT NULL,
     body text NOT NULL,
     position integer NOT NULL,
+    first_page integer,
+    last_page integer,
     embedding vector(384),
     embedding_model text,
     search_tsv tsvector GENERATED ALWAYS AS (to_tsvector('english', heading || ' ' || body)) STORED,
@@ -71,12 +73,17 @@ CREATE TABLE clauses (
     CONSTRAINT chk_clauses_number_shape CHECK (clause_number ~ '^[0-9]+(\.[0-9]+)*$'),
     CONSTRAINT chk_clauses_body_not_blank CHECK (btrim(body) <> ''),
     CONSTRAINT chk_clauses_position_positive CHECK (position > 0),
+    CONSTRAINT chk_clauses_pages_ordered CHECK (
+        (first_page IS NULL AND last_page IS NULL) OR (first_page >= 1 AND last_page >= first_page)
+    ),
     CONSTRAINT chk_clauses_embedding_with_model CHECK ((embedding IS NULL) = (embedding_model IS NULL))
 );
 COMMENT ON TABLE clauses IS 'One numbered clause of a contract, with its vector and full-text search fields. Serves US-00-001, US-00-002, US-00-004, US-00-005.';
 COMMENT ON COLUMN clauses.id IS 'Surrogate key; the clause an extraction quote or an answer citation points to.';
 COMMENT ON COLUMN clauses.contract_id IS 'The contract this clause belongs to.';
 COMMENT ON COLUMN clauses.clause_number IS 'Number as printed in the contract, such as 7.2; the clause part of a [contract, clause] citation.';
+COMMENT ON COLUMN clauses.first_page IS 'Page the clause heading is printed on, from 1; NULL for clauses loaded before migration 0002 (US-00-009).';
+COMMENT ON COLUMN clauses.last_page IS 'Page of the last line of the clause body; equals first_page unless it crosses a page.';
 COMMENT ON COLUMN clauses.heading IS 'Heading printed after the number, such as Termination; may be empty when the contract prints none.';
 COMMENT ON COLUMN clauses.body IS 'Clause text; quotes are checked against it after normalisation.';
 COMMENT ON COLUMN clauses.position IS 'Order of the clause in the contract, from 1.';

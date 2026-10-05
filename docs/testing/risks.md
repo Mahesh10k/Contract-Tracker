@@ -40,3 +40,6 @@ No git history touches these paths yet (one commit, no fixes), so likelihood com
 | R-009 | US-00-002 | A cached reply survives a prompt or model change, so extraction and the eval keep using the old prompt's answers | AC-US-00-002-5, Q-028, ADR-0009 | M | M | Medium | TC-0047, TC-0048 |
 | R-010 | US-00-002 | A failed extraction leaves some field rows behind, so a contract looks half extracted | AC-US-00-002-7 | M | M | Medium | TC-0052, TC-0056 |
 | R-011 | US-00-002 | The shared normaliser is too lax (drops digits or words), so "90 days" matches "30 days" | review task T5, AC-US-00-002-3 | L | H | Medium | TC-0042, TC-0040 |
+| R-012 | US-02-005 | Regenerating the set changes an existing contract, so every cached reply and earlier score silently stops matching | AC-US-02-005-7, change size | M | H | High | TC-0063, TC-0061, TC-0068 |
+| R-013 | US-02-005 | A planted case does not actually contain its trap (the clause fits on one page, the quote sits in the notice clause), so the eval overstates hard-case coverage | AC-US-02-005-3, AC-US-02-005-5 | M | M | Medium | TC-0059, TC-0061 |
+| R-014 | US-00-009 | A clause crossing a page is split in two or given the wrong page, so a citation sends the owner to the wrong page | AC-US-00-009-2, new migration | L | M | Low | TC-0067 |
