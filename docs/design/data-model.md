@@ -143,7 +143,7 @@ Recompute rule: expiry depends on effective_date and term, the notice deadline o
 
 One planned email for one obligation at one lead time.
 
-Serves US-00-006. Expected volume: 2 per obligation, about 1,400 rows (10^3).
+Serves US-00-006. Expected volume: 3 per obligation, about 2,100 rows (10^3).
 
 **Indexes**
 

@@ -1,7 +1,7 @@
 # Importing the backlog: ContractTracker
 
-6 epics, 12 stories, 51 tasks, from 30 statements in the PRD.
-Gate: stories-coverage: 30 REQ from docs/product/PRD.md (0 withdrawn), 30 covered, 0 out of scope, 0 gaps, 12 stories, 56 AC, 0 orphans, 0 problems
+6 epics, 14 stories, 70 tasks, from 44 statements in the PRD.
+Gate: stories-coverage: 44 REQ from docs/product/PRD.md (0 withdrawn), 44 covered, 0 out of scope, 0 gaps, 14 stories, 72 AC, 0 orphans, 0 problems
 
 ## The files
 

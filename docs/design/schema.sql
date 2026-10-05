@@ -202,7 +202,7 @@ CREATE TABLE reminders (
 COMMENT ON TABLE reminders IS 'One planned email for one obligation at one lead time. Serves US-00-006.';
 COMMENT ON COLUMN reminders.id IS 'Surrogate key.';
 COMMENT ON COLUMN reminders.obligation_id IS 'The obligation this reminder is about.';
-COMMENT ON COLUMN reminders.lead_days IS 'Days before due_on the email is due, 30 or 7 by default.';
+COMMENT ON COLUMN reminders.lead_days IS 'Days before due_on the email is due: 60, 30 or 7 by default (Q-029).';
 COMMENT ON COLUMN reminders.send_on IS 'obligations.due_on minus lead_days.';
 COMMENT ON COLUMN reminders.status IS 'pending, then sending just before the SMTP call, then sent; back to pending if SMTP fails; skipped when a closer reminder for the same obligation is due on the same run. A row left in sending after a crash is never resent automatically.';
 COMMENT ON COLUMN reminders.sent_at IS 'When the email was handed to MailHog.';

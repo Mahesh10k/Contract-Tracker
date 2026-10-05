@@ -1,6 +1,6 @@
 # PRD: ContractTracker
 
-Source: project brief pasted on 2026-10-01 (45 lines), plus the user's decisions D1 and D2 in /office-hours the same day (design note: docs/designs/contracttracker.md)   Normalised: 2026-10-01
+Source: project brief pasted on 2026-10-01 (45 lines), plus the user's decisions D1 and D2 in /office-hours the same day (design note: docs/designs/contracttracker.md); revised task list pasted by the developer on 2026-10-05 (6 lines, TASK-001 to TASK-006), adopted from TASK-002 on   Normalised: 2026-10-05
 Owner: unconfirmed:   Tracker epic: unconfirmed:
 
 ## 1. Problem
@@ -67,6 +67,20 @@ One testable statement per id. Ids are never reused or renumbered.
 | REQ-028 | The evaluations run as part of `make check`. | Contract owner | "Evals run under make check." | none |
 | REQ-029 | The project README takes a fresh clone to a working demo. | inferred: Developer | "TASK-006 final evals + traceability + README + demo" (added 2026-10-01, missed in the first pass) | none |
 | REQ-030 | The project keeps a traceability table from each REQ to the stories and tests that cover it. | inferred: Developer | "TASK-006 ... traceability" (added 2026-10-01, missed in the first pass) | none |
+| REQ-031 | The synthetic contracts state dates both as absolute dates and as dates relative to another stated date. | inferred: Developer | 2026-10-05 list, TASK-001: "varied wording (absolute and relative dates" | ambiguous: Q-031 |
+| REQ-032 | The synthetic contracts include notice periods in days and in months, and contracts with and without renewal. | inferred: Developer | 2026-10-05 list, TASK-001: "notice in days and months, renewal present and absent" | none |
+| REQ-033 | The synthetic contracts include a contract whose notice period is stated in a clause other than the notice clause. | inferred: Developer | 2026-10-05 list, TASK-001: "notice in a different clause" | none |
+| REQ-034 | The synthetic contracts include a contract with an amendment that changes an earlier term. | inferred: Developer | 2026-10-05 list, TASK-001: "an amendment" | ambiguous: Q-030 |
+| REQ-035 | The synthetic contracts include a contract with a clause that continues across a page break. | inferred: Developer | 2026-10-05 list, TASK-001: "a clause across a page break" | none |
+| REQ-036 | The synthetic contracts include a contract with no renewal clause. | inferred: Developer | 2026-10-05 list, TASK-001: "no renewal clause" | none |
+| REQ-037 | The system records the page or pages each clause appears on. | Contract owner | 2026-10-05 list, TASK-001: "numbered-clause splitter that keeps page numbers" | none |
+| REQ-038 | The system retries an extraction once when the model reply fails validation. | Contract owner | 2026-10-05 list, TASK-002: "Validate with Pydantic, retry once on failure" | none |
+| REQ-039 | The evaluation reports extraction results for prompt v1 and prompt v2 side by side. | inferred: Developer | 2026-10-05 list, TASK-003: "Compare prompt v1 and v2" | none |
+| REQ-040 | The system embeds each clause with its contract title and clause heading prefixed to the clause text. | Contract owner | 2026-10-05 list, TASK-004: "Embed clauses with the contract title and heading prefixed" | none |
+| REQ-041 | The evaluation reports recall@5 for vector-only retrieval and for hybrid retrieval. | inferred: Developer | 2026-10-05 list, TASK-004: "Measure recall@5, then add hybrid search" | none |
+| REQ-042 | The system lets the owner set the date it treats as today for reminders and deadlines. | Contract owner | 2026-10-05 list, TASK-005: "with a \"pretend today is\" setting" | ambiguous: Q-032 |
+| REQ-043 | The project records the latest results of every evaluation in EVALS.md. | inferred: Developer | 2026-10-05 list, TASK-006: "Rerun all evals into EVALS.md" | none |
+| REQ-044 | The project has a security review of API key handling and file uploads before the demo. | inferred: Developer | 2026-10-05 list, TASK-006: "/cso for a security review of key handling and uploads" | none |
 
 ## 6. Constraints
 
@@ -91,9 +105,20 @@ From the user's decisions in /office-hours (2026-10-01):
 - D1.4: Refusal has two layers: a retrieval-score floor in code and an instruction in the prompt; about a third of the Q&A eval set is unanswerable.
 - D2: Extraction makes one LLM call per contract with numbered clauses in the input and returns `{value, quote, clause_id}` per field.
 
+From the developer's revised task list (2026-10-05), named methods and tools:
+- Reminders 60, 30 and 7 days before a deadline (reverses Q-001; see Q-029).
+- TASK-001 named reportlab and data/answer_key.json; the developer kept TASK-001 as built
+  (fpdf2, truth.json per contract, ADR-0006) on 2026-10-05 (Q-027).
+- One OpenRouter wrapper with retries, caching by contract hash and a cost log (llm-gateway; Q-028).
+- Versioned extraction prompts (prompt-registry); Pydantic validation of model replies.
+- compute_obligations() with python-dateutil, unit tests for month-end, leap years, days vs months.
+- Skills named per task: bearing:rag (TASK-007), bearing:llm-gateway and bearing:prompt-registry
+  (TASK-002), bearing:llm-eval (TASK-003), bearing:llm-guardrails (TASK-004), gstack /qa (TASK-005),
+  bearing:traceability with zero gaps, gstack /cso and bearing:task-report (TASK-006).
+
 ## 7. Open questions
 
-25 entries in docs/product/questions.md: 14 open, 0 need your confirmation. Q-001 to Q-009, Q-018 and Q-019 confirmed on 2026-10-01; Q-015 to Q-023 come from the critic; Q-024 and Q-025 from the backlog.
+32 entries in docs/product/questions.md: 13 open, 0 need your confirmation. Q-027 to Q-032 come from the 2026-10-05 task list (Q-027, Q-029 to Q-032 confirmed that day); Q-001 was reversed by Q-029 on 2026-10-05.
 
 ## 8. Could not extract
 

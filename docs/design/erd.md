@@ -65,7 +65,7 @@ erDiagram
     reminders {
         uuid id PK
         uuid obligation_id FK
-        integer lead_days "30 or 7"
+        integer lead_days "60, 30 or 7"
         date send_on
         reminder_status status "pending, sending, sent, skipped"
         timestamptz sent_at
@@ -97,4 +97,4 @@ erDiagram
 | clauses | zero-or-one to many | extractions | A field's quote cites one clause of the same contract, enforced by the composite key; null when the cited number does not exist. |
 | contracts | one-to-many | obligations | A contract's dated duties; they go with the contract (CASCADE). |
 | extractions | one-to-many | obligations | Each date is cited to one field of the same contract (composite key); any correction recomputes all of the contract's dates, and a removed field removes its dates (CASCADE). |
-| obligations | one-to-many | reminders | Each obligation gets a 30-day and a 7-day reminder; a removed date must never be emailed (CASCADE). |
+| obligations | one-to-many | reminders | Each obligation gets a 60-day, a 30-day and a 7-day reminder (Q-029); a removed date must never be emailed (CASCADE). |
