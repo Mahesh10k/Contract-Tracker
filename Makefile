@@ -69,6 +69,12 @@ typecheck: ## mypy strict
 	$(call need_tool,typecheck,mypy); \
 	$(UV) run mypy app evals tests && echo "typecheck: $$n files checked"
 
+eval-extraction: ## Extraction eval over the 6 golden contracts, offline from llm_cache (no key, no spend)
+	$(UV) run python -m evals.extraction.run
+
+eval-live: ## Fill llm_cache from OpenRouter and print spend; the only target that spends (reads .env, needs make db)
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m evals.extraction.run --live
+
 test: ## Unit tests with coverage (integration tests excluded)
 	@n=$$(git ls-files -co --exclude-standard 'tests/test_*.py' 'tests/**/test_*.py' | grep -v '^tests/integration/' | wc -l | tr -d ' '); \
 	[ "$$n" -gt 0 ] || { echo "test: 0 test files, nothing checked" >&2; exit 1; }; \

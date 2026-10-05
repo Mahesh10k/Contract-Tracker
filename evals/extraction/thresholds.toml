@@ -1,0 +1,10 @@
+# Extraction eval limits (US-02-001, Q-006, Q-015). 6 golden contracts per field,
+# so one miss is about 17 points; limits are allowed misses, not percentages.
+grounding_min = 0.95
+
+[allowed_misses]
+parties = 1
+effective_date = 1
+term = 1
+auto_renewal = 1
+notice_period = 1

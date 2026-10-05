@@ -120,6 +120,22 @@ Acceptance criteria: AC-US-00-003-1, AC-US-00-003-2, AC-US-00-003-3, AC-US-00-00
 Not applicable: Security: no new input path; Performance: two dates per contract; Accessibility: no screen.
 Invariants: the LLM output is never a date; notice_deadline <= expiry.
 
+## US-02-001: Measure extraction accuracy and quote grounding
+
+Requirements: REQ-024, REQ-057
+Acceptance criteria: AC-US-02-001-1, AC-US-02-001-2, AC-US-02-001-3, AC-US-02-001-4
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-02-001-1 | Happy | Model output equal to the key scores full; empty output scores zero | the graders measure the field, not the wording | AC-US-02-001-1 | TC-0105, TC-0106, TC-0107 |
+| TS-US-02-001-2 | Error | A field over its allowed misses, or no cases at all | the gate stops a regression and never passes on nothing | AC-US-02-001-2, AC-US-02-001-1 | TC-0108, TC-0109, TC-0112 |
+| TS-US-02-001-3 | Happy | Grounding over every returned quote | a made-up quote lowers the number even when it is later held | AC-US-02-001-3 | TC-0110, TC-0114 |
+| TS-US-02-001-4 | Alternate | One truth value changed | the score moves by exactly one, so the eval is sensitive | AC-US-02-001-4 | TC-0111 |
+| TS-US-02-001-5 | Happy | The run over the 6 golden contracts from the cache | the number in EVALS.md comes from the real prompt and model | AC-US-02-001-1 | TC-0113 |
+
+Not applicable: Security: no user input; Performance: 6 calls; Accessibility: no screen.
+Invariants: the eval builds the same request as the app (same cache key); a cache miss offline fails, never calls live.
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered

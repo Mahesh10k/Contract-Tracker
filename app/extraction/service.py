@@ -14,7 +14,9 @@ cites (REQ-014); anything else is held in needs_review with the reason.
 """
 
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,22 +67,38 @@ async def extract_contract(
     return await store(session, prepared, reply, model_id=gateway.model)
 
 
+class ClauseText(Protocol):
+    """What the prompt needs of a clause: a stored one or one fresh from the splitter."""
+
+    @property
+    def number(self) -> str: ...
+    @property
+    def heading(self) -> str: ...
+    @property
+    def body(self) -> str: ...
+
+
+def build_request(title: str, clauses: Sequence[ClauseText]) -> LLMRequest:
+    """Render the extraction prompt for one contract; the app and the eval share it."""
+    prompt = load(PROMPT_NAME, PROMPT_VERSION)
+    text = "\n".join(f"{c.number} {c.heading}\n{c.body}" for c in clauses)
+    return LLMRequest(
+        feature="extraction",
+        prompt_name=PROMPT_NAME,
+        prompt_version=f"v{prompt.version}",
+        system=render(prompt, {"contract_title": title, "contract": text}),
+        user="Return the JSON object for the contract above.",
+        max_tokens=prompt.max_tokens,
+    )
+
+
 async def prepare(session: AsyncSession, contract_id: uuid.UUID) -> PreparedExtraction:
     """Read the contract and render the extraction prompt with its clauses. Writes nothing."""
     contract = await contract_repo.find_contract(session, contract_id)
     if contract is None:
         raise NotFoundError(f"Contract {contract_id} not found")
     stored = await contract_repo.clauses_of(session, contract_id)
-    prompt = load(PROMPT_NAME, PROMPT_VERSION)
-    text = "\n".join(f"{c.number} {c.heading}\n{c.body}" for c in stored)
-    request = LLMRequest(
-        feature="extraction",
-        prompt_name=PROMPT_NAME,
-        prompt_version=f"v{prompt.version}",
-        system=render(prompt, {"contract_title": contract.title, "contract": text}),
-        user="Return the JSON object for the contract above.",
-        max_tokens=prompt.max_tokens,
-    )
+    request = build_request(contract.title, stored)
     return PreparedExtraction(contract_id, request, {c.number: c for c in stored})
 
 
