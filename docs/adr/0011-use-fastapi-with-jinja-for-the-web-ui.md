@@ -1,6 +1,6 @@
 # ADR-0011: Use FastAPI with Jinja templates for the web UI
 
-- Status: Accepted
+- Status: Superseded by ADR-0012 on 2026-10-05
 - Date: 2026-10-01
 - Task: none
 - Deciders: Developer (project owner), in tech-decision on 2026-10-01
