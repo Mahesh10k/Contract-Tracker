@@ -37,7 +37,7 @@ setup: ## Install Python 3.12, dependencies (writes uv.lock) and git hooks
 dev: ## Run the API locally with reload (reads .env if present)
 	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run uvicorn app.main:create_app --factory --reload --host 0.0.0.0 --port "$${PORT:-8080}"
 
-contracts: ## Write the 18 synthetic contracts and their truth.json answer keys to data/contracts (deterministic)
+contracts: ## Write the synthetic contracts, their truth.json files and data/answer_key.json for the 6 golden ones (deterministic)
 	$(UV) run python -m evals.contracts.generate data/contracts
 
 ingest: ## Load contract PDFs: make ingest FILES="data/contracts/*.pdf" [TYPE=lease|vendor|service]

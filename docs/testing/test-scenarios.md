@@ -69,6 +69,23 @@ Acceptance criteria: AC-US-00-009-1, AC-US-00-009-2, AC-US-00-009-3
 Not applicable: Security: no new input path; Performance: two integer columns; Accessibility: no screen (pages appear in the UI in TASK-005).
 Invariants: first_page <= last_page or both NULL (chk_clauses_pages_ordered).
 
+## US-02-006: Pick the 6-contract golden set and its answer key
+
+Requirements: REQ-054, REQ-055
+Acceptance criteria: AC-US-02-006-1, AC-US-02-006-2, AC-US-02-006-3, AC-US-02-006-4
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-02-006-1 | Happy | `make contracts` writes the answer key for 2 leases, 2 vendor and 2 service contracts | every eval and the demo run on the same six files | AC-US-02-006-1 | TC-0072 |
+| TS-US-02-006-2 | Error | A golden id the generator did not write | a typo in the golden list fails loudly instead of shrinking the set | AC-US-02-006-1 | TC-0073 |
+| TS-US-02-006-3 | Edge | Holdout contracts and the two hard cases | the set holds the traps and none of the held-out contracts | AC-US-02-006-1, AC-US-02-006-2 | TC-0074, TC-0075 |
+| TS-US-02-006-4 | Happy | Key values equal truth.json, 5 fields only | the eval scores against the generator's own truth | AC-US-02-006-3 | TC-0076, TC-0077 |
+| TS-US-02-006-5 | Edge | The no-renewal contract has no auto_renewal quote | a missing clause is expected as null, not as an empty string | AC-US-02-006-3 | TC-0078 |
+| TS-US-02-006-6 | Alternate | The generator runs twice | the key is byte-identical, so cached replies and scores stay comparable | AC-US-02-006-4 | TC-0079 |
+
+Not applicable: Security: no input from users; Performance: six records; Accessibility: no screen.
+Invariants: every golden id has a truth.json; the key lists exactly the 5 fields of REQ-045 per contract.
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered

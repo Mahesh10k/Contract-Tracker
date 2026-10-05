@@ -1,0 +1,220 @@
+{
+  "contracts": {
+    "lease-01": {
+      "title": "Lease Agreement 01",
+      "contract_type": "lease",
+      "hard_case": null,
+      "fields": {
+        "parties": {
+          "value": "Northgate Realty Inc and Delta Foods Inc",
+          "quote": "This Lease is made between Northgate Realty Inc and Delta Foods Inc.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "1 January 2025",
+          "quote": "The term commences on 1 January 2025.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "two (2) years",
+          "quote": "The term is two (2) years from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": "does not renew automatically",
+          "quote": "This Lease does not renew automatically.",
+          "clause": "2.3"
+        },
+        "notice_period": {
+          "value": "not less than thirty days",
+          "quote": "Either party may end this Lease at expiry by giving not less than thirty days written notice before the end of the term.",
+          "clause": "7"
+        }
+      },
+      "expected": {
+        "expiry": "2026-12-31",
+        "notice_deadline": "2026-12-01"
+      }
+    },
+    "lease-04": {
+      "title": "Lease Agreement 04",
+      "contract_type": "lease",
+      "hard_case": null,
+      "fields": {
+        "parties": {
+          "value": "Oakline Estates Ltd and Acme Analytics Inc",
+          "quote": "This Lease is made between Oakline Estates Ltd and Acme Analytics Inc.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "1 April 2026",
+          "quote": "The term commences on 1 April 2026.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "one (1) year",
+          "quote": "The term is one (1) year from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": "renews automatically for successive one-year terms",
+          "quote": "This Lease renews automatically for successive one-year terms unless either party gives notice under clause 7.",
+          "clause": "2.3"
+        },
+        "notice_period": {
+          "value": "sixty (60) days",
+          "quote": "Either party may end this Lease at expiry by giving sixty (60) days written notice before the end of the term.",
+          "clause": "7"
+        }
+      },
+      "expected": {
+        "expiry": "2027-03-31",
+        "notice_deadline": "2027-01-30"
+      }
+    },
+    "vendor-07": {
+      "title": "Supply Agreement 07",
+      "contract_type": "vendor",
+      "hard_case": "notice-elsewhere",
+      "fields": {
+        "parties": {
+          "value": "Brightpath Supplies Inc and Cedar Health Ltd",
+          "quote": "This Agreement is made between Brightpath Supplies Inc and Cedar Health Ltd.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "three (3) months after 1 June 2025",
+          "quote": "The term commences three (3) months after 1 June 2025, the date this Agreement is signed.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "two (2) years",
+          "quote": "The term is two (2) years from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": "renews automatically for successive one-year terms",
+          "quote": "This Agreement renews automatically for successive one-year terms unless either party gives notice under clause 7.",
+          "clause": "2.3"
+        },
+        "notice_period": {
+          "value": "three (3) months",
+          "quote": "Notice to prevent renewal must be given three (3) months before the end of the term.",
+          "clause": "2.3"
+        }
+      },
+      "expected": {
+        "expiry": "2027-08-31",
+        "notice_deadline": "2027-05-31"
+      }
+    },
+    "vendor-08": {
+      "title": "Supply Agreement 08",
+      "contract_type": "vendor",
+      "hard_case": "no-renewal",
+      "fields": {
+        "parties": {
+          "value": "Copperleaf Trading Ltd and Acme Analytics Inc",
+          "quote": "This Agreement is made between Copperleaf Trading Ltd and Acme Analytics Inc.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "1 April 2024",
+          "quote": "The term commences on 1 April 2024.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "one (1) year",
+          "quote": "The term is one (1) year from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": null,
+          "quote": null,
+          "clause": null
+        },
+        "notice_period": {
+          "value": "ninety (90) days",
+          "quote": "Either party may end this Agreement at expiry by giving ninety (90) days written notice before the end of the term.",
+          "clause": "7"
+        }
+      },
+      "expected": {
+        "expiry": "2025-03-31",
+        "notice_deadline": "2024-12-31"
+      }
+    },
+    "service-01": {
+      "title": "Services Agreement 01",
+      "contract_type": "service",
+      "hard_case": null,
+      "fields": {
+        "parties": {
+          "value": "Bluebell Security Inc and Delta Foods Inc",
+          "quote": "This Agreement is made between Bluebell Security Inc and Delta Foods Inc.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "1 August 2024",
+          "quote": "The term commences on 1 August 2024.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "two (2) years",
+          "quote": "The term is two (2) years from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": "does not renew automatically",
+          "quote": "This Agreement does not renew automatically.",
+          "clause": "2.3"
+        },
+        "notice_period": {
+          "value": "three (3) months",
+          "quote": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term.",
+          "clause": "7"
+        }
+      },
+      "expected": {
+        "expiry": "2026-07-31",
+        "notice_deadline": "2026-04-30"
+      }
+    },
+    "service-04": {
+      "title": "Services Agreement 04",
+      "contract_type": "service",
+      "hard_case": null,
+      "fields": {
+        "parties": {
+          "value": "Bluebell Security Inc and Beta Logistics LLC",
+          "quote": "This Agreement is made between Bluebell Security Inc and Beta Logistics LLC.",
+          "clause": "1"
+        },
+        "effective_date": {
+          "value": "1 April 2024",
+          "quote": "The term commences on 1 April 2024.",
+          "clause": "2.1"
+        },
+        "term": {
+          "value": "five (5) years",
+          "quote": "The term is five (5) years from the commencement date.",
+          "clause": "2.2"
+        },
+        "auto_renewal": {
+          "value": "does not renew automatically",
+          "quote": "This Agreement does not renew automatically.",
+          "clause": "2.3"
+        },
+        "notice_period": {
+          "value": "three (3) months",
+          "quote": "Either party may end this Agreement at expiry by giving three (3) months written notice before the end of the term.",
+          "clause": "7"
+        }
+      },
+      "expected": {
+        "expiry": "2029-03-31",
+        "notice_deadline": "2028-12-31"
+      }
+    }
+  }
+}
