@@ -22,9 +22,8 @@ from app.db.repositories import contracts as contract_repo
 from app.db.repositories.llm_calls import LlmCallLedger
 from app.db.session import make_engine, make_session_factory
 from app.extraction import service
-from app.extraction.schema import ExtractionReply
 from app.llm.cache import ReplyCache
-from app.llm.gateway import BudgetReachedError, Gateway
+from app.llm.gateway import BudgetReachedError, Gateway, InvalidReplyError
 
 
 async def run(
@@ -67,12 +66,19 @@ async def _extract_one(
         prepared = await service.prepare(session, contract_id)
     async with factory() as ledger_session:
         gateway = gateway_for(ledger_session)
+        reply: service.Reply | None
         try:
-            reply = (await gateway.parse(prepared.request, ExtractionReply)).value
+            reply = (await gateway.parse(prepared.request, service.REPLY_SCHEMA)).value
+        except InvalidReplyError:
+            reply = None
         finally:
             await ledger_session.commit()
     async with factory() as session, session.begin():
-        result = await service.store(session, prepared, reply, model_id=gateway.model)
+        if reply is None:
+            rows = service.invalid_reply_rows()
+            result = await service.store_rows(session, prepared, rows, model_id=gateway.model)
+        else:
+            result = await service.store(session, prepared, reply, model_id=gateway.model)
         label = await contract_repo.source_name(session, contract_id)
     sys.stdout.write(f"{label}: {result.accepted} accepted, {result.needs_review} need review\n")
 
@@ -88,7 +94,7 @@ async def _main(names: list[str]) -> int:
                 return Gateway(
                     client=client,
                     cache=ReplyCache(settings.llm_cache_dir),
-                    ledger=LlmCallLedger(ledger_session),
+                    ledger=LlmCallLedger(ledger_session, since=settings.llm_budget_since),
                     model=settings.llm_model,
                     api_key=settings.openrouter_api_key,
                     budget_stop_usd=settings.llm_budget_stop_usd,
@@ -102,7 +108,9 @@ async def _main(names: list[str]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     """Parse arguments and extract the contracts."""
-    parser = argparse.ArgumentParser(description="Extract the 10 fields from stored contracts.")
+    parser = argparse.ArgumentParser(
+        description="Extract the 5 fields (prompt v2) from stored contracts."
+    )
     parser.add_argument("names", nargs="*", help="PDF file names without .pdf; none means all")
     args = parser.parse_args(argv)
     return asyncio.run(_main(args.names))

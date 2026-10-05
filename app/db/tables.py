@@ -91,6 +91,7 @@ review_reason = Enum(
     "clause_not_found",
     "could_not_parse",
     "value_missing",
+    "invalid_reply",
     name="review_reason",
     create_type=False,
 )

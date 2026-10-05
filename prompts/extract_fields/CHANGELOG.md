@@ -1,5 +1,20 @@
 # extract_fields changelog
 
+## v2 (draft, 2026-10-05)
+
+Scope change, not tuning (TASK-008, ADR-0015): the one-day brief keeps 5
+fields (parties, effective_date, term, auto_renewal, notice_period), so v2
+asks for those only (ExtractionReplyV2). Same rules as v1; adds that
+clause_id is where the sentence actually is (the notice-elsewhere hard case),
+that effective_date keeps any offset as written, and a toy example for a
+notice stated in a termination clause. max_tokens 2000 to 1200 for the
+smaller reply.
+
+- seed: 10/10 fixtures render with no placeholder left and pass variable
+  validation (`tests/test_prompts.py`).
+- Wording review (claude-api prompt-audit): not run.
+- Full score: not run yet; first scored at STOP 2 by `make eval-live`.
+
 ## v1 (draft, 2026-10-05)
 
 First version (TASK-002, ADR-0008). One call per contract: the numbered

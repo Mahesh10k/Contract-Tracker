@@ -12,6 +12,7 @@ from structlog.testing import capture_logs
 
 from app.llm.cache import ReplyCache
 from app.llm.gateway import (
+    InvalidReplyError,
     BudgetReachedError,
     FeatureDisabledError,
     Gateway,
@@ -315,3 +316,36 @@ async def test_the_retry_is_refused_when_the_first_attempt_reaches_the_stop(
         await gateway.parse(REQ, Answer)
 
     assert len(replies.requests) == 1
+
+
+async def test_tc0083_two_schema_invalid_replies_raise_invalid_reply(tmp_path: Path) -> None:
+    # TASK-008, REQ-046: an unreadable reply after the retry is its own error.
+    replies = Replies(ok(chat_reply("not json")), ok(chat_reply("not json")))
+    gateway, ledger = make(replies, tmp_path)
+
+    with pytest.raises(InvalidReplyError):
+        await gateway.parse(REQ, Answer)
+
+    assert len(ledger.records) == 2
+    assert not list((tmp_path / "cache").glob("**/*.json"))
+
+
+async def test_tc0085_two_timeouts_are_not_an_invalid_reply(tmp_path: Path) -> None:
+    replies = Replies(httpx.ReadTimeout("slow"), httpx.ReadTimeout("slow"))
+    gateway, _ = make(replies, tmp_path)
+
+    with pytest.raises(GatewayFailedError) as raised:
+        await gateway.parse(REQ, Answer)
+
+    assert not isinstance(raised.value, InvalidReplyError)
+
+
+async def test_tc0086_invalid_then_valid_returns_the_retry_and_caches_it(tmp_path: Path) -> None:
+    replies = Replies(ok(chat_reply("not json")), ok(chat_reply(GOOD)))
+    gateway, _ = make(replies, tmp_path)
+
+    first = await gateway.parse(REQ, Answer)
+    again = await gateway.parse(REQ, Answer)
+
+    assert first.value == Answer(answer="Delaware")
+    assert again.cache_hit is True

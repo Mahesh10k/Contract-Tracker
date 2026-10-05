@@ -18,7 +18,7 @@ CREATE TYPE extraction_field AS ENUM (
     'payment_terms', 'escalation', 'liability_cap', 'termination_rights', 'governing_law'
 );
 CREATE TYPE extraction_status AS ENUM ('accepted', 'needs_review', 'corrected');
-CREATE TYPE review_reason AS ENUM ('quote_not_found', 'clause_not_found', 'could_not_parse', 'value_missing');
+CREATE TYPE review_reason AS ENUM ('quote_not_found', 'clause_not_found', 'could_not_parse', 'value_missing', 'invalid_reply');
 CREATE TYPE obligation_kind AS ENUM ('expiry', 'notice_deadline', 'renewal', 'escalation', 'payment');
 CREATE TYPE reminder_status AS ENUM ('pending', 'sending', 'sent', 'skipped');
 

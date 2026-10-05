@@ -31,3 +31,11 @@ async def test_tc0021_vector_extension_and_hnsw_index_exist(session: AsyncSessio
     assert extension == "vector"
     assert index is not None
     assert "hnsw" in index
+
+
+async def test_tc0089_review_reason_has_invalid_reply(session: AsyncSession) -> None:
+    # TASK-008, migration 0003; its Down runs in make migrate-verify.
+    values = await session.scalar(text("SELECT enum_range(NULL::review_reason)::text"))
+
+    assert values is not None
+    assert "invalid_reply" in values

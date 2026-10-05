@@ -41,3 +41,26 @@ class ExtractionReply(BaseModel):
     reason: str | None
     injection_suspected: bool
     fields: Fields
+
+
+class FieldsV2(BaseModel):
+    """The 5 fields of REQ-045 (prompt v2, ADR-0015), all required, each possibly null inside."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    parties: FieldReply
+    effective_date: FieldReply
+    term: FieldReply
+    auto_renewal: FieldReply
+    notice_period: FieldReply
+
+
+class ExtractionReplyV2(BaseModel):
+    """The whole reply for one contract (prompts/extract_fields/v2.md)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["ok", "unsupported"]
+    reason: str | None
+    injection_suspected: bool
+    fields: FieldsV2

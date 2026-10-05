@@ -44,7 +44,7 @@ ingest: ## Load contract PDFs: make ingest FILES="data/contracts/*.pdf" [TYPE=le
 	@[ -n "$(FILES)" ] || { echo "usage: make ingest FILES=\"data/contracts/*.pdf\" [TYPE=lease]" >&2; exit 2; }
 	DATABASE_URL=$(DATABASE_URL) $(UV) run python -m app.ingestion.cli $(FILES) $(if $(TYPE),--type $(TYPE))
 
-extract: ## Extract the 10 fields: make extract NAMES="lease-01 vendor-02" (no NAMES: every contract)
+extract: ## Extract the 5 fields (prompt v2): make extract NAMES="lease-01 vendor-02" (no NAMES: every contract)
 	DATABASE_URL=$(DATABASE_URL) $(UV) run python -m app.extraction.cli $(NAMES)
 
 format: ## Format

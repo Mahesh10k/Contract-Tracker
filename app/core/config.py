@@ -4,6 +4,7 @@ Construction fails fast and names every invalid variable at once. Secrets
 have no defaults. `get_settings` is the one module-level singleton.
 """
 
+from datetime import date
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
@@ -34,7 +35,9 @@ class Settings(BaseSettings):
     # LLM through OpenRouter (ADR-0001, ADR-0002); no key means replay from the cache only.
     openrouter_api_key: SecretStr | None = None
     llm_model: str = "anthropic/claude-haiku-4.5"
-    llm_budget_stop_usd: Decimal = Decimal(9)
+    # USD 2 for the one-day build: stop at 1.80, counting spend since this date (ADR-0014, Q-033).
+    llm_budget_stop_usd: Decimal = Decimal("1.80")
+    llm_budget_since: date | None = date(2026, 10, 5)
     llm_cache_dir: Path = Path("llm_cache")
 
     @field_validator("openrouter_api_key", mode="before")
