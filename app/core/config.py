@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     llm_budget_stop_usd: Decimal = Decimal(9)
     llm_cache_dir: Path = Path("llm_cache")
 
+    @field_validator("openrouter_api_key", mode="before")
+    @classmethod
+    def _blank_key_is_no_key(cls, value: object) -> object:
+        """`OPENROUTER_API_KEY=` left empty means replay only, never a call with a blank key."""
+        return None if value == "" else value
+
     @field_validator("database_url")
     @classmethod
     def _async_driver(cls, value: PostgresDsn) -> PostgresDsn:
