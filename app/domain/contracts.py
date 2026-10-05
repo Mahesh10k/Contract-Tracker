@@ -16,6 +16,29 @@ class Clause:
 
 
 @dataclass(frozen=True)
+class StoredClause:
+    """A clause as stored, with the id an extraction cites."""
+
+    id: uuid.UUID
+    number: str
+    heading: str
+    body: str
+
+
+@dataclass(frozen=True)
+class FieldRow:
+    """One extracted field ready to store (US-00-002)."""
+
+    field_name: str
+    value_text: str | None
+    quote: str | None
+    cited_clause_number: str | None
+    clause_id: uuid.UUID | None
+    status: str
+    review_reason: str | None
+
+
+@dataclass(frozen=True)
 class StoredContract:
     """A contract already in the database, as the duplicate check needs it."""
 

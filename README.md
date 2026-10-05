@@ -11,6 +11,15 @@ contracts". `make help` lists every command; `make check` is the gate.
   `truth.json` answer keys to `data/contracts/` (deterministic; committed).
   `make ingest FILES="data/contracts/*.pdf"` loads PDFs as contracts and numbered
   clauses; a PDF without truth.json needs `TYPE=lease|vendor|service`.
+- TASK-002 (extraction): `make extract NAMES="lease-01"` (no NAMES: every
+  contract) makes one structured call per contract through the LLM gateway
+  (`app/llm/`) with the versioned prompt `prompts/extract_fields/v1.md`, and
+  stores 10 fields with value, quote and clause. A quote not found in its cited
+  clause holds the field in needs_review. Replies are cached in `llm_cache/`
+  (committed, ADR-0009); a replay needs no key and costs nothing. A live call
+  needs `OPENROUTER_API_KEY` in `.env`; every attempt is logged in `llm_calls`
+  and calls stop once recorded spend reaches `LLM_BUDGET_STOP_USD` (USD 9).
+  Re-run the command to retry a failed contract.
 - Migration 0001 creates the full schema from `docs/design/schema.sql`.
 - The Bearing `python-api` skeleton: FastAPI app with `/healthz` and `/readyz`,
   settings, structured logging, Alembic.
@@ -22,6 +31,7 @@ make db && make migrate   # add POSTGRES_PORT=55432 to every db command if 5432 
 # A database migrated on main before TASK-001 holds the old probe migration:
 # run make db-reset once (it deletes local data) before make migrate.
 make contracts && make ingest FILES="data/contracts/*.pdf"
+make extract          # replays llm_cache/; a cache miss needs OPENROUTER_API_KEY
 make check            # unit gates; make test-integration needs make db
 ```
 

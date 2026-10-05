@@ -7,7 +7,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.tables import clauses, contracts
-from app.domain.contracts import Clause, ContractRefusedError, NewContract, StoredContract
+from app.domain.contracts import (
+    Clause,
+    ContractRefusedError,
+    NewContract,
+    StoredClause,
+    StoredContract,
+)
 
 
 def _refused(exc: IntegrityError) -> ContractRefusedError:
@@ -86,3 +92,46 @@ async def source_filename(session: AsyncSession, contract_id: uuid.UUID) -> str 
     return await session.scalar(
         select(contracts.c.source_filename).where(contracts.c.id == contract_id)
     )
+
+
+async def find_contract(session: AsyncSession, contract_id: uuid.UUID) -> StoredContract | None:
+    """The contract's id and title, or None for an unknown id."""
+    row = (
+        await session.execute(
+            select(contracts.c.id, contracts.c.title).where(contracts.c.id == contract_id)
+        )
+    ).first()
+    return StoredContract(id=row.id, title=row.title) if row else None
+
+
+async def find_by_source_stem(session: AsyncSession, stem: str) -> uuid.UUID | None:
+    """The id of the contract loaded from `<stem>.pdf`, or None."""
+    return await session.scalar(
+        select(contracts.c.id).where(contracts.c.source_filename == f"{stem}.pdf")
+    )
+
+
+async def all_contract_ids(session: AsyncSession) -> list[uuid.UUID]:
+    """Every contract id, oldest first (bounded by the synthetic set's size)."""
+    result = await session.scalars(
+        select(contracts.c.id).order_by(contracts.c.created_at, contracts.c.id).limit(1000)
+    )
+    return list(result)
+
+
+async def source_name(session: AsyncSession, contract_id: uuid.UUID) -> str:
+    """The file name a contract was loaded from ("" for an unknown id)."""
+    return await source_filename(session, contract_id) or ""
+
+
+async def clauses_of(session: AsyncSession, contract_id: uuid.UUID) -> list[StoredClause]:
+    """A contract's clauses in document order."""
+    result = await session.execute(
+        select(clauses.c.id, clauses.c.clause_number, clauses.c.heading, clauses.c.body)
+        .where(clauses.c.contract_id == contract_id)
+        .order_by(clauses.c.position)
+    )
+    return [
+        StoredClause(id=r.id, number=r.clause_number, heading=r.heading, body=r.body)
+        for r in result
+    ]
