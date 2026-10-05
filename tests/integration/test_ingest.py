@@ -109,6 +109,48 @@ async def test_tc0004_every_generated_contract_stores_its_truth_clauses(
     assert [tuple(r) for r in stored] == [(c["number"], c["heading"]) for c in truth["clauses"]]
 
 
+async def test_tc0068_the_page_break_clause_is_stored_on_pages_1_to_2(
+    session: AsyncSession, generated: Path
+) -> None:
+    result = await ingest_file(session, generated / "lease-08.pdf")
+
+    stored = await session.execute(
+        select(clauses.c.clause_number, clauses.c.first_page, clauses.c.last_page)
+        .where(clauses.c.contract_id == result.contract_id)
+        .order_by(clauses.c.position)
+    )
+    pages = {r.clause_number: (r.first_page, r.last_page) for r in stored}
+    assert (1, 2) in pages.values()
+    assert pages["1"] == (1, 1)
+    assert pages[max(pages, key=lambda n: tuple(int(p) for p in n.split(".")))] == (2, 2)
+
+
+async def test_tc0069_a_clause_written_without_pages_keeps_them_empty(
+    session: AsyncSession, generated: Path
+) -> None:
+    # Migration 0002 adds nullable columns with no default: rows written before it stay unguessed.
+    result = await ingest_file(session, generated / "lease-01.pdf")
+    await session.execute(
+        clauses.insert().values(
+            contract_id=result.contract_id,
+            clause_number="99",
+            heading="Old Row",
+            body="A clause stored before page numbers existed.",
+            position=99,
+        )
+    )
+
+    row = (
+        await session.execute(
+            select(clauses.c.body, clauses.c.first_page, clauses.c.last_page).where(
+                clauses.c.clause_number == "99"
+            )
+        )
+    ).one()
+
+    assert row == ("A clause stored before page numbers existed.", None, None)
+
+
 async def test_tc0008_clause_7_2_is_returned_without_its_neighbours(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -223,7 +265,7 @@ async def test_tc0024_failure_while_storing_clauses_leaves_nothing(
 ) -> None:
     # The splitter never yields an empty body, so the refusal is injected at its seam.
     refused = [Clause("1", "Parties", "A and B."), Clause("2", "Term", " ")]
-    monkeypatch.setattr("app.ingestion.service.split_clauses", lambda _text: refused)
+    monkeypatch.setattr("app.ingestion.service.split_pages", lambda _pages: refused)
     path = write(tmp_path, "blank-clause.pdf", text_pdf("1 Parties\nA and B."))
 
     with pytest.raises(InvalidContractError) as raised:

@@ -28,10 +28,11 @@ class NoTextLayerError(DomainError):
 
 @dataclass(frozen=True)
 class PdfText:
-    """The text of every page joined in order, and the page count."""
+    """The text of every page joined in order, each page's own text, and the page count."""
 
     text: str
     page_count: int
+    pages: tuple[str, ...] = ()
 
 
 def read_pdf(data: bytes) -> PdfText:
@@ -47,4 +48,4 @@ def read_pdf(data: bytes) -> PdfText:
     text = "\n".join(pages)
     if not text.strip():
         raise NoTextLayerError("No text found; scanned PDFs are not supported")
-    return PdfText(text=text, page_count=len(pages))
+    return PdfText(text=text, page_count=len(pages), pages=tuple(pages))

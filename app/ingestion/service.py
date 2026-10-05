@@ -19,7 +19,7 @@ from app.core.errors import DomainError, NotFoundError
 from app.db.repositories import contracts as repo
 from app.domain.contracts import Clause, ContractRefusedError, NewContract
 from app.ingestion.pdf import read_pdf
-from app.ingestion.splitter import split_clauses
+from app.ingestion.splitter import split_pages
 
 CONTRACT_TYPES = ("lease", "vendor", "service")
 
@@ -111,7 +111,7 @@ async def ingest_file(
 
     kind, title = await _type_and_title(path, contract_type)
     pdf = await anyio.to_thread.run_sync(read_pdf, data)
-    found = split_clauses(pdf.text)
+    found = split_pages(pdf.pages)
     if not found:
         raise NoClausesError(f"No numbered clauses found in {path.name}")
     try:

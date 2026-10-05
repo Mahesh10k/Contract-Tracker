@@ -1,6 +1,6 @@
 """Clause splitter: numbered headings become clauses (US-00-001, AC-US-00-001-2)."""
 
-from app.ingestion.splitter import Clause, split_clauses
+from app.ingestion.splitter import Clause, split_clauses, split_pages
 
 
 def test_two_plain_clauses_are_split_in_order() -> None:
@@ -123,3 +123,42 @@ def test_a_dotted_list_inside_undotted_clauses_is_body_text() -> None:
 
     assert [(c.number, c.heading) for c in clauses] == [("1", "Parties"), ("2", "Term")]
     assert "2. Acme Analytics Inc" in clauses[0].body
+
+
+def test_tc0066_a_clause_on_page_2_has_pages_2_to_2() -> None:
+    pages = ["1 Parties\nAcme and Beta.", "2 Term\nThree years."]
+
+    clauses = split_pages(pages)
+
+    assert [(c.number, c.first_page, c.last_page) for c in clauses] == [
+        ("1", 1, 1),
+        ("2", 2, 2),
+    ]
+
+
+def test_tc0067_a_clause_across_a_page_break_is_one_clause_on_pages_1_to_2() -> None:
+    pages = [
+        "1 Parties\nAcme and Beta.\n2 Term\nThe term is three",
+        "years from the start.\n3 Law\nDelaware.",
+    ]
+
+    clauses = split_pages(pages)
+
+    assert [(c.number, c.first_page, c.last_page) for c in clauses] == [
+        ("1", 1, 1),
+        ("2", 1, 2),
+        ("3", 2, 2),
+    ]
+    assert clauses[1].body == "The term is three\nyears from the start."
+
+
+def test_tc0070_a_heading_alone_at_the_foot_of_page_1_starts_on_page_1() -> None:
+    clauses = split_pages(["1 Parties\nAcme.\n2 Term", "Three years."])
+
+    assert (clauses[1].first_page, clauses[1].last_page) == (1, 2)
+
+
+def test_tc0071_text_without_pages_has_no_page_numbers() -> None:
+    clauses = split_clauses("1 Parties\nAcme.")
+
+    assert (clauses[0].first_page, clauses[0].last_page) == (None, None)

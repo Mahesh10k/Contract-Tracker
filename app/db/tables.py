@@ -47,6 +47,8 @@ clauses = Table(
     Column("heading", Text, nullable=False),
     Column("body", Text, nullable=False),
     Column("position", Integer, nullable=False),
+    Column("first_page", Integer),
+    Column("last_page", Integer),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
     Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
 )

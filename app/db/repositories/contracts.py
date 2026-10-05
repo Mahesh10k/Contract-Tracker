@@ -67,6 +67,8 @@ async def insert_clauses(
                     "heading": c.heading,
                     "body": c.body,
                     "position": position,
+                    "first_page": c.first_page,
+                    "last_page": c.last_page,
                 }
                 for position, c in enumerate(found, start=1)
             ],
@@ -79,12 +81,18 @@ async def find_clause(session: AsyncSession, contract_id: uuid.UUID, number: str
     """Clause `number` of a contract, or None."""
     row = (
         await session.execute(
-            select(clauses.c.clause_number, clauses.c.heading, clauses.c.body).where(
-                clauses.c.contract_id == contract_id, clauses.c.clause_number == number
-            )
+            select(
+                clauses.c.clause_number,
+                clauses.c.heading,
+                clauses.c.body,
+                clauses.c.first_page,
+                clauses.c.last_page,
+            ).where(clauses.c.contract_id == contract_id, clauses.c.clause_number == number)
         )
     ).first()
-    return Clause(number=row.clause_number, heading=row.heading, body=row.body) if row else None
+    if row is None:
+        return None
+    return Clause(row.clause_number, row.heading, row.body, row.first_page, row.last_page)
 
 
 async def source_filename(session: AsyncSession, contract_id: uuid.UUID) -> str | None:

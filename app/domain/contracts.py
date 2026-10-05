@@ -8,11 +8,17 @@ from app.core.errors import DomainError
 
 @dataclass(frozen=True)
 class Clause:
-    """One numbered clause: its number as printed, heading and body text."""
+    """One numbered clause: its number as printed, heading, body and the pages it is on.
+
+    Pages are 1-based and None when the text came without page boundaries
+    (US-00-009).
+    """
 
     number: str
     heading: str
     body: str
+    first_page: int | None = None
+    last_page: int | None = None
 
 
 @dataclass(frozen=True)
