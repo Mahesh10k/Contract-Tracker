@@ -23,6 +23,24 @@ Acceptance criteria: AC-US-00-001-1, AC-US-00-001-2, AC-US-00-001-3, AC-US-00-00
 Not applicable: Performance: 18 small PDFs, no SLO in the PRD; Accessibility: no screen in this task (the upload page is US-00-007).
 Invariants: a contract is stored with all its clauses or not at all (TC-0024).
 
+## US-00-002: Extract the 10 fields with a checked quote each
+
+Requirements: REQ-005, REQ-006, REQ-014, REQ-015, REQ-038
+Acceptance criteria: AC-US-00-002-1, AC-US-00-002-2, AC-US-00-002-3, AC-US-00-002-4, AC-US-00-002-5, AC-US-00-002-6, AC-US-00-002-7
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-US-00-002-1 | Happy | One call extracts the 10 fields with value, quote and clause | every contract gets all 10 fields, each traceable to a clause | AC-US-00-002-1, AC-US-00-002-2 | TC-0035, TC-0038 |
+| TS-US-00-002-2 | Alternate | A bad reply is retried once, or a cached reply is reused | a single bad reply or a repeat run costs no extra correctness | AC-US-00-002-5, AC-US-00-002-7 | TC-0036, TC-0046, TC-0054 |
+| TS-US-00-002-3 | Error | The model times out, returns 5xx or fails the schema twice | a failed extraction stores nothing and says why | AC-US-00-002-7 | TC-0052, TC-0053, TC-0055, TC-0056 |
+| TS-US-00-002-4 | Edge | Quotes differ by layout only, are made up, or cite the wrong or a missing clause | only a quote really in its cited clause is accepted | AC-US-00-002-2, AC-US-00-002-3, AC-US-00-002-4 | TC-0037, TC-0039, TC-0043, TC-0044, TC-0045 |
+| TS-US-00-002-5 | Edge | Normalisation of line breaks, hyphens and quotes | layout noise is ignored and real wording differences are not | AC-US-00-002-3 | TC-0040, TC-0041, TC-0042 |
+| TS-US-00-002-6 | Edge | Spend at, just under and across USD 9 | no call is made once recorded spend reaches USD 9 | AC-US-00-002-6 | TC-0049, TC-0050, TC-0051 |
+| TS-US-00-002-7 | Security | Prompt or model change against the reply cache | a cached answer is never reused for a different prompt or model | AC-US-00-002-5 | TC-0047, TC-0048 |
+
+Not applicable: Performance: about 18 calls per full run, no SLO in the PRD; Accessibility: no screen in this task (the retry button is US-00-007).
+Invariants: a contract has 10 extraction rows or none (TC-0056); every live call is recorded with its cost (TC-0051, TC-0055).
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered

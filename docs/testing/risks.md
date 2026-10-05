@@ -35,3 +35,8 @@ No git history touches these paths yet (one commit, no fixes), so likelihood com
 | R-004 | US-00-001 | A scanned, corrupt or non-PDF file is half stored or crashes the command, leaving a contract with no clauses | AC-US-00-001-4, AC-US-00-001-6, external input, TASK-001 review finding 2 | M | M | Medium | TC-0011, TC-0017, TC-0018, TC-0024, TC-0029, TC-0030, TC-0031, TC-0034 |
 | R-005 | US-00-001 | Migration 0001 fails on the vector extension or its downgrade leaves objects behind, blocking every later task and CI | review T3, T1, change size | M | M | Medium | TC-0020, TC-0021 |
 | R-006 | US-00-001 | Integration tests stop rolling back, so rows leak between tests and failures become random | review T4 | L | M | Low | TC-0023 |
+| R-007 | US-00-002 | A quote the model made up, or took from another clause, is accepted as grounded, so a wrong deadline drives a missed notice | AC-US-00-002-4, B3, new LLM integration | M | H | High | TC-0044, TC-0045, TC-0042 |
+| R-008 | US-00-002 | Spend escapes the USD 9 stop because a retry or a failed attempt is not logged, or the stop is checked after the call | AC-US-00-002-6, AC-US-00-002-7, Q-007 | M | H | High | TC-0049, TC-0051, TC-0055 |
+| R-009 | US-00-002 | A cached reply survives a prompt or model change, so extraction and the eval keep using the old prompt's answers | AC-US-00-002-5, Q-028, ADR-0009 | M | M | Medium | TC-0047, TC-0048 |
+| R-010 | US-00-002 | A failed extraction leaves some field rows behind, so a contract looks half extracted | AC-US-00-002-7 | M | M | Medium | TC-0052, TC-0056 |
+| R-011 | US-00-002 | The shared normaliser is too lax (drops digits or words), so "90 days" matches "30 days" | review task T5, AC-US-00-002-3 | L | H | Medium | TC-0042, TC-0040 |
