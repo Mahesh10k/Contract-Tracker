@@ -3,14 +3,14 @@
 - Task: TASK-002
 - Title: Extraction
 - Branch: feature/TASK-002-Extraction
-- Status: in progress
+- Status: in review
 - Owner: Mahesh Pikki
 - Started: 2026-10-05
 - Updated: 2026-10-05
 - Acceptance criteria: 7
 
 ## Next
-- definition-of-done, branch-review, merge-request
+- address review comments
 
 ## Done
 - LLM gateway (app/llm): timeout, one retry, disk cache, llm_calls ledger, USD 9 stop
