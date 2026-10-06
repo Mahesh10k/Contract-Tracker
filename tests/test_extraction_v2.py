@@ -66,7 +66,9 @@ def test_tc0081_a_reply_missing_notice_period_fails_the_schema() -> None:
 
 
 def test_tc0082_a_reply_with_payment_terms_fails_the_schema() -> None:
-    fields = {n: {"value": None, "quote": None, "clause_id": None} for n in ANSWER_FIELDS}
+    fields: dict[str, dict[str, str | None]] = {
+        n: {"value": None, "quote": None, "clause_id": None} for n in ANSWER_FIELDS
+    }
     fields["payment_terms"] = {"value": "monthly", "quote": None, "clause_id": None}
 
     with pytest.raises(ValidationError, match="payment_terms"):

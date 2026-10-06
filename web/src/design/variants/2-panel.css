@@ -1,0 +1,188 @@
+/* Direction 2, Instrument panel. Serves the owner triaging many contracts in one sitting,
+   on a monitor: dense rows, tabular figures, a status rail on the left. IBM Plex Sans
+   Condensed display / IBM Plex Sans body. Cool graphite surfaces, one teal accent for the
+   current section and the primary action. Weak for: reading long quotes (small measure). */
+@import "@fontsource/ibm-plex-sans-condensed/500.css";
+@import "@fontsource/ibm-plex-sans-condensed/600.css";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+
+:root[data-variant="2-panel"] {
+  --font-display: "IBM Plex Sans Condensed", ui-sans-serif, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, sans-serif;
+
+  --background: oklch(0.955 0.006 240);
+  --foreground: oklch(0.24 0.02 245);
+  --card: oklch(0.985 0.003 240);
+  --card-foreground: oklch(0.24 0.02 245);
+  --primary: oklch(0.44 0.09 200);
+  --primary-foreground: oklch(0.98 0.005 200);
+  --muted: oklch(0.925 0.008 240);
+  --muted-foreground: oklch(0.44 0.02 245);
+  --accent: oklch(0.91 0.03 200);
+  --border: oklch(0.55 0.02 245);
+  --hairline: oklch(0.86 0.008 240);
+  --input: oklch(0.52 0.02 245);
+  --ring: oklch(0.44 0.09 200);
+
+  --ok-bg: oklch(0.93 0.045 160);
+  --ok-fg: oklch(0.34 0.07 160);
+  --warn-bg: oklch(0.94 0.065 85);
+  --warn-fg: oklch(0.37 0.07 65);
+  --bad-bg: oklch(0.93 0.04 25);
+  --bad-fg: oklch(0.4 0.14 25);
+
+  --radius: 3px;
+  --radius-inner: 3px;
+  --space-row: 0.4375rem;
+  --measure: 90rem;
+}
+
+:root[data-variant="2-panel"].dark {
+  --background: oklch(0.21 0.016 250);
+  --foreground: oklch(0.92 0.008 240);
+  --card: oklch(0.26 0.018 250);
+  --card-foreground: oklch(0.92 0.008 240);
+  --primary: oklch(0.78 0.1 195);
+  --primary-foreground: oklch(0.2 0.03 220);
+  --muted: oklch(0.29 0.018 250);
+  --muted-foreground: oklch(0.77 0.015 245);
+  --accent: oklch(0.33 0.04 210);
+  --border: oklch(0.63 0.02 245);
+  --hairline: oklch(0.35 0.016 250);
+  --input: oklch(0.63 0.02 245);
+  --ring: oklch(0.78 0.1 195);
+
+  --ok-bg: oklch(0.31 0.05 160);
+  --ok-fg: oklch(0.88 0.08 160);
+  --warn-bg: oklch(0.33 0.055 85);
+  --warn-fg: oklch(0.9 0.08 85);
+  --bad-bg: oklch(0.31 0.06 25);
+  --bad-fg: oklch(0.88 0.08 25);
+}
+
+/* Rail layout: masthead across the top, sections stacked on the left, readouts on the right. */
+:root[data-variant="2-panel"] [data-slot="shell"] {
+  grid-template-columns: 15rem minmax(0, 1fr);
+  column-gap: 2rem;
+  align-items: start;
+  padding-top: 1.25rem;
+}
+
+:root[data-variant="2-panel"] [data-slot="masthead"] {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.875rem;
+}
+
+:root[data-variant="2-panel"] [data-slot="brand"] {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:root[data-variant="2-panel"] [data-slot="tagline"] {
+  font-size: 0.9375rem;
+}
+
+:root[data-variant="2-panel"] [data-slot="tablist"] {
+  flex-direction: column;
+  border-bottom: 0;
+  border-left: 1px solid var(--border);
+  gap: 0;
+  position: sticky;
+  top: 1rem;
+}
+
+:root[data-variant="2-panel"] [data-slot="tab"] {
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+  border-bottom: 0;
+  border-left: 4px solid transparent;
+  margin-left: -1px;
+  min-height: 2.75rem;
+}
+
+:root[data-variant="2-panel"] [data-slot="tab"][aria-selected="true"] {
+  border-left-color: var(--primary);
+  background: var(--accent);
+}
+
+:root[data-variant="2-panel"] main {
+  min-width: 0;
+}
+
+:root[data-variant="2-panel"] [data-slot="panel-title"] {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+:root[data-variant="2-panel"] [data-slot="table"] th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--muted);
+}
+
+:root[data-variant="2-panel"] [data-slot="table"] tbody th {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: 0;
+  background: transparent;
+  color: var(--foreground);
+  white-space: normal;
+}
+
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(even) {
+  background: var(--card);
+}
+
+:root[data-variant="2-panel"] [data-slot="badge"] {
+  border-radius: 3px;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+:root[data-variant="2-panel"] [data-slot="quote"] {
+  font-size: 0.9375rem;
+  max-width: 48ch;
+}
+
+/* The motion moment: readout rows settle in once, top to bottom. */
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr {
+  animation: panel-settle 320ms var(--ease-out) both;
+}
+
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(2) { animation-delay: 60ms; }
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(3) { animation-delay: 120ms; }
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(4) { animation-delay: 180ms; }
+:root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(n + 5) { animation-delay: 240ms; }
+
+@keyframes panel-settle {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 760px) {
+  :root[data-variant="2-panel"] [data-slot="shell"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-variant="2-panel"] [data-slot="tablist"] {
+    flex-direction: row;
+    border-left: 0;
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-variant="2-panel"] [data-slot="table"] tbody tr {
+    animation: none;
+  }
+}

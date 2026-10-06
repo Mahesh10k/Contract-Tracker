@@ -6,7 +6,7 @@ STATE := .bearing/state
 SKIPPED := $(STATE)/.skipped
 # The gates `make check` runs, in order. test-integration needs Postgres, so
 # it is a CI job and a manual target, not part of check.
-GATES := format-check lint typecheck test vuln
+GATES := format-check lint typecheck test vuln web-check eval-extraction eval-qa
 POSTGRES_PORT ?= 5432
 DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(POSTGRES_PORT)/contract-tracker
 # psql takes the plain URL (no SQLAlchemy driver suffix).
@@ -22,7 +22,7 @@ define need_tool
 command -v $(UV) >/dev/null || $(call skip,$(1),uv); $(UV) run --quiet $(2) --version >/dev/null 2>&1 || $(call skip,$(1),$(2))
 endef
 
-.PHONY: help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
+.PHONY: web web-install web-check ui eval-extraction eval-qa eval-live fetch-model embed ask remind mail help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -30,6 +30,7 @@ help: ## List targets
 setup: ## Install Python 3.12, dependencies (writes uv.lock) and git hooks
 	$(UV) python install 3.12
 	@if [ -f uv.lock ]; then $(UV) sync --locked --all-groups; else echo "setup: no uv.lock yet, resolving; commit the lockfile it writes"; $(UV) sync --all-groups; fi
+	$(UV) run python -m app.retrieval.fetch
 	bash .githooks/install.sh
 	@echo "setup: the committed .githooks run on commit; .pre-commit-config.yaml is for 'uv run pre-commit run --all-files'"
 	@echo "setup done"
@@ -69,11 +70,45 @@ typecheck: ## mypy strict
 	$(call need_tool,typecheck,mypy); \
 	$(UV) run mypy app evals tests && echo "typecheck: $$n files checked"
 
+ui: ## API on :8080 plus the React page on http://localhost:5173 (reads .env; needs make db and make migrate)
+	@set -a; [ -f .env ] && . ./.env; set +a; trap 'kill 0' EXIT; \
+	$(UV) run uvicorn app.main:create_app --factory --port 8080 & \
+	(cd web && npm run dev); wait
+
+web-install: ## Install the React app's packages exactly as locked (Node 20 or later)
+	cd web && npm ci
+
+web: ## The React page alone on :5173; add ?mock=1 to the URL to use sample data without the API
+	cd web && npm run dev
+
+web-check: ## Lint, typecheck and unit-test the React app (a gate of make check)
+	@command -v npm >/dev/null || $(call skip,web-check,npm); \
+	[ -d web/node_modules ] || $(call skip,web-check,web/node_modules: run make web-install); \
+	n=$$(git ls-files -co --exclude-standard 'web/src/*.test.ts' 'web/src/*.test.tsx' | wc -l | tr -d ' '); \
+	[ "$$n" -gt 0 ] || { echo "web-check: 0 test files, nothing checked" >&2; exit 1; }; \
+	cd web && npm run --silent lint && npm run --silent typecheck && npm test --silent 2>&1 | tail -6 && echo "web-check: $$n test files checked"
+
 eval-extraction: ## Extraction eval over the 6 golden contracts, offline from llm_cache (no key, no spend)
 	$(UV) run python -m evals.extraction.run
 
-eval-live: ## Fill llm_cache from OpenRouter and print spend; the only target that spends (reads .env, needs make db)
-	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m evals.extraction.run --live
+eval-qa: ## Q&A eval over the golden questions, offline from llm_cache (needs the model: make fetch-model)
+	$(UV) run python -m evals.qa.run
+
+eval-live: ## Fill llm_cache from OpenRouter for both evals and print spend; the only target that spends
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m evals.extraction.run --live; \
+	$(UV) run python -m evals.qa.run --live
+
+fetch-model: ## Download the embedding model once into models/ (about 130 MB; later runs are offline)
+	$(UV) run python -m app.retrieval.fetch
+
+remind: ## Send due reminders to MailHog: make remind [TODAY=2026-10-31]; PRETEND_TODAY in .env is the default
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m app.reminders.cli $(if $(TODAY),--today $(TODAY))
+
+embed: ## Embed every clause that has no vector yet (needs make db, make migrate and make fetch-model)
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m app.qa.cli embed
+
+ask: ## Ask a question: make ask Q="Which law governs Supply Agreement 08?"
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m app.qa.cli ask "$(Q)"
 
 test: ## Unit tests with coverage (integration tests excluded)
 	@n=$$(git ls-files -co --exclude-standard 'tests/test_*.py' 'tests/**/test_*.py' | grep -v '^tests/integration/' | wc -l | tr -d ' '); \
@@ -116,6 +151,9 @@ fix: format ## Apply every automatic fix
 
 db: ## Start Postgres in Docker (host port POSTGRES_PORT, default 5432)
 	POSTGRES_PORT=$(POSTGRES_PORT) docker compose up -d --wait postgres
+
+mail: ## Start MailHog (SMTP on 1025, web UI on http://localhost:8025) for reminder email
+	docker compose up -d --wait mailhog
 
 db-reset: ## Drop and recreate the local database (destructive)
 	POSTGRES_PORT=$(POSTGRES_PORT) docker compose down -v && POSTGRES_PORT=$(POSTGRES_PORT) docker compose up -d --wait postgres

@@ -12,11 +12,11 @@ from structlog.testing import capture_logs
 
 from app.llm.cache import ReplyCache
 from app.llm.gateway import (
-    InvalidReplyError,
     BudgetReachedError,
     FeatureDisabledError,
     Gateway,
     GatewayFailedError,
+    InvalidReplyError,
     LLMRequest,
     MissingApiKeyError,
 )

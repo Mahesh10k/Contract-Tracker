@@ -1,0 +1,110 @@
+[
+  {
+    "id": "q01",
+    "question": "Which law governs Supply Agreement 08?",
+    "answerable": true,
+    "expected": {
+      "contract": "Supply Agreement 08",
+      "clause": "8",
+      "answer_contains_any": [
+        "california"
+      ]
+    }
+  },
+  {
+    "id": "q02",
+    "question": "What is the liability cap in Lease Agreement 01?",
+    "answerable": true,
+    "expected": {
+      "contract": "Lease Agreement 01",
+      "clause": "4",
+      "answer_contains_any": [
+        "50,000"
+      ]
+    }
+  },
+  {
+    "id": "q03",
+    "question": "How often is rent paid under Lease Agreement 04?",
+    "answerable": true,
+    "expected": {
+      "contract": "Lease Agreement 04",
+      "clause": "3",
+      "answer_contains_any": [
+        "monthly in advance",
+        "monthly"
+      ]
+    }
+  },
+  {
+    "id": "q04",
+    "question": "How much notice must be given to prevent renewal of Supply Agreement 07?",
+    "answerable": true,
+    "expected": {
+      "contract": "Supply Agreement 07",
+      "clause": "2.3",
+      "answer_contains_any": [
+        "three (3) months",
+        "three months",
+        "3 months"
+      ]
+    }
+  },
+  {
+    "id": "q05",
+    "question": "What is the liability cap in Supply Agreement 07?",
+    "answerable": true,
+    "expected": {
+      "contract": "Supply Agreement 07",
+      "clause": "4",
+      "answer_contains_any": [
+        "two times the annual fees",
+        "two times",
+        "twice"
+      ]
+    }
+  },
+  {
+    "id": "q06",
+    "question": "When do payments fall due under Services Agreement 01?",
+    "answerable": true,
+    "expected": {
+      "contract": "Services Agreement 01",
+      "clause": "3",
+      "answer_contains_any": [
+        "quarterly in advance",
+        "quarterly"
+      ]
+    }
+  },
+  {
+    "id": "q07",
+    "question": "Which law governs Services Agreement 04?",
+    "answerable": true,
+    "expected": {
+      "contract": "Services Agreement 04",
+      "clause": "8",
+      "answer_contains_any": [
+        "new york"
+      ]
+    }
+  },
+  {
+    "id": "q08",
+    "question": "What is the tenant's parking allowance?",
+    "answerable": false,
+    "expected": null
+  },
+  {
+    "id": "q09",
+    "question": "Does any contract include a non-compete?",
+    "answerable": false,
+    "expected": null
+  },
+  {
+    "id": "q10",
+    "question": "Who is the CEO of Northgate Realty?",
+    "answerable": false,
+    "expected": null
+  }
+]

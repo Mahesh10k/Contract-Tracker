@@ -8,6 +8,7 @@ them; columns the code does not touch yet are left out.
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     Enum,
     Integer,
@@ -112,6 +113,45 @@ extractions = Table(
     Column("corrected_at", DateTime(timezone=True)),
     Column("prompt_version", Text, nullable=False),
     Column("model_id", Text, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+)
+
+obligation_kind = Enum(
+    "expiry",
+    "notice_deadline",
+    "renewal",
+    "escalation",
+    "payment",
+    name="obligation_kind",
+    create_type=False,
+)
+reminder_status = Enum(
+    "pending", "sending", "sent", "skipped", name="reminder_status", create_type=False
+)
+
+obligations = Table(
+    "obligations",
+    metadata,
+    Column("id", Uuid, primary_key=True, server_default=func.gen_random_uuid()),
+    Column("contract_id", Uuid, nullable=False),
+    Column("source_extraction_id", Uuid, nullable=False),
+    Column("kind", obligation_kind, nullable=False),
+    Column("due_on", Date, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+)
+
+reminders = Table(
+    "reminders",
+    metadata,
+    Column("id", Uuid, primary_key=True, server_default=func.gen_random_uuid()),
+    Column("obligation_id", Uuid, nullable=False),
+    Column("lead_days", Integer, nullable=False),
+    Column("send_on", Date, nullable=False),
+    Column("status", reminder_status, nullable=False, server_default="pending"),
+    Column("sent_at", DateTime(timezone=True)),
+    Column("recipient", Text),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
     Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
 )

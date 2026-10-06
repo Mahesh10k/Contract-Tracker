@@ -1,5 +1,7 @@
 # User flows
 
+> **Superseded in part (2026-10-06).** The one-day brief of 2026-10-05 and ADR-0012 to ADR-0016 changed: 5 fields instead of 10, vector search instead of hybrid, USD 2 instead of USD 10, 6 golden contracts and 10 golden questions, and a React page instead of FastAPI with Jinja. Where this document differs, those ADRs and `docs/product/PRD.md` win. The screens are the five tabs of the React page; the steps below still hold with those names.
+
 Backlog: docs/product/backlog.md   Built: 2026-10-01
 Flows: 6   Screens named: 6
 
@@ -51,7 +53,7 @@ Exercises: US-00-002, US-00-003, US-00-007, US-00-008
 
 | Step | Screen | The user | The system | Story |
 | --- | --- | --- | --- | --- |
-| 1 | Contract view | opens the contract | shows 10 fields, each with value, quote and clause number | US-00-002, US-00-007 |
+| 1 | Contract view | opens the contract | shows 5 fields, each with value, quote and clause number | US-00-002, US-00-007 |
 | 2 | Contract view | reads the obligations | lists expiry, notice, renewal, escalation and payment dates with their clauses | US-00-003 |
 
 ### Alternate paths
@@ -121,7 +123,7 @@ Exercises: US-00-004, US-00-005, US-00-007
 
 | Step | Screen | The user | The system | Story |
 | --- | --- | --- | --- | --- |
-| 1 | Ask | types the question and submits | retrieves the top 5 clauses by hybrid search | US-00-004 |
+| 1 | Ask | types the question and submits | retrieves the top 5 clauses by vector search | US-00-004 |
 | 2 | Ask | reads the answer | shows the answer with [contract, clause] citations linking to clause text | US-00-004, US-00-007 |
 
 ### Alternate paths

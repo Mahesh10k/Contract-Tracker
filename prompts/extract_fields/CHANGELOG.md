@@ -13,7 +13,7 @@ smaller reply.
 - seed: 10/10 fixtures render with no placeholder left and pass variable
   validation (`tests/test_prompts.py`).
 - Wording review (claude-api prompt-audit): not run.
-- Full score: not run yet; first scored at STOP 2 by `make eval-live`.
+- Score (2026-10-05, `make eval-live`, 6 golden contracts): parties 6/6, effective_date 6/6, term 6/6, auto_renewal 6/6, notice_period 6/6; grounding 29/29 returned quotes; deadlines 12/12. Cost USD 0.0203 (about 0.0034 per contract). Offline replay from llm_cache gives the same numbers for USD 0. Seed-sized set (30 labelled fields, under the 50 minimum) on template wording: a floor for regressions, not proof of real-world accuracy.
 
 ## v1 (draft, 2026-10-05)
 

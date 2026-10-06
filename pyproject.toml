@@ -23,6 +23,8 @@ dependencies = [
   "pypdf>=6,<7",
   "httpx>=0.28,<1",
   "python-dateutil>=2.9.0.post0",
+  "python-multipart>=0.0.32",
+  "sentence-transformers>=6.1.0",
 ]
 
 [dependency-groups]
@@ -41,6 +43,18 @@ dev = [
 [tool.uv]
 # The repository is run from its root, not installed as a distribution.
 package = false
+
+# ADR-0004: embeddings run on CPU. The default Linux torch wheel drags in several GB of CUDA
+# libraries; the CPU index serves the same API without them. uv applies this source only to a
+# direct dependency, so run `uv add torch` once on a machine that can reach
+# download.pytorch.org to switch the lock to the CPU build (TASK-008 note: not yet done).
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
 
 [tool.ruff]
 line-length = 100

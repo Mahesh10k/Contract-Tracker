@@ -16,7 +16,7 @@ from collections.abc import Callable
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.core.errors import DomainError
 from app.db.repositories import contracts as contract_repo
 from app.db.repositories.llm_calls import LlmCallLedger
@@ -45,7 +45,12 @@ async def run(
             code = 1
             continue
         try:
-            await _extract_one(factory, gateway_for, contract_id)
+            result = await extract_one(factory, gateway_for, contract_id)
+            async with factory() as session:
+                label = await contract_repo.source_name(session, contract_id)
+            sys.stdout.write(
+                f"{label}: {result.accepted} accepted, {result.needs_review} need review\n"
+            )
         except BudgetReachedError as exc:
             sys.stderr.write(f"{exc.message}\n")
             return 1
@@ -57,11 +62,12 @@ async def run(
     return code
 
 
-async def _extract_one(
+async def extract_one(
     factory: async_sessionmaker[AsyncSession],
     gateway_for: Callable[[AsyncSession], Gateway],
     contract_id: uuid.UUID,
-) -> None:
+) -> service.ExtractionResult:
+    """Extract one contract: the call commits its spend on its own, then the rows are stored."""
     async with factory() as session:
         prepared = await service.prepare(session, contract_id)
     async with factory() as ledger_session:
@@ -79,8 +85,26 @@ async def _extract_one(
             result = await service.store_rows(session, prepared, rows, model_id=gateway.model)
         else:
             result = await service.store(session, prepared, reply, model_id=gateway.model)
-        label = await contract_repo.source_name(session, contract_id)
-    sys.stdout.write(f"{label}: {result.accepted} accepted, {result.needs_review} need review\n")
+    return result
+
+
+def gateway_factory(
+    settings: Settings, client: httpx.AsyncClient, run_id: uuid.UUID
+) -> Callable[[AsyncSession], Gateway]:
+    """Gateways that record spend in the ledger session given, with the day's budget stop."""
+
+    def gateway_for(ledger_session: AsyncSession) -> Gateway:
+        return Gateway(
+            client=client,
+            cache=ReplyCache(settings.llm_cache_dir),
+            ledger=LlmCallLedger(ledger_session, since=settings.llm_budget_since),
+            model=settings.llm_model,
+            api_key=settings.openrouter_api_key,
+            budget_stop_usd=settings.llm_budget_stop_usd,
+            run_id=run_id,
+        )
+
+    return gateway_for
 
 
 async def _main(names: list[str]) -> int:
@@ -89,18 +113,7 @@ async def _main(names: list[str]) -> int:
     run_id = uuid.uuid4()
     try:
         async with httpx.AsyncClient() as client:
-
-            def gateway_for(ledger_session: AsyncSession) -> Gateway:
-                return Gateway(
-                    client=client,
-                    cache=ReplyCache(settings.llm_cache_dir),
-                    ledger=LlmCallLedger(ledger_session, since=settings.llm_budget_since),
-                    model=settings.llm_model,
-                    api_key=settings.openrouter_api_key,
-                    budget_stop_usd=settings.llm_budget_stop_usd,
-                    run_id=run_id,
-                )
-
+            gateway_for = gateway_factory(settings, client, run_id)
             return await run(names, make_session_factory(engine), gateway_for)
     finally:
         await engine.dispose()

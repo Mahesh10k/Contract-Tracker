@@ -1,5 +1,7 @@
 # GenAI solution: ContractTracker extraction and cited Q&A
 
+> **Superseded in part (2026-10-06).** The one-day brief of 2026-10-05 and ADR-0012 to ADR-0016 changed: 5 fields instead of 10, vector search instead of hybrid, USD 2 instead of USD 10, 6 golden contracts and 10 golden questions, and a React page instead of FastAPI with Jinja. Where this document differs, those ADRs and `docs/product/PRD.md` win. Its cost and eval-size figures describe the original plan; current figures are in EVALS.md.
+
 Serves: REQ-003 to REQ-030; US-00-002, US-00-003, US-00-004, US-00-005, US-02-001, US-02-002, US-02-003
 Status: Draft
 Owner: Developer (project owner)

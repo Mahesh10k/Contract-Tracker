@@ -18,10 +18,11 @@ settled again, differently, in each file that runs into it.
 | ADR-0009 | Cache LLM replies on disk so make check runs evals offline | evaluation | Accepted | cheap: delete the folder and run live once |
 | ADR-0010 | Send reminder email over SMTP to MailHog | email, sms, push, payments | Accepted | cheap: SMTP settings |
 | ADR-0011 | Use FastAPI with Jinja templates for the web UI | frontend | Superseded by ADR-0012 | cheap: five pages over the same services |
-| ADR-0012 | Use one Streamlit page with five tabs for the UI | frontend | Accepted | cheap: the page calls the same services as the CLI |
+| ADR-0012 | Use one Streamlit page with five tabs for the UI | frontend | Superseded by ADR-0016 | cheap: the page calls the same services as the CLI |
 | ADR-0013 | Retrieve the top 5 clauses by vector similarity, refuse below a cosine floor | search | Accepted | cheap: one function; one live eval run |
 | ADR-0014 | Cap LLM spend at USD 2 for the one-day build | llm provider and models | Proposed | cheap: two settings |
 | ADR-0015 | Extract 5 fields with a new prompt version, keeping v1 | llm extraction | Proposed | cheap: one prompt file and one schema |
+| ADR-0016 | Use a React single-page app (Vite, TypeScript, Tailwind) for the UI | frontend | Accepted | awkward: UI and JSON API would move back |
 
 ## Conflicts that were settled
 

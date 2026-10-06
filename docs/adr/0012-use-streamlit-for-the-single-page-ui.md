@@ -1,6 +1,6 @@
 # ADR-0012: Use one Streamlit page with five tabs for the UI
 
-- Status: Accepted
+- Status: Superseded by ADR-0016 on 2026-10-05
 - Date: 2026-10-05
 - Task: TASK-008
 - Deciders: Developer (project owner), fixed in the one-day brief of 2026-10-05

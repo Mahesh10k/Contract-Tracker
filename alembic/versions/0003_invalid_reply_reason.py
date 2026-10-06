@@ -8,6 +8,9 @@ Locks: ALTER TYPE ... ADD VALUE takes a brief lock on the type only; no table re
 Rows: none changed on upgrade.
 Index: none; the review queue index filters on status, not reason. The ledger now filters
   llm_calls on created_at >= LLM_BUDGET_SINCE (ADR-0014): no index, about 10^2 rows a day.
+  The Streamlit page (US-00-007) reads extractions by contract_id (uq_extractions_contract_field),
+  needs_review by created_at (idx_extractions_needs_review), and accepted or corrected rows of
+  every contract: no index, the demo holds 6 contracts times 5 fields.
 Retention / PII: no personal data.
 Down: rows with invalid_reply become value_missing (still needs_review), then the type
   is rebuilt without the value; Down loses: the distinction between the two reasons.

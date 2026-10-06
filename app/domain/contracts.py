@@ -73,3 +73,27 @@ class ContractRefusedError(DomainError):
     def __init__(self, constraint: str) -> None:
         super().__init__(f"refused by {constraint}", details={"constraint": constraint})
         self.constraint = constraint
+
+
+@dataclass(frozen=True)
+class ContractSummary:
+    """A loaded contract as the contract list shows it (US-00-007)."""
+
+    id: uuid.UUID
+    title: str
+    contract_type: str
+    source_filename: str
+
+
+@dataclass(frozen=True)
+class StoredField:
+    """One stored field as the page shows it; value is the correction when there is one."""
+
+    contract_id: uuid.UUID
+    contract_title: str
+    field_name: str
+    value: str | None
+    quote: str | None
+    clause_number: str | None
+    status: str
+    review_reason: str | None

@@ -3,14 +3,14 @@
 - Task: TASK-008
 - Title: OneDayScope
 - Branch: feature/TASK-008-OneDayScope
-- Status: started
+- Status: in progress
 - Owner: Mahesh Pikki
 - Started: 2026-10-05
-- Updated: 2026-10-05
+- Updated: 2026-10-06
 - Acceptance criteria: unknown
 
 ## Next
-- PRD and backlog revision to the one-day brief; STOP 1
+- Run make fetch-model, make embed, make eval-live (user); then floor spike, reminders, evals in make check, README
 
 ## Done
 - none
@@ -19,7 +19,7 @@
 - none
 
 ## Decisions
-- none
+- noned ~/AI/ContractTracker && git switch feature/TASK-008-OneDayScope
 
 ## Links
 - MR: none

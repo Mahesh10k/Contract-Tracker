@@ -88,7 +88,7 @@ One testable statement per id. Ids are never reused or renumbered.
 | REQ-049 | The system replies "Not found in these contracts" without an LLM call when the best retrieved clause scores below a similarity threshold. | Contract owner | 2026-10-05: "reply \"Not found in these contracts\" below a similarity threshold" | none |
 | REQ-050 | The system replies "Not found in these contracts" when the retrieved clauses do not answer the question. | Contract owner | 2026-10-05: "or when the clauses don't answer it" | none |
 | REQ-051 | The system checks that every clause an answer cites is one of the retrieved clauses. | Contract owner | 2026-10-05: "a check that every citation was retrieved" | none |
-| REQ-052 | The system provides a single Streamlit page with the tabs Upload, Contracts (fields and quotes), Deadlines, Ask and Needs review. | Contract owner | 2026-10-05: "Streamlit page with tabs: Upload, Contracts (fields + quotes), Deadlines, Ask, Needs review" | none |
+| REQ-052 | The system provides a single-page web app (React since 2026-10-05, ADR-0016; Streamlit before) with the tabs Upload, Contracts (fields and quotes), Deadlines, Ask and Needs review. | Contract owner | 2026-10-05: "Streamlit page with tabs: Upload, Contracts (fields + quotes), Deadlines, Ask, Needs review" | none |
 | REQ-053 | The Streamlit page has a "send due reminders" button that emails every due reminder to MailHog. | Contract owner | 2026-10-05: "a \"send due reminders\" button that emails MailHog" | none |
 | REQ-054 | The golden contract set has 6 synthetic contracts: 2 leases, 2 vendor and 2 service agreements, including the hard cases of REQ-033 and REQ-036. | inferred: Developer | 2026-10-05: "6 synthetic contracts (2 leases, 2 vendor, 2 service), 2 hard cases" | none |
 | REQ-055 | data/answer_key.json holds the expected value of each of the 5 fields for every golden contract. | inferred: Developer | 2026-10-05: "Golden sets: data/answer_key.json for extraction" | none |
@@ -132,7 +132,7 @@ From the developer's revised task list (2026-10-05), named methods and tools:
 From the one-day re-scope brief (2026-10-05); these replace the matching lines above where they differ:
 - One day, one session; checkpoints with two STOP points for the developer.
 - Budget USD 2 for the day (replaces USD 10; see Q-033).
-- Streamlit single-page UI (replaces FastAPI with Jinja, ADR-0011; Q-013 reversed).
+- Single-page UI: Streamlit per the brief (ADR-0012), then React from 2026-10-05 (ADR-0016).
 - Vector-only retrieval (replaces hybrid, ADR-0005).
 - reportlab named for PDF generation; the generator stays on fpdf2 under the "keep code" choice (Q-027).
 - Out of scope: OCR, login, hybrid search, scheduler, prompt comparisons.
