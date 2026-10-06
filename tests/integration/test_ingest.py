@@ -46,6 +46,7 @@ async def count(session: AsyncSession, table: FromClause) -> int:
     return await session.scalar(select(func.count()).select_from(table)) or 0
 
 
+# TC-0001
 async def test_tc0001_generated_lease_is_stored_with_title_type_and_text(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -60,6 +61,7 @@ async def test_tc0001_generated_lease_is_stored_with_title_type_and_text(
 
 
 @pytest.mark.parametrize("heading", [c["heading"] for c in load_truth(LEASE_01_TRUTH)["clauses"]])
+# TC-0001
 async def test_tc0001_full_text_holds_every_clause_heading(
     session: AsyncSession, generated: Path, heading: str
 ) -> None:
@@ -70,6 +72,7 @@ async def test_tc0001_full_text_holds_every_clause_heading(
     assert heading in (full_text or "")
 
 
+# TC-0002
 async def test_tc0002_pdf_without_truth_and_type_is_refused(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -82,6 +85,7 @@ async def test_tc0002_pdf_without_truth_and_type_is_refused(
     assert await count(session, contracts) == 0
 
 
+# TC-0003
 async def test_tc0003_one_page_one_clause_contract_is_stored(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -94,6 +98,7 @@ async def test_tc0003_one_page_one_clause_contract_is_stored(
 
 
 @pytest.mark.parametrize("contract_id", CONTRACT_IDS)
+# TC-0004
 async def test_tc0004_every_generated_contract_stores_its_truth_clauses(
     session: AsyncSession, generated: Path, contract_id: str
 ) -> None:
@@ -109,6 +114,7 @@ async def test_tc0004_every_generated_contract_stores_its_truth_clauses(
     assert [tuple(r) for r in stored] == [(c["number"], c["heading"]) for c in truth["clauses"]]
 
 
+# TC-0068
 async def test_tc0068_the_page_break_clause_is_stored_on_pages_1_to_2(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -125,6 +131,7 @@ async def test_tc0068_the_page_break_clause_is_stored_on_pages_1_to_2(
     assert pages[max(pages, key=lambda n: tuple(int(p) for p in n.split(".")))] == (2, 2)
 
 
+# TC-0069
 async def test_tc0069_a_clause_written_without_pages_keeps_them_empty(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -151,6 +158,7 @@ async def test_tc0069_a_clause_written_without_pages_keeps_them_empty(
     assert row == ("A clause stored before page numbers existed.", None, None)
 
 
+# TC-0008
 async def test_tc0008_clause_7_2_is_returned_without_its_neighbours(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -166,6 +174,7 @@ async def test_tc0008_clause_7_2_is_returned_without_its_neighbours(
     assert "Sixty days." not in clause.body
 
 
+# TC-0009
 async def test_tc0009_missing_clause_number_is_not_found(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -177,6 +186,7 @@ async def test_tc0009_missing_clause_number_is_not_found(
     assert raised.value.message == "Clause 99.1 not found in lease-01"
 
 
+# TC-0010
 async def test_tc0010_first_and_last_clause_bodies_match_the_truth(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -211,6 +221,7 @@ async def test_bad_files_are_refused_and_nothing_is_stored(
     assert await count(session, clauses) == 0
 
 
+# TC-0013
 async def test_tc0013_text_page_then_blank_page_is_stored(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -221,6 +232,7 @@ async def test_tc0013_text_page_then_blank_page_is_stored(
     assert await session.scalar(select(contracts.c.page_count)) == 2
 
 
+# TC-0014
 async def test_tc0014_same_file_twice_keeps_one_contract(
     session: AsyncSession, generated: Path
 ) -> None:
@@ -234,6 +246,7 @@ async def test_tc0014_same_file_twice_keeps_one_contract(
     assert await count(session, clauses) == clause_count
 
 
+# TC-0015
 async def test_tc0015_same_bytes_under_another_name_is_a_duplicate(
     session: AsyncSession, generated: Path, tmp_path: Path
 ) -> None:
@@ -246,6 +259,7 @@ async def test_tc0015_same_bytes_under_another_name_is_a_duplicate(
     assert await count(session, contracts) == 1
 
 
+# TC-0016
 async def test_tc0016_file_with_one_different_character_is_a_new_contract(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -260,6 +274,7 @@ async def test_tc0016_file_with_one_different_character_is_a_new_contract(
     assert await count(session, contracts) == 2
 
 
+# TC-0024
 async def test_tc0024_failure_while_storing_clauses_leaves_nothing(
     session: AsyncSession, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

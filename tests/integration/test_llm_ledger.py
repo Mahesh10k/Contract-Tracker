@@ -1,5 +1,6 @@
 """The llm_calls ledger behind the gateway's budget stop (Q-007, TC-0049, TC-0051)."""
 
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
@@ -73,6 +74,7 @@ async def test_recorded_calls_add_up_to_the_spend(session: AsyncSession) -> None
     assert await ledger.spent_usd() == Decimal("1.263500")
 
 
+# TC-0049
 async def test_tc0049_spend_at_nine_dollars_stops_the_call(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -87,6 +89,7 @@ async def test_tc0049_spend_at_nine_dollars_stops_the_call(
     assert await session.scalar(select(func.count()).select_from(llm_calls)) == 1
 
 
+# TC-0051
 async def test_tc0051_the_call_that_crosses_nine_is_recorded_and_the_next_is_refused(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -101,3 +104,19 @@ async def test_tc0051_the_call_that_crosses_nine_is_recorded_and_the_next_is_ref
 
     assert await ledger.spent_usd() == Decimal("9.008500")
     assert len(sent) == 1
+
+
+# TC-0090
+async def test_tc0090_spend_before_the_budget_window_does_not_count(session: AsyncSession) -> None:
+    # TASK-008, ADR-0014: USD 2 for the day, counted from LLM_BUDGET_SINCE.
+    await LlmCallLedger(session).record(earlier_spend("5.00"))
+    await session.execute(
+        llm_calls.update()
+        .where(llm_calls.c.cost_usd == Decimal("5.00"))
+        .values(created_at=datetime(2026, 10, 4, 12, tzinfo=UTC))
+    )
+    await LlmCallLedger(session).record(earlier_spend("0.10"))
+
+    spent = await LlmCallLedger(session, since=date(2026, 10, 5)).spent_usd()
+
+    assert spent == Decimal("0.10")

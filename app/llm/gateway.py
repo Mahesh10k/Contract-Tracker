@@ -63,6 +63,19 @@ class GatewayFailedError(DomainError):
     code = "llm_failed"
 
 
+class InvalidReplyError(GatewayFailedError):
+    """Both attempts returned a reply that was not valid JSON for the schema (REQ-046).
+
+    Callers hold the work for review; an outage (timeout, 5xx) stays a plain
+    GatewayFailedError so it can be retried later.
+    """
+
+    code = "llm_invalid_reply"
+
+
+INVALID_REPLY = "reply did not match the schema"
+
+
 @dataclass(frozen=True)
 class LLMRequest:
     """One structured-output call: the prompt by name and version, and its two messages."""
@@ -165,11 +178,12 @@ class Gateway:
                 reason = exc.reason
                 continue
             except ValidationError:
-                reason = "reply did not match the schema"
+                reason = INVALID_REPLY
                 continue
             await anyio.to_thread.run_sync(self.cache.put, key, {"content": content})
             return Parsed(value=value, cache_hit=False)
-        raise GatewayFailedError(f"{req.feature.capitalize()} failed: {reason}")
+        error = InvalidReplyError if reason == INVALID_REPLY else GatewayFailedError
+        raise error(f"{req.feature.capitalize()} failed: {reason}")
 
     def _body(self, req: LLMRequest, schema: type[BaseModel]) -> dict[str, object]:
         return {
@@ -280,9 +294,9 @@ class Gateway:
             choice = data["choices"][0]
             content = str(choice["message"]["content"])
         except (KeyError, IndexError, TypeError) as exc:
-            raise _RetryableError("reply did not match the schema") from exc
+            raise _RetryableError(INVALID_REPLY) from exc
         if choice.get("finish_reason") != "stop":
-            raise _RetryableError("reply did not match the schema")
+            raise _RetryableError(INVALID_REPLY)
         return content
 
     async def _record(

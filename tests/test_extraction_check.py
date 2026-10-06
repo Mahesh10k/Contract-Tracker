@@ -27,6 +27,7 @@ def test_a_quote_inside_its_clause_is_accepted_with_the_clause_id() -> None:
     assert (row.status, row.review_reason, row.clause_id) == ("accepted", None, NOTICE.id)
 
 
+# TC-0037
 def test_tc0037_a_null_value_is_held_as_value_missing() -> None:
     reply = FieldReply(value=None, quote=None, clause_id=None)
 
@@ -43,6 +44,7 @@ def test_a_value_without_a_quote_is_held_as_value_missing() -> None:
     assert row.review_reason == "value_missing"
 
 
+# TC-0039
 def test_tc0039_an_unknown_clause_number_is_held_and_kept_as_cited() -> None:
     reply = FieldReply(value="Delaware", quote="laws of Delaware", clause_id="99.1")
 
@@ -55,6 +57,7 @@ def test_tc0039_an_unknown_clause_number_is_held_and_kept_as_cited() -> None:
     )
 
 
+# TC-0044
 def test_tc0044_a_quote_not_in_the_clause_is_held_but_keeps_the_clause_id() -> None:
     reply = FieldReply(
         value="thirty days", quote="giving thirty (30) days written notice", clause_id="2.3"

@@ -23,12 +23,14 @@ PROBE = {
 }
 
 
+# TC-0022
 async def test_tc0022_contracts_table_exists_and_is_empty(session: AsyncSession) -> None:
     count = await session.scalar(select(func.count()).select_from(contracts))
 
     assert count == 0
 
 
+# TC-0023
 async def test_tc0023_an_insert_made_through_the_test_session_is_rolled_back(
     engine: AsyncEngine,
 ) -> None:

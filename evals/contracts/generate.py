@@ -20,6 +20,7 @@ from pathlib import Path
 from fpdf import FPDF
 
 from evals.contracts.dates import end_of_term, months_after, months_before
+from evals.contracts.golden import write_answer_key
 from evals.contracts.truth import TRUTH, Truth, TruthClause, TruthDates, TruthField
 
 FIELDS = (
@@ -475,3 +476,8 @@ if __name__ == "__main__":
     target = Path(sys.argv[1] if len(sys.argv) > 1 else "data/contracts")
     paths = generate(target)
     sys.stdout.write(f"contracts: {len(paths)} written to {target}\n")
+    key_path = target.parent / "answer_key.json"
+    key = write_answer_key(target, key_path)
+    sys.stdout.write(
+        f"answer key: {len(key['contracts'])} golden contracts written to {key_path}\n"
+    )

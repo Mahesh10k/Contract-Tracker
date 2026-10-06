@@ -28,3 +28,6 @@ htmlcov/
 dist/
 build/
 .env
+
+# Embedding model fetched by make fetch-model (ADR-0004)
+models/

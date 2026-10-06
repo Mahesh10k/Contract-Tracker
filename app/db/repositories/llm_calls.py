@@ -1,5 +1,6 @@
 """The llm_calls ledger: one row per gateway attempt; its sum is the budget stop's spend."""
 
+from datetime import UTC, date, datetime, time
 from decimal import Decimal
 
 from sqlalchemy import func, insert, select
@@ -12,12 +13,17 @@ from app.llm.gateway import CallRecord
 class LlmCallLedger:
     """The gateway's Ledger on Postgres. The caller owns the transaction."""
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, since: date | None = None) -> None:
         self.session = session
+        self.since = since
 
     async def spent_usd(self) -> Decimal:
-        """Total recorded spend, every run included."""
-        total = await self.session.scalar(select(func.coalesce(func.sum(llm_calls.c.cost_usd), 0)))
+        """Recorded spend since `since` (every run when None), for the budget stop (ADR-0014)."""
+        query = select(func.coalesce(func.sum(llm_calls.c.cost_usd), 0))
+        if self.since is not None:
+            start = datetime.combine(self.since, time.min, tzinfo=UTC)
+            query = query.where(llm_calls.c.created_at >= start)
+        total = await self.session.scalar(query)
         return Decimal(total or 0)
 
     async def record(self, call: CallRecord) -> None:

@@ -10,6 +10,7 @@ from app.db.tables import clauses, contracts
 from app.domain.contracts import (
     Clause,
     ContractRefusedError,
+    ContractSummary,
     NewContract,
     StoredClause,
     StoredContract,
@@ -141,5 +142,25 @@ async def clauses_of(session: AsyncSession, contract_id: uuid.UUID) -> list[Stor
     )
     return [
         StoredClause(id=r.id, number=r.clause_number, heading=r.heading, body=r.body)
+        for r in result
+    ]
+
+
+async def list_contracts(session: AsyncSession, limit: int = 500) -> list[ContractSummary]:
+    """Loaded contracts by title, for the contract list (bounded; the demo holds a few)."""
+    result = await session.execute(
+        select(
+            contracts.c.id,
+            contracts.c.title,
+            contracts.c.contract_type,
+            contracts.c.source_filename,
+        )
+        .order_by(contracts.c.title, contracts.c.id)
+        .limit(limit)
+    )
+    return [
+        ContractSummary(
+            id=r.id, title=r.title, contract_type=r.contract_type, source_filename=r.source_filename
+        )
         for r in result
     ]

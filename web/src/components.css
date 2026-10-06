@@ -1,0 +1,271 @@
+/* Component styles read only the variables in index.css and the data-slot hooks, so a
+   direction restyles layout and density without touching component code (ADR-0016). */
+
+[data-slot="app"] {
+  min-height: 100vh;
+}
+
+[data-slot="shell"] {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+[data-slot="masthead"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+[data-slot="brand"] {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 600;
+  margin: 0;
+  text-wrap: balance;
+}
+
+[data-slot="tagline"] {
+  margin: 0.25rem 0 0;
+  color: var(--muted-foreground);
+}
+
+[data-slot="tools"] {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+[data-slot="tablist"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+[data-slot="tab"] {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-weight: 500;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  cursor: pointer;
+}
+
+[data-slot="tab"][aria-selected="true"] {
+  color: var(--foreground);
+  border-bottom-color: var(--primary);
+}
+
+[data-slot="tab"] .count {
+  margin-left: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-slot="panel"] {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  min-width: 0;
+}
+
+[data-slot="panel-title"] {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: balance;
+}
+
+[data-slot="panel-lede"] {
+  margin: 0.25rem 0 0;
+  color: var(--muted-foreground);
+  max-width: 66ch;
+}
+
+[data-slot="controls"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem 1rem;
+}
+
+[data-slot="field-group"] {
+  display: grid;
+  gap: 0.25rem;
+}
+
+[data-slot="label"] {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+[data-slot="input"],
+[data-slot="select"] {
+  font: inherit;
+  color: var(--foreground);
+  background: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-inner);
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+}
+
+[data-slot="input"][type="file"] {
+  padding: 0.5rem 0.75rem;
+}
+
+[data-slot="button"] {
+  font: inherit;
+  font-weight: 600;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+
+[data-slot="button"][data-primary] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-slot="button"]:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+:is([data-slot="button"], [data-slot="tab"], [data-slot="input"], [data-slot="select"]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+[data-slot="notice"] {
+  border-radius: var(--radius-inner);
+  padding: 0.625rem 0.875rem;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+[data-slot="notice"][data-tone="ok"] {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+[data-slot="notice"][data-tone="bad"] {
+  background: var(--bad-bg);
+  color: var(--bad-fg);
+}
+
+[data-slot="table-wrap"] {
+  overflow-x: auto;
+}
+
+[data-slot="table"] {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-slot="table"] th {
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  padding: var(--space-row) 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+[data-slot="table"] td {
+  padding: var(--space-row) 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: top;
+}
+
+[data-slot="table"] .num {
+  text-align: right;
+}
+
+[data-slot="quote"] {
+  margin: 0;
+  color: var(--muted-foreground);
+  max-width: 62ch;
+}
+
+[data-slot="clause"] {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+
+[data-slot="badge"] {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+[data-slot="badge"][data-tone="ok"] {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+[data-slot="badge"][data-tone="warn"] {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+[data-slot="badge"][data-tone="bad"] {
+  background: var(--bad-bg);
+  color: var(--bad-fg);
+}
+
+[data-slot="empty"] {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  color: var(--muted-foreground);
+}
+
+[data-slot="empty"] strong {
+  display: block;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+[data-slot="answer"] {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 72ch;
+}
+
+[data-slot="citation"] {
+  border-left: 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--hairline);
+}
+
+[data-slot="citation"] cite {
+  font-style: normal;
+  font-weight: 600;
+}

@@ -1,6 +1,6 @@
 # ADR-0005: Retrieve clauses with hybrid search (pgvector plus Postgres full-text) and a cosine floor for refusal
 
-- Status: Accepted
+- Status: Superseded by ADR-0013 on 2026-10-05
 - Date: 2026-10-01
 - Task: none
 - Deciders: Developer (project owner), fixed in the brief; floor approach from the critic (Q-017)

@@ -16,6 +16,7 @@ def test_text_and_page_count_are_read_from_a_text_pdf() -> None:
     assert "2 Term" in result.text
 
 
+# TC-0011
 def test_tc0011_image_only_pdf_is_refused_as_scanned() -> None:
     with pytest.raises(NoTextLayerError) as raised:
         read_pdf(image_only_pdf(2))
@@ -23,11 +24,13 @@ def test_tc0011_image_only_pdf_is_refused_as_scanned() -> None:
     assert raised.value.message == "No text found; scanned PDFs are not supported"
 
 
+# TC-0012
 def test_tc0012_pdf_with_only_whitespace_is_refused_as_scanned() -> None:
     with pytest.raises(NoTextLayerError):
         read_pdf(text_pdf("   ", ""))
 
 
+# TC-0013
 def test_tc0013_text_page_followed_by_blank_page_is_accepted() -> None:
     result = read_pdf(text_pdf("1 Services\nCleaning.", ""))
 
@@ -35,6 +38,7 @@ def test_tc0013_text_page_followed_by_blank_page_is_accepted() -> None:
     assert "Cleaning." in result.text
 
 
+# TC-0017
 def test_tc0017_text_file_renamed_to_pdf_is_unreadable() -> None:
     with pytest.raises(UnreadablePdfError) as raised:
         read_pdf(b"hello\n")
@@ -42,6 +46,7 @@ def test_tc0017_text_file_renamed_to_pdf_is_unreadable() -> None:
     assert raised.value.message == "Not a readable PDF"
 
 
+# TC-0018
 def test_tc0018_truncated_pdf_is_unreadable() -> None:
     data = text_pdf("1 Parties\nAcme Ltd.")
 
@@ -49,6 +54,7 @@ def test_tc0018_truncated_pdf_is_unreadable() -> None:
         read_pdf(data[: len(data) // 2])
 
 
+# TC-0019
 def test_tc0019_empty_file_is_unreadable() -> None:
     with pytest.raises(UnreadablePdfError):
         read_pdf(b"")

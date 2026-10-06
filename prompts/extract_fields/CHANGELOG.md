@@ -1,5 +1,20 @@
 # extract_fields changelog
 
+## v2 (draft, 2026-10-05)
+
+Scope change, not tuning (TASK-008, ADR-0015): the one-day brief keeps 5
+fields (parties, effective_date, term, auto_renewal, notice_period), so v2
+asks for those only (ExtractionReplyV2). Same rules as v1; adds that
+clause_id is where the sentence actually is (the notice-elsewhere hard case),
+that effective_date keeps any offset as written, and a toy example for a
+notice stated in a termination clause. max_tokens 2000 to 1200 for the
+smaller reply.
+
+- seed: 10/10 fixtures render with no placeholder left and pass variable
+  validation (`tests/test_prompts.py`).
+- Wording review (claude-api prompt-audit): not run.
+- Score (2026-10-05, `make eval-live`, 6 golden contracts): parties 6/6, effective_date 6/6, term 6/6, auto_renewal 6/6, notice_period 6/6; grounding 29/29 returned quotes; deadlines 12/12. Cost USD 0.0203 (about 0.0034 per contract). Offline replay from llm_cache gives the same numbers for USD 0. Seed-sized set (30 labelled fields, under the 50 minimum) on template wording: a floor for regressions, not proof of real-world accuracy.
+
 ## v1 (draft, 2026-10-05)
 
 First version (TASK-002, ADR-0008). One call per contract: the numbered

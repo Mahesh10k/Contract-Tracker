@@ -16,6 +16,7 @@ from app.llm.gateway import (
     FeatureDisabledError,
     Gateway,
     GatewayFailedError,
+    InvalidReplyError,
     LLMRequest,
     MissingApiKeyError,
 )
@@ -100,6 +101,7 @@ async def test_the_request_asks_for_strict_json_schema_output_with_usage(tmp_pat
     assert replies.requests[0].headers["authorization"] == "Bearer sk-test"
 
 
+# TC-0046
 async def test_tc0046_a_cached_reply_makes_no_request_and_costs_nothing(tmp_path: Path) -> None:
     first = Replies(ok(chat_reply(GOOD)))
     gateway, _ = make(first, tmp_path)
@@ -114,6 +116,7 @@ async def test_tc0046_a_cached_reply_makes_no_request_and_costs_nothing(tmp_path
     assert [(r.cache_hit, r.cost_usd) for r in ledger2.records] == [(True, Decimal(0))]
 
 
+# TC-0054
 async def test_tc0054_a_timeout_then_a_good_reply_succeeds_and_both_are_recorded(
     tmp_path: Path,
 ) -> None:
@@ -127,6 +130,7 @@ async def test_tc0054_a_timeout_then_a_good_reply_succeeds_and_both_are_recorded
     assert ledger.records[0].cost_usd > 0
 
 
+# TC-0052
 async def test_tc0052_two_timeouts_fail_with_a_reason(tmp_path: Path) -> None:
     replies = Replies(httpx.ReadTimeout("slow"), httpx.ReadTimeout("slow"))
     gateway, ledger = make(replies, tmp_path)
@@ -149,6 +153,7 @@ async def test_an_unreachable_model_is_retried_then_fails_with_a_reason(tmp_path
     assert [r.cost_usd > 0 for r in ledger.records] == [True, True]
 
 
+# TC-0053
 async def test_tc0053_two_503_replies_fail_with_the_status(tmp_path: Path) -> None:
     replies = Replies(httpx.Response(503), httpx.Response(503))
     gateway, _ = make(replies, tmp_path)
@@ -159,6 +164,7 @@ async def test_tc0053_two_503_replies_fail_with_the_status(tmp_path: Path) -> No
     assert raised.value.message == "Extraction failed: model unavailable (503)"
 
 
+# TC-0055
 async def test_tc0055_two_replies_that_fail_the_schema_fail_and_both_are_paid(
     tmp_path: Path,
 ) -> None:
@@ -172,6 +178,7 @@ async def test_tc0055_two_replies_that_fail_the_schema_fail_and_both_are_paid(
     assert sum(r.cost_usd for r in ledger.records) == Decimal("0.0270")
 
 
+# TC-0036
 async def test_tc0036_a_reply_that_fails_the_schema_is_retried_once(tmp_path: Path) -> None:
     # REQ-038: retry once on a reply that fails validation.
     replies = Replies(ok(chat_reply({"oops": 1})), ok(chat_reply(GOOD)))
@@ -207,6 +214,7 @@ async def test_a_400_is_not_retried(tmp_path: Path) -> None:
     assert len(replies.requests) == 1
 
 
+# TC-0049
 async def test_tc0049_spend_at_the_stop_refuses_before_any_request(tmp_path: Path) -> None:
     replies = Replies()
     gateway, ledger = make(replies, tmp_path, ledger=InMemoryLedger(spent="9.000000"))
@@ -219,6 +227,7 @@ async def test_tc0049_spend_at_the_stop_refuses_before_any_request(tmp_path: Pat
     assert ledger.records == []
 
 
+# TC-0050
 async def test_tc0050_spend_just_under_the_stop_allows_the_call(tmp_path: Path) -> None:
     replies = Replies(ok(chat_reply(GOOD)))
     gateway, _ = make(replies, tmp_path, ledger=InMemoryLedger(spent="8.999999"))
@@ -315,3 +324,39 @@ async def test_the_retry_is_refused_when_the_first_attempt_reaches_the_stop(
         await gateway.parse(REQ, Answer)
 
     assert len(replies.requests) == 1
+
+
+# TC-0083
+async def test_tc0083_two_schema_invalid_replies_raise_invalid_reply(tmp_path: Path) -> None:
+    # TASK-008, REQ-046: an unreadable reply after the retry is its own error.
+    replies = Replies(ok(chat_reply("not json")), ok(chat_reply("not json")))
+    gateway, ledger = make(replies, tmp_path)
+
+    with pytest.raises(InvalidReplyError):
+        await gateway.parse(REQ, Answer)
+
+    assert len(ledger.records) == 2
+    assert not list((tmp_path / "cache").glob("**/*.json"))
+
+
+# TC-0085
+async def test_tc0085_two_timeouts_are_not_an_invalid_reply(tmp_path: Path) -> None:
+    replies = Replies(httpx.ReadTimeout("slow"), httpx.ReadTimeout("slow"))
+    gateway, _ = make(replies, tmp_path)
+
+    with pytest.raises(GatewayFailedError) as raised:
+        await gateway.parse(REQ, Answer)
+
+    assert not isinstance(raised.value, InvalidReplyError)
+
+
+# TC-0086
+async def test_tc0086_invalid_then_valid_returns_the_retry_and_caches_it(tmp_path: Path) -> None:
+    replies = Replies(ok(chat_reply("not json")), ok(chat_reply(GOOD)))
+    gateway, _ = make(replies, tmp_path)
+
+    first = await gateway.parse(REQ, Answer)
+    again = await gateway.parse(REQ, Answer)
+
+    assert first.value == Answer(answer="Delaware")
+    assert again.cache_hit is True

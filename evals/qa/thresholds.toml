@@ -1,0 +1,6 @@
+# Q&A eval limits (US-02-002, Q-006). 7 answerable and 10 total questions, so one miss is
+# 14 and 10 points: limits are allowed misses, not percentages.
+[allowed_misses]
+recall = 1
+answer = 1
+refusal = 1

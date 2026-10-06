@@ -14,6 +14,7 @@ def test_two_plain_clauses_are_split_in_order() -> None:
     ]
 
 
+# TC-0005
 def test_tc0005_cross_reference_inside_text_is_not_a_heading() -> None:
     text = "7.1 Term\nThe term ends as set out in clause\n7.2 below.\n7.2 Renewal\nIt renews."
 
@@ -24,6 +25,7 @@ def test_tc0005_cross_reference_inside_text_is_not_a_heading() -> None:
     assert all(c.heading != "below." for c in clauses)
 
 
+# TC-0006
 def test_tc0006_decimal_at_line_start_is_not_a_heading() -> None:
     text = "4.1 Rent\nRent rises by\n3.5 percent each year.\n4.2 Deposit\nTwo months."
 
@@ -52,6 +54,7 @@ def test_nested_numbering_follows_the_sequence() -> None:
     assert [c.number for c in clauses] == ["7", "7.1", "7.2", "8"]
 
 
+# TC-0007
 def test_tc0007_heading_hyphenated_across_lines_is_rejoined() -> None:
     text = "12.10 Limit-\nation of Liability\nCapped at fees."
 
@@ -125,6 +128,7 @@ def test_a_dotted_list_inside_undotted_clauses_is_body_text() -> None:
     assert "2. Acme Analytics Inc" in clauses[0].body
 
 
+# TC-0066
 def test_tc0066_a_clause_on_page_2_has_pages_2_to_2() -> None:
     pages = ["1 Parties\nAcme and Beta.", "2 Term\nThree years."]
 
@@ -136,6 +140,7 @@ def test_tc0066_a_clause_on_page_2_has_pages_2_to_2() -> None:
     ]
 
 
+# TC-0067
 def test_tc0067_a_clause_across_a_page_break_is_one_clause_on_pages_1_to_2() -> None:
     pages = [
         "1 Parties\nAcme and Beta.\n2 Term\nThe term is three",
@@ -152,12 +157,14 @@ def test_tc0067_a_clause_across_a_page_break_is_one_clause_on_pages_1_to_2() -> 
     assert clauses[1].body == "The term is three\nyears from the start."
 
 
+# TC-0070
 def test_tc0070_a_heading_alone_at_the_foot_of_page_1_starts_on_page_1() -> None:
     clauses = split_pages(["1 Parties\nAcme.\n2 Term", "Three years."])
 
     assert (clauses[1].first_page, clauses[1].last_page) == (1, 2)
 
 
+# TC-0071
 def test_tc0071_text_without_pages_has_no_page_numbers() -> None:
     clauses = split_clauses("1 Parties\nAcme.")
 

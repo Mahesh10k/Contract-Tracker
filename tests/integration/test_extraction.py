@@ -1,4 +1,8 @@
-"""Extraction: one call, 10 fields, each quote checked against its clause (US-00-002)."""
+"""Extraction: one call, 5 fields with prompt v2, each quote checked against its clause.
+
+US-00-002 and, since TASK-008, US-00-010 (ADR-0015): v2 asks for the 5 fields of
+REQ-045, and a reply still invalid after the retry holds all 5 for review (REQ-046).
+"""
 
 import json
 from decimal import Decimal
@@ -24,18 +28,7 @@ from tests.llm.fakes import chat_reply
 pytestmark = pytest.mark.integration
 
 DATA = Path(__file__).parents[2] / "data" / "contracts"
-FIELDS = (
-    "parties",
-    "effective_date",
-    "term",
-    "auto_renewal",
-    "notice_period",
-    "payment_terms",
-    "escalation",
-    "liability_cap",
-    "termination_rights",
-    "governing_law",
-)
+FIELDS = ("parties", "effective_date", "term", "auto_renewal", "notice_period")
 
 
 def perfect_reply(contract_id: str) -> dict[str, object]:
@@ -48,6 +41,7 @@ def perfect_reply(contract_id: str) -> dict[str, object]:
         "fields": {
             name: {"value": f["value"], "quote": f["quote"], "clause_id": f["clause"]}
             for name, f in truth["fields"].items()
+            if name in FIELDS
         },
     }
 
@@ -109,7 +103,8 @@ async def calls(session: AsyncSession) -> int:
     return await session.scalar(select(func.count()).select_from(llm_calls)) or 0
 
 
-async def test_tc0035_one_call_stores_ten_accepted_fields(
+# TC-0035
+async def test_tc0035_one_call_stores_five_accepted_fields(
     session: AsyncSession, tmp_path: Path
 ) -> None:
     contract = await lease_01(session)
@@ -121,7 +116,7 @@ async def test_tc0035_one_call_stores_ten_accepted_fields(
     assert sorted(stored) == sorted(FIELDS)
     assert {s[0] for s in stored.values()} == {"accepted"}
     assert len(transport.requests) == 1
-    assert (result.accepted, result.needs_review) == (10, 0)
+    assert (result.accepted, result.needs_review) == (5, 0)
 
 
 async def test_the_request_sends_the_contract_inside_its_delimiters(
@@ -138,19 +133,24 @@ async def test_the_request_sends_the_contract_inside_its_delimiters(
     assert "<contract_title>\nLease Agreement 01\n</contract_title>" in text
 
 
+# TC-0037
 async def test_tc0037_a_field_the_model_marks_absent_is_held_as_value_missing(
     session: AsyncSession, tmp_path: Path
 ) -> None:
     contract = await lease_01(session)
     reply = with_field(
-        perfect_reply("lease-01"), "escalation", value=None, quote=None, clause_id=None
+        perfect_reply("lease-01"), "auto_renewal", value=None, quote=None, clause_id=None
     )
 
     await extract_contract(session, make_gateway(session, Transport(ok(reply)), tmp_path), contract)
 
-    assert (await rows(session, contract))["escalation"][:2] == ("needs_review", "value_missing")
+    assert (await rows(session, contract))["auto_renewal"][:2] == (
+        "needs_review",
+        "value_missing",
+    )
 
 
+# TC-0038
 async def test_tc0038_a_field_holds_value_quote_cited_number_and_its_clause(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -166,18 +166,20 @@ async def test_tc0038_a_field_holds_value_quote_cited_number_and_its_clause(
     assert value == load_truth(DATA / "lease-01.truth.json")["fields"]["term"]["value"]
 
 
+# TC-0039
 async def test_tc0039_a_cited_clause_that_does_not_exist_is_held(
     session: AsyncSession, tmp_path: Path
 ) -> None:
     contract = await lease_01(session)
-    reply = with_field(perfect_reply("lease-01"), "governing_law", clause_id="99.1")
+    reply = with_field(perfect_reply("lease-01"), "parties", clause_id="99.1")
 
     await extract_contract(session, make_gateway(session, Transport(ok(reply)), tmp_path), contract)
 
-    status, reason, cited, clause_id, _ = (await rows(session, contract))["governing_law"]
+    status, reason, cited, clause_id, _ = (await rows(session, contract))["parties"]
     assert (status, reason, cited, clause_id) == ("needs_review", "clause_not_found", "99.1", None)
 
 
+# TC-0043
 async def test_tc0043_a_quote_with_a_pdf_line_break_is_accepted(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -191,22 +193,24 @@ async def test_tc0043_a_quote_with_a_pdf_line_break_is_accepted(
     assert (await rows(session, contract))["notice_period"][0] == "accepted"
 
 
+# TC-0044
 async def test_tc0044_a_made_up_quote_is_held_as_quote_not_found(
     session: AsyncSession, tmp_path: Path
 ) -> None:
     contract = await lease_01(session)
     reply = with_field(
-        perfect_reply("lease-01"), "termination_rights", quote="Either party may terminate at will."
+        perfect_reply("lease-01"), "effective_date", quote="The term commences at will."
     )
 
     await extract_contract(session, make_gateway(session, Transport(ok(reply)), tmp_path), contract)
 
-    assert (await rows(session, contract))["termination_rights"][:2] == (
+    assert (await rows(session, contract))["effective_date"][:2] == (
         "needs_review",
         "quote_not_found",
     )
 
 
+# TC-0045
 async def test_tc0045_a_real_quote_cited_to_the_wrong_clause_is_held(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -218,7 +222,8 @@ async def test_tc0045_a_real_quote_cited_to_the_wrong_clause_is_held(
     assert (await rows(session, contract))["term"][:2] == ("needs_review", "quote_not_found")
 
 
-async def test_tc0046_a_second_run_replays_the_cache_and_keeps_ten_rows(
+# TC-0046
+async def test_tc0046_a_second_run_replays_the_cache_and_keeps_five_rows(
     session: AsyncSession, tmp_path: Path
 ) -> None:
     contract = await lease_01(session)
@@ -230,9 +235,10 @@ async def test_tc0046_a_second_run_replays_the_cache_and_keeps_ten_rows(
     await extract_contract(session, make_gateway(session, offline, tmp_path), contract)
 
     assert offline.requests == []
-    assert len(await rows(session, contract)) == 10
+    assert len(await rows(session, contract)) == 5
 
 
+# TC-0186
 async def test_a_corrected_field_survives_re_extraction(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -296,22 +302,27 @@ async def test_two_failed_attempts_store_no_fields(
     assert await calls(session) == 2
 
 
-async def test_tc0055_two_schema_failures_store_nothing_and_both_are_paid(
+# TC-0084
+async def test_tc0084_two_schema_failures_hold_all_five_fields_and_both_are_paid(
     session: AsyncSession, tmp_path: Path
 ) -> None:
+    # TASK-008, REQ-046: replaces TC-0055's "store nothing" for prompt v2.
     contract = await lease_01(session)
     bad = httpx.Response(200, json=chat_reply({"fields": "oops"}, cost=0.0135))
 
-    with pytest.raises(GatewayFailedError):
-        await extract_contract(
-            session, make_gateway(session, Transport(bad, bad), tmp_path), contract
-        )
+    result = await extract_contract(
+        session, make_gateway(session, Transport(bad, bad), tmp_path), contract
+    )
 
-    assert await rows(session, contract) == {}
+    stored = await rows(session, contract)
+    assert sorted(stored) == sorted(FIELDS)
+    assert {s[:2] for s in stored.values()} == {("needs_review", "invalid_reply")}
+    assert (result.accepted, result.needs_review) == (0, 5)
     spent = await session.scalar(select(func.sum(llm_calls.c.cost_usd)))
     assert spent == Decimal("0.027000")
 
 
+# TC-0056
 async def test_tc0056_a_storage_failure_leaves_no_extraction_rows(
     session: AsyncSession, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -338,7 +349,7 @@ async def factory(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(bind=connection, join_transaction_mode="create_savepoint")
 
 
-async def test_spend_survives_a_failed_extraction_in_the_command(
+async def test_an_unreadable_reply_is_held_and_its_spend_kept_in_the_command(
     session: AsyncSession,
     factory: async_sessionmaker[AsyncSession],
     tmp_path: Path,
@@ -353,10 +364,8 @@ async def test_spend_survives_a_failed_extraction_in_the_command(
 
     code = await run_cli(["lease-01"], factory, gateway_for)
 
-    assert code == 1
-    assert (
-        "lease-01.pdf: Extraction failed: reply did not match the schema" in capsys.readouterr().err
-    )
+    assert code == 0
+    assert "lease-01.pdf: 0 accepted, 5 need review" in capsys.readouterr().out
     assert await calls(session) == 2
 
 
@@ -391,3 +400,39 @@ async def test_the_command_stops_at_the_budget(
     assert "LLM budget reached" in capsys.readouterr().err
     assert transport.requests == []
     assert BudgetReachedError.code == "llm_budget_reached"
+
+
+# TC-0179
+async def test_an_unreadable_reply_does_not_wipe_fields_that_were_already_accepted(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    # Review 2: a failed re-extraction must hold only what was never accepted.
+    contract = await lease_01(session)
+    await extract_contract(
+        session, make_gateway(session, Transport(ok(perfect_reply("lease-01"))), tmp_path), contract
+    )
+    bad = httpx.Response(200, json=chat_reply({"fields": "oops"}, cost=0.0135))
+    other_cache = tmp_path / "other"
+
+    result = await extract_contract(
+        session, make_gateway(session, Transport(bad, bad), other_cache), contract
+    )
+
+    stored = await rows(session, contract)
+    assert {s[0] for s in stored.values()} == {"accepted"}
+    assert (result.accepted, result.needs_review) == (0, 5)
+
+
+# TC-0103
+async def test_tc0103_the_notice_elsewhere_contract_stores_notice_period_accepted_on_clause_2_3(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    contract = (await ingest_file(session, DATA / "vendor-07.pdf")).contract_id
+    gateway = make_gateway(session, Transport(ok(perfect_reply("vendor-07"))), tmp_path)
+
+    await extract_contract(session, gateway, contract)
+
+    status, reason, cited, clause_id, value = (await rows(session, contract))["notice_period"]
+    assert (status, reason, cited) == ("accepted", None, "2.3")
+    assert clause_id is not None
+    assert value == "three (3) months"
