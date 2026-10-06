@@ -22,7 +22,7 @@ define need_tool
 command -v $(UV) >/dev/null || $(call skip,$(1),uv); $(UV) run --quiet $(2) --version >/dev/null 2>&1 || $(call skip,$(1),$(2))
 endef
 
-.PHONY: help setup dev contracts ingest check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
+.PHONY: help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -43,6 +43,9 @@ contracts: ## Write the 18 synthetic contracts and their truth.json answer keys 
 ingest: ## Load contract PDFs: make ingest FILES="data/contracts/*.pdf" [TYPE=lease|vendor|service]
 	@[ -n "$(FILES)" ] || { echo "usage: make ingest FILES=\"data/contracts/*.pdf\" [TYPE=lease]" >&2; exit 2; }
 	DATABASE_URL=$(DATABASE_URL) $(UV) run python -m app.ingestion.cli $(FILES) $(if $(TYPE),--type $(TYPE))
+
+extract: ## Extract the 10 fields: make extract NAMES="lease-01 vendor-02" (no NAMES: every contract)
+	DATABASE_URL=$(DATABASE_URL) $(UV) run python -m app.extraction.cli $(NAMES)
 
 format: ## Format
 	$(UV) run ruff format .

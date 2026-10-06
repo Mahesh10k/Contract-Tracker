@@ -4,10 +4,12 @@ Construction fails fast and names every invalid variable at once. Secrets
 have no defaults. `get_settings` is the one module-level singleton.
 """
 
+from decimal import Decimal
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
-from pydantic import PostgresDsn, field_validator
+from pydantic import PostgresDsn, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Env = Literal["development", "test", "production"]
@@ -29,6 +31,17 @@ class Settings(BaseSettings):
     db_pool_size: int = 5
     db_pool_max_overflow: int = 10
     db_echo: bool = False
+    # LLM through OpenRouter (ADR-0001, ADR-0002); no key means replay from the cache only.
+    openrouter_api_key: SecretStr | None = None
+    llm_model: str = "anthropic/claude-haiku-4.5"
+    llm_budget_stop_usd: Decimal = Decimal(9)
+    llm_cache_dir: Path = Path("llm_cache")
+
+    @field_validator("openrouter_api_key", mode="before")
+    @classmethod
+    def _blank_key_is_no_key(cls, value: object) -> object:
+        """`OPENROUTER_API_KEY=` left empty means replay only, never a call with a blank key."""
+        return None if value == "" else value
 
     @field_validator("database_url")
     @classmethod

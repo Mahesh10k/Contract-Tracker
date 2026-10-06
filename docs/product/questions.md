@@ -1,7 +1,7 @@
 # Open questions: ContractTracker
 
 PRD: docs/product/PRD.md   Updated: 2026-10-01
-Entries: 26   Open: 12   Needs your confirmation: 0
+Entries: 32   Open: 13   Needs your confirmation: 0
 
 Basis, for every entry:
 - stated: the input answers it elsewhere; the passage that wins is named.
@@ -19,14 +19,20 @@ Confirmed on 2026-10-01 in the planning session: questions 1 to 9, 18 and 19 in
 the register below (reminder timing, recipient and trigger; UI screens; review
 corrections; eval thresholds; budget stop; scanned PDFs; meaning of obligation;
 corrections win over re-extraction; reminder catch-up).
+Confirmed on 2026-10-05 from the revised task list: Q-027 (keep TASK-001 as built), Q-029
+(reminders at 60, 30 and 7 days, reversing Q-001), Q-030 (amendment extends the term),
+Q-031 (relative dates anchored in the same sentence), Q-032 (PRETEND_TODAY in .env).
 
 ## Register
 
 | Q | Status | Kind | Where | Basis | Question | Readings | Decision | Why | Affects |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Q-001 | confirmed | gap | REQ-016 | assumption | How long before a deadline is the reminder sent? | (a) fixed 30 and 7 days; (b) one fixed lead time; (c) set per contract | (a) 30 and 7 days before, configurable in settings | common practice for notice periods; two reminders give a second chance | US-00-006 |
+| Q-030 | confirmed | gap | REQ-034 | assumption | What does the planted amendment change, and which value does the answer key expect? | (a) it extends the term by one year; the answer key expects the amended term, quoted from the amendment clause; (b) it changes the rent; (c) the original value stays expected | (a) | the term drives expiry, notice and renewal, so an amendment there tests the hardest path | US-02-005 |
+| Q-031 | confirmed | gap | REQ-031 | assumption | What is a relative date relative to? | (a) a date stated in the same sentence; (b) the signature date as an 11th field; (c) another extracted field | (a) | REQ-005 fixes 10 fields and ADR-0007 keeps dates in code; an anchor in the same sentence needs neither change | US-02-005 |
+| Q-032 | confirmed | gap | REQ-042 | assumption | Where does the owner set "pretend today is"? | (a) PRETEND_TODAY in .env, read by `make remind` and the deadlines page, overridable per command; (b) a field on a settings page; (c) only the `make remind` argument (Q-003) | (a) | one value both reminders and the deadlines page agree on; no UI state to store | US-00-006 |
+| Q-001 | confirmed | gap | REQ-016 | assumption | How long before a deadline is the reminder sent? | (a) fixed 30 and 7 days; (b) one fixed lead time; (c) set per contract | (a) 30 and 7 days before, configurable in settings. Reversed by the developer on 2026-10-05 (task list, TASK-005: "60, 30 and 7 days"); see Q-029 | common practice for notice periods; two reminders give a second chance | US-00-006 |
 | Q-002 | confirmed | gap | REQ-016 | assumption | Who receives reminders when there is no login? | (a) one address in `.env`; (b) an address per contract | (a) one address in `.env` | no users exist; one developer demo | US-00-006 |
-| Q-003 | confirmed | gap | REQ-016 | assumption | What triggers reminders to be sent? | (a) a command run on demand; (b) an in-process scheduler; (c) a cron container | (a) `make remind` with an optional "today" date; each reminder sent once | demoable without waiting for real dates; no scheduler to run | US-00-006 |
+| Q-003 | confirmed | gap | REQ-016 | assumption | What triggers reminders to be sent? | (a) a command run on demand; (b) an in-process scheduler; (c) a cron container | (a) `make remind` with an optional "today" date; each reminder sent once. Extended on 2026-10-05 by REQ-042 (a "pretend today is" setting); see Q-032 | demoable without waiting for real dates; no scheduler to run | US-00-006 |
 | Q-004 | confirmed | gap | REQ-022 | assumption | What must the web UI let the user do? | (a) upload, contract view with fields and quotes, deadlines, review queue, ask; (b) read-only views plus ask | (a) | every REQ with a user-visible result needs a screen | US-00-007, US-00-008 |
 | Q-005 | confirmed | gap | REQ-013, REQ-015 | assumption | What can the user do with a needs_review item? | (a) view only; (b) enter a corrected value that feeds date computation | (b) | without a correction path, unparsed contracts never get reminders | US-00-008 |
 | Q-006 | confirmed | gap | REQ-023, REQ-024, REQ-025, REQ-026, REQ-027, REQ-028 | assumption | What eval scores count as passing? | (a) thresholds per metric; (b) report only, no pass or fail | (a) extraction 85% per field, grounding 100% of accepted fields, recall@5 0.90, answer 80%, refusal 90%; extraction and grounding restated by Q-015 | "Evals run under make check" needs a pass rule | US-02-001, US-02-002, US-02-003 |
@@ -50,3 +56,6 @@ corrections win over re-extraction; reminder catch-up).
 | Q-024 | open | gap | REQ-011, REQ-012 | convention | How far ahead are recurring escalation and payment dates computed? | (a) to the end of the current term; (b) a fixed horizon such as 24 months; (c) including renewal terms | (a); renewal terms get dates once the renewal date passes | bounded and testable; matches the term the contract states | US-00-003, US-00-006 |
 | Q-025 | open | gap | Personas | convention | Who triggers the eval stories? The PRD names only the contract owner. | (a) a developer persona, group 02, inferred; (b) fold evals into owner stories | (a) | evals are run by whoever builds the product, not by the contract owner | US-02-001, US-02-002, US-02-003, US-02-004 |
 | Q-026 | open | gap | REQ-001, REQ-022 | convention | Where does an uploaded contract's type (lease, vendor, service) come from? Raised by the data-model review. | (a) a required type picker on the upload form; (b) the model classifies it during extraction; (c) the type column is optional | (a) | no LLM call for something the owner knows; the column stays required for the contract list | US-00-001, US-00-007 |
+| Q-027 | confirmed | contradiction | Constraints | stated | The 2026-10-05 list names reportlab and one data/answer_key.json for TASK-001; ADR-0006 and the merged TASK-001 use fpdf2 and a truth.json per contract. | (a) keep TASK-001 as built; (b) rebuild with reportlab and one answer key, superseding ADR-0006 | (a), decided by the developer on 2026-10-05; hard cases, relative dates and page numbers move to TASK-007 on the existing generator | ADR-0006 is accepted and TASK-001 is merged; the rest of the list builds on either form | US-02-005 |
+| Q-028 | open | gap | Constraints | inferred | The list says "caching by contract hash"; ADR-0009 keys the cache by hash(prompt version, model, full request). | (a) the ADR-0009 key, which contains the contract text, so it is a contract hash plus prompt and model; (b) contract hash alone | (a) | (b) would serve a stale reply after a prompt or model change and break the v1 and v2 comparison (REQ-039) | US-00-002, US-02-001 |
+| Q-029 | confirmed | open-question | REQ-016 | stated | How long before a deadline are reminders sent (revised)? | (a) 60, 30 and 7 days; (b) 30 and 7 days (Q-001) | (a), from the developer's task list on 2026-10-05; replaces Q-001's answer | stated in the list: "Send reminders 60, 30 and 7 days before deadlines" | US-00-006 |

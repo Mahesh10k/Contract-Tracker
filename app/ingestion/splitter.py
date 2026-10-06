@@ -8,7 +8,7 @@ import re
 
 from app.domain.contracts import Clause
 
-__all__ = ["Clause", "split_clauses", "successors"]
+__all__ = ["Clause", "split_clauses", "split_pages", "successors"]
 
 # "7.2 Renewal" or "1. Services": a number, an optional dot, then a capitalised word.
 HEADING = re.compile(r"^(?P<number>\d+(?:\.\d+)*)(?P<dot>\.?)\s+(?P<heading>[A-Z].*)$")
@@ -32,7 +32,29 @@ def successors(number: str) -> set[str]:
 
 
 def split_clauses(text: str) -> list[Clause]:
-    """Return the clauses of `text` in document order.
+    """Return the clauses of `text` in document order, without page numbers."""
+    return _split([(line, None) for line in BROKEN_WORD.sub(r"\1", text).splitlines()])
+
+
+def split_pages(pages: list[str] | tuple[str, ...]) -> list[Clause]:
+    """Return the clauses of a document given page by page, each with its first and last page.
+
+    A clause runs from the page of its heading to the page of its last
+    non-blank body line, so a clause continued onto the next page is one
+    clause on pages 1 to 2 (US-00-009). A word broken across a page boundary
+    is not rejoined.
+    """
+    return _split(
+        [
+            (line, number)
+            for number, page in enumerate(pages, start=1)
+            for line in BROKEN_WORD.sub(r"\1", page).splitlines()
+        ]
+    )
+
+
+def _split(lines: list[tuple[str, int | None]]) -> list[Clause]:
+    """Split numbered lines into clauses.
 
     Preamble: until the first clause closes, a heading numbered "1" restarts
     the sequence when the current candidate is not a "1" ("100 Main Street")
@@ -45,25 +67,32 @@ def split_clauses(text: str) -> list[Clause]:
     """
     clauses: list[Clause] = []
     number = heading = style = ""
-    body: list[str] = []
-    for line in BROKEN_WORD.sub(r"\1", text).splitlines():
+    first: int | None = None
+    body: list[tuple[str, int | None]] = []
+    for line, page in lines:
         match = HEADING.match(line)
-        if match and _restarts(match, clauses, number, body):
-            number, heading, style, body = match["number"], match["heading"], match["dot"], []
+        if match and _restarts(match, clauses, number, [text for text, _ in body]):
+            number, heading, style, first, body = (
+                match["number"],
+                match["heading"],
+                match["dot"],
+                page,
+                [],
+            )
         elif (
             match
             and (not number or match["number"] in successors(number))
             and (not number or match["dot"] == style)
         ):
             if number:
-                clauses.append(_clause(number, heading, body))
+                clauses.append(_clause(number, heading, body, first))
             else:
                 style = match["dot"]
-            number, heading, body = match["number"], match["heading"], []
+            number, heading, first, body = match["number"], match["heading"], page, []
         else:
-            body.append(line)
+            body.append((line, page))
     if number:
-        clauses.append(_clause(number, heading, body))
+        clauses.append(_clause(number, heading, body, first))
     return clauses
 
 
@@ -74,6 +103,9 @@ def _restarts(match: re.Match[str], clauses: list[Clause], number: str, body: li
     return number != "1" or not any(line.strip() for line in body)
 
 
-def _clause(number: str, heading: str, body: list[str]) -> Clause:
-    text = "\n".join(body).strip()
-    return Clause(number, heading, text or heading)
+def _clause(
+    number: str, heading: str, body: list[tuple[str, int | None]], first: int | None
+) -> Clause:
+    text = "\n".join(line for line, _ in body).strip()
+    pages = [page for line, page in body if line.strip()]
+    return Clause(number, heading, text or heading, first, pages[-1] if pages else first)

@@ -81,7 +81,7 @@ Column reasons are in `data-dictionary.csv` (Why column), one per column; the DD
 
 One numbered clause of a contract, with its vector and full-text search fields.
 
-Serves US-00-001, US-00-002, US-00-004, US-00-005. Expected volume: about 25 clauses per contract, about 450 rows (10^2 to 10^3).
+Serves US-00-001, US-00-002, US-00-004, US-00-005, US-00-009. Since migration 0002 each clause carries first_page and last_page (NULL for rows loaded before it); no index, since pages are only displayed. Expected volume: about 25 clauses per contract, about 450 rows (10^2 to 10^3).
 
 **Indexes**
 
@@ -97,6 +97,7 @@ Serves US-00-001, US-00-002, US-00-004, US-00-005. Expected volume: about 25 cla
 - `chk_clauses_body_not_blank`: refuses an empty clause, which retrieval could return with nothing to quote.
 - `chk_clauses_position_positive`: refuses a zero or negative position.
 - `chk_clauses_embedding_with_model`: refuses a vector without the model that made it, or the reverse (ADR-0004).
+- `chk_clauses_pages_ordered`: pages come together and in order (first_page from 1, last_page not before it), or both are NULL (migration 0002).
 
 ### `extractions`: Extracted fields (hot: no)
 
@@ -143,7 +144,7 @@ Recompute rule: expiry depends on effective_date and term, the notice deadline o
 
 One planned email for one obligation at one lead time.
 
-Serves US-00-006. Expected volume: 2 per obligation, about 1,400 rows (10^3).
+Serves US-00-006. Expected volume: 3 per obligation, about 2,100 rows (10^3).
 
 **Indexes**
 

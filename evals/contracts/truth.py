@@ -5,7 +5,7 @@ hand edit that breaks the shape fails loudly instead of scoring wrong.
 """
 
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from pydantic import TypeAdapter
 
@@ -49,6 +49,8 @@ class Truth(TypedDict):
     clauses: list[TruthClause]
     fields: dict[str, TruthField]
     expected: TruthDates
+    # Only on planted contracts (US-02-005), so the 18 original files keep their bytes.
+    hard_case: NotRequired[str]
 
 
 TRUTH = TypeAdapter(Truth)

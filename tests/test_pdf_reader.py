@@ -63,3 +63,14 @@ def test_corrupt_byte_that_breaks_pypdf_internals_is_unreadable(offset: int) -> 
 
     with pytest.raises(UnreadablePdfError):
         read_pdf(bytes(data))
+
+
+def test_each_page_text_is_kept_in_order() -> None:
+    # US-00-009: pages are needed to know which page a clause is on.
+    data = text_pdf("1 Parties\nAcme Ltd and Beta LLC.", "2 Term\nThree years.")
+
+    result = read_pdf(data)
+
+    assert len(result.pages) == 2
+    assert "Acme Ltd" in result.pages[0]
+    assert "2 Term" in result.pages[1]

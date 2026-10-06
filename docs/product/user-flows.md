@@ -86,7 +86,7 @@ Exercises: US-00-006
 
 | Step | Screen | The user | The system | Story |
 | --- | --- | --- | --- | --- |
-| 1 | Terminal | runs `make remind` | sends the 30-day reminder for each due obligation and records it as sent | US-00-006 |
+| 1 | Terminal | runs `make remind` | sends each due 60, 30 or 7-day reminder and records it as sent | US-00-006 |
 | 2 | MailHog inbox | opens the email | shows contract, obligation, date and clause | US-00-006 |
 
 ### Alternate paths
@@ -95,6 +95,7 @@ Exercises: US-00-006
 | --- | --- | --- | --- |
 | 1 | `make remind` was not run for a while | every unsent reminder due on or before today is sent once | US-00-006 |
 | 1 | it is run twice the same day | the second run sends nothing | US-00-006 |
+| 1 | PRETEND_TODAY is set in .env | make remind and the deadlines page both treat that date as today | US-00-006 |
 
 ### When it fails
 

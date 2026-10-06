@@ -21,7 +21,7 @@ PRD: docs/product/PRD.md   Backlog: docs/product/backlog.md   Built: 2026-10-01
 | REQ-013 | Unparseable value goes to needs_review | criterion-of US-00-003 | the failure path of date computation; correction seeded US-00-008 via Q-005 | US-00-003, US-00-008 | AC-US-00-003-6, AC-US-00-008-1, AC-US-00-008-2, AC-US-00-008-4 |
 | REQ-014 | Quote checked against source clause | criterion-of US-00-002 | a check on each extracted field | US-00-002 | AC-US-00-002-3 |
 | REQ-015 | Ungrounded field goes to needs_review | criterion-of US-00-002 | the failure path of the quote check | US-00-002, US-00-008 | AC-US-00-002-4, AC-US-00-008-1, AC-US-00-008-3 |
-| REQ-016 | Emails reminders before deadlines | story | a new thing the user receives | US-00-006 | AC-US-00-006-1, AC-US-00-006-2, AC-US-00-006-3, AC-US-00-006-4, AC-US-00-006-5, AC-US-00-006-6 |
+| REQ-016 | Emails reminders before deadlines | story | a new thing the user receives; lead times 60, 30 and 7 days since Q-029 | US-00-006 | AC-US-00-006-1, AC-US-00-006-2, AC-US-00-006-3, AC-US-00-006-4, AC-US-00-006-5, AC-US-00-006-6 |
 | REQ-017 | Answers questions across all contracts | story | a new thing the user can do | US-00-004 | AC-US-00-004-1 |
 | REQ-018 | Hybrid retrieval | criterion-of US-00-004 | how answers find clauses, not a user action | US-00-004 | AC-US-00-004-2, AC-US-00-004-3 |
 | REQ-019 | Cites [contract, clause] | criterion-of US-00-004 | the form of every answer | US-00-004 | AC-US-00-004-4, AC-US-00-004-5 |
@@ -36,6 +36,20 @@ PRD: docs/product/PRD.md   Backlog: docs/product/backlog.md   Built: 2026-10-01
 | REQ-028 | Evals run under make check | story | turns two reports into a gate on every change | US-02-003 | AC-US-02-003-1, AC-US-02-003-2, AC-US-02-003-3 |
 | REQ-029 | README takes a fresh clone to a demo | story | the developer can show the product to someone else | US-02-004 | AC-US-02-004-1 |
 | REQ-030 | Traceability table REQ to tests | criterion-of US-02-004 | the evidence that goes with the demo | US-02-004 | AC-US-02-004-2 |
+| REQ-031 | Absolute and relative dates in the set | story | new golden-set data the developer can evaluate against; seeds US-02-005 | US-02-005 | AC-US-02-005-1, AC-US-02-005-7 |
+| REQ-032 | Notice in days and months; renewal present and absent | criterion-of US-02-005 | a property of the same planted set | US-02-005 | AC-US-02-005-2, AC-US-02-005-7 |
+| REQ-033 | Notice stated outside the notice clause | criterion-of US-02-005 | one planted case of the same set | US-02-005 | AC-US-02-005-3 |
+| REQ-034 | Amendment that changes an earlier term | criterion-of US-02-005 | one planted case of the same set (Q-030) | US-02-005 | AC-US-02-005-4 |
+| REQ-035 | Clause across a page break | criterion-of US-02-005 | one planted case of the same set | US-02-005 | AC-US-02-005-5 |
+| REQ-036 | Contract with no renewal clause | criterion-of US-02-005 | one planted case of the same set | US-02-005 | AC-US-02-005-6 |
+| REQ-037 | Clause page numbers | story | the owner can do something new: find a cited clause by page; US-00-001 is Done, so a new story | US-00-009 | AC-US-00-009-1, AC-US-00-009-2, AC-US-00-009-3 |
+| REQ-038 | Retry once on validation failure | criterion-of US-00-002 | a rule on the existing extraction, folded into AC-7 (To do, edited in place) | US-00-002 | AC-US-00-002-7 |
+| REQ-039 | Prompt v1 and v2 side by side | criterion-of US-02-001 | one more view of the same extraction report | US-02-001 | AC-US-02-001-5 |
+| REQ-040 | Title and heading prefixed to embeddings | criterion-of US-00-004 | how clauses are embedded for the existing Q&A | US-00-004 | AC-US-00-004-6 |
+| REQ-041 | recall@5 vector-only and hybrid | criterion-of US-02-002 | one more line of the same Q&A report | US-02-002 | AC-US-02-002-5 |
+| REQ-042 | Pretend-today setting | criterion-of US-00-006 | qualifies when reminders fire (Q-032) | US-00-006 | AC-US-00-006-7 |
+| REQ-043 | EVALS.md with the latest results | criterion-of US-02-003 | an output of the same eval gate | US-02-003 | AC-US-02-003-4 |
+| REQ-044 | Security review of key handling and uploads | criterion-of US-02-004 | part of making the demo ready for someone else | US-02-004 | AC-US-02-004-3 |
 
 ## Gaps
 
@@ -51,5 +65,5 @@ PRD: docs/product/PRD.md   Backlog: docs/product/backlog.md   Built: 2026-10-01
 
 ## Counts
 
-stories-coverage: 30 REQ from docs/product/PRD.md (0 withdrawn), 30 covered, 0 out of scope, 0 gaps, 12 stories, 56 AC, 0 orphans, 0 problems
+stories-coverage: 44 REQ from docs/product/PRD.md (0 withdrawn), 44 covered, 0 out of scope, 0 gaps, 14 stories, 72 AC, 0 orphans, 0 problems
 Verdict: covered
