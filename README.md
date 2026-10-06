@@ -42,7 +42,7 @@ key. A live call needs `OPENROUTER_API_KEY`, is logged in `llm_calls`, and stops
 extraction on an uncached input spend money.
 
 Other commands: `make extract NAMES="lease-01"`, `make embed`, `make ask Q="Which law governs
-Supply Agreement 08?"`, `make remind TODAY=2026-10-31`, `make eval-extraction`, `make eval-qa`,
+Supply Agreement 08?"`, `make remind TODAY=2026-10-31` (a date ahead of today is a preview that records nothing), `make eval-extraction`, `make eval-qa`,
 `make eval-live`. Add `?mock=1` to the page URL (development) to view it with sample data and no API.
 
 ## Demo in five steps
@@ -52,9 +52,11 @@ Supply Agreement 08?"`, `make remind TODAY=2026-10-31`, `make eval-extraction`, 
    the cache). On Contracts, pick Lease Agreement 01: five fields, each with its quote and clause.
 3. **See what is held.** Needs review tab: Supply Agreement 08's auto renewal is held because that
    contract has no renewal clause. The system does not guess.
-4. **Deadlines and reminders.** Deadlines tab: set "Treat today as" to 2026-10-31 and press "Send due
+4. **Deadlines and reminders.** Deadlines tab: leave "Treat today as" on today's date and press "Send due
    reminders". Open http://localhost:8025 and read the email: contract, obligation, date, clause.
-   Press again: nothing new is sent.
+   Press again: "No reminders are due." (a reminder is sent once). Set the date box ahead of today
+   to preview a later date: the emails go to MailHog but nothing is recorded, so pressing again
+   sends them again, and your real reminders are left untouched.
 5. **Ask and be refused.** Ask tab: "Which law governs Supply Agreement 08?" answers California with
    the clause text under it. Then "Does any contract include a non-compete?" answers "Not found in
    these contracts".

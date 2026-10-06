@@ -46,6 +46,32 @@ class Mailer(Protocol):
     async def send(self, message: EmailMessage) -> None: ...
 
 
+class PreviewStore:
+    """Reads like the real store but records nothing: a preview must not change any reminder.
+
+    A "today" ahead of the real clock (PRETEND_TODAY, the page's date box) is a preview. Retiring
+    or marking reminders for a date that has not happened would hide real ones later.
+    """
+
+    def __init__(self, inner: ReminderStore) -> None:
+        self.inner = inner
+
+    async def due(self, today: date) -> list[DueReminder]:
+        return await self.inner.due(today)
+
+    async def claim(self, reminder_id: uuid.UUID, recipient: str) -> bool:
+        return True
+
+    async def mark_sent(self, reminder_id: uuid.UUID) -> None:
+        return None
+
+    async def revert(self, reminder_id: uuid.UUID) -> None:
+        return None
+
+    async def mark_skipped(self, reminder_ids: list[uuid.UUID]) -> None:
+        return None
+
+
 @dataclass(frozen=True)
 class SendResult:
     """What a run did."""
@@ -55,9 +81,17 @@ class SendResult:
 
 
 async def send_due(
-    store: ReminderStore, mailer: Mailer, today: date, recipient: str, sender: str
+    store: ReminderStore,
+    mailer: Mailer,
+    today: date,
+    recipient: str,
+    sender: str,
+    *,
+    record: bool = True,
 ) -> SendResult:
-    """Email every reminder that is due as of `today`; see the module note for the order."""
+    """Email every reminder due as of `today`; `record=False` is a preview that changes nothing."""
+    if not record:
+        store = PreviewStore(store)
     choice = choose(await store.due(today), today)
     if choice.skip:
         await store.mark_skipped([r.id for r in choice.skip])

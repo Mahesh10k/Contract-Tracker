@@ -10,7 +10,7 @@ from typing import ClassVar
 import pytest
 
 from app.retrieval import fetch
-from app.retrieval.embedder import MODEL_NAME, SentenceTransformerEmbedder
+from app.retrieval.embedder import MODEL_NAME, ModelNotFetchedError, SentenceTransformerEmbedder
 from app.retrieval.service import embed_missing, search
 from app.retrieval.text import QUERY_INSTRUCTION
 from tests.retrieval.fakes import FakeEmbedder
@@ -44,9 +44,17 @@ def stand_in_library(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(sys.modules, "sentence_transformers", module)
 
 
+def saved_model(root: Path) -> Path:
+    """A folder where `make fetch-model` would have saved the model."""
+    folder = root / MODEL_NAME.replace("/", "--")
+    folder.mkdir()
+    return folder
+
+
 def test_a_question_gets_the_instruction_a_clause_does_not_and_vectors_are_normalised(
     tmp_path: Path,
 ) -> None:
+    saved_model(tmp_path)
     embedder = SentenceTransformerEmbedder(tmp_path)
 
     embedder.embed_query("Who pays?")
@@ -59,23 +67,28 @@ def test_a_question_gets_the_instruction_a_clause_does_not_and_vectors_are_norma
     assert doc_norm is True
 
 
-def test_the_model_is_loaded_once_on_the_cpu_and_only_when_first_used(tmp_path: Path) -> None:
+def test_the_model_is_loaded_once_from_the_local_folder_on_the_cpu_and_only_when_first_used(
+    tmp_path: Path,
+) -> None:
+    local = saved_model(tmp_path)
     embedder = SentenceTransformerEmbedder(tmp_path)
     assert StandIn.loads == []
 
     embedder.embed_documents(["a"])
     embedder.embed_documents(["b"])
 
-    assert StandIn.loads == [(MODEL_NAME, "cpu")]
-
-
-def test_a_model_saved_in_the_local_folder_is_loaded_from_there(tmp_path: Path) -> None:
-    local = tmp_path / MODEL_NAME.replace("/", "--")
-    local.mkdir()
-
-    SentenceTransformerEmbedder(tmp_path).embed_documents(["a"])
-
     assert StandIn.loads == [(str(local), "cpu")]
+
+
+# TC-0178
+def test_a_missing_model_folder_is_an_error_naming_the_fix_and_nothing_is_downloaded(
+    tmp_path: Path,
+) -> None:
+    # Review 15: Q-016, no embedding ever needs the network.
+    with pytest.raises(ModelNotFetchedError, match="make fetch-model"):
+        SentenceTransformerEmbedder(tmp_path).embed_query("Who pays?")
+
+    assert StandIn.loads == []
 
 
 def test_fetch_saves_the_model_into_the_models_folder(

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Answer, Api, Contract, Deadline, Field, HeldField } from "./api";
 import { Empty, formatDay, label, Notice, PanelHead, StatusBadge, type Message } from "./ui";
 
@@ -7,19 +7,39 @@ const fail = (error: unknown): Message => ({
   text: error instanceof Error ? error.message : "Something went wrong.",
 });
 
+/** One request at a time per panel: a double click must not run the server work twice. */
+function useBusy() {
+  const [busy, setBusy] = useState(false);
+  const running = useRef(false);
+  const guard = async (work: () => Promise<void>) => {
+    if (running.current) return;
+    running.current = true;
+    setBusy(true);
+    try {
+      await work();
+    } finally {
+      running.current = false;
+      setBusy(false);
+    }
+  };
+  return [busy, guard] as const;
+}
+
 export function UploadPanel({ api, onChanged }: { api: Api; onChanged: () => void }) {
   const [type, setType] = useState<Contract["contract_type"]>("lease");
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<Message>(null);
+  const [busy, guard] = useBusy();
 
-  const run = async (work: () => Promise<string>) => {
-    try {
-      setMessage({ tone: "ok", text: await work() });
-      onChanged();
-    } catch (error) {
-      setMessage(fail(error));
-    }
-  };
+  const run = (work: () => Promise<string>) =>
+    guard(async () => {
+      try {
+        setMessage({ tone: "ok", text: await work() });
+        onChanged();
+      } catch (error) {
+        setMessage(fail(error));
+      }
+    });
 
   return (
     <section data-slot="panel" role="tabpanel" aria-labelledby="t-upload">
@@ -54,14 +74,20 @@ export function UploadPanel({ api, onChanged }: { api: Api; onChanged: () => voi
         <button
           data-slot="button"
           data-primary
-          disabled={!file}
+          disabled={!file || busy}
+          aria-busy={busy}
           onClick={() => file && run(async () => `Loaded ${await api.upload(file, type)}`)}
         >
           Load contract
         </button>
       </div>
       <div data-slot="controls">
-        <button data-slot="button" onClick={() => run(async () => `Loaded: ${(await api.loadGolden()).join(", ")}`)}>
+        <button
+          data-slot="button"
+          disabled={busy}
+          aria-busy={busy}
+          onClick={() => run(async () => `Loaded: ${(await api.loadGolden()).join(", ")}`)}
+        >
           Load the 6 golden contracts
         </button>
         <span data-slot="panel-lede">The set the evals use, with their real titles.</span>
@@ -77,6 +103,7 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
   const [fields, setFields] = useState<Field[]>([]);
   const [message, setMessage] = useState<Message>(null);
   const picked = contracts.find((c) => c.id === pickedId) ?? contracts[0];
+  const [busy, guard] = useBusy();
 
   useEffect(() => {
     api.contracts().then(setContracts).catch((e) => setMessage(fail(e)));
@@ -88,15 +115,16 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
     api.fields(pickedKey).then(setFields).catch((e) => setMessage(fail(e)));
   }, [api, pickedKey, version]);
 
-  const extract = async () => {
-    if (!picked) return;
-    try {
-      setMessage({ tone: "ok", text: await api.extract(picked.id) });
-      onChanged();
-    } catch (error) {
-      setMessage(fail(error));
-    }
-  };
+  const extract = () =>
+    guard(async () => {
+      if (!picked) return;
+      try {
+        setMessage({ tone: "ok", text: await api.extract(picked.id) });
+        onChanged();
+      } catch (error) {
+        setMessage(fail(error));
+      }
+    });
 
   if (contracts.length === 0) {
     return (
@@ -120,7 +148,9 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
             ))}
           </select>
         </div>
-        <button data-slot="button" data-primary onClick={extract}>Extract fields</button>
+        <button data-slot="button" data-primary disabled={busy} aria-busy={busy} onClick={extract}>
+          Extract fields
+        </button>
         <span data-slot="panel-lede">{picked?.contract_type}, loaded from {picked?.source_filename}</span>
       </div>
       <Notice message={message} />
@@ -153,18 +183,20 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
 export function DeadlinesPanel({ api, today, version }: { api: Api; today: string; version: number }) {
   const [rows, setRows] = useState<Deadline[]>([]);
   const [message, setMessage] = useState<Message>(null);
+  const [busy, guard] = useBusy();
 
   useEffect(() => {
     api.deadlines(today).then(setRows).catch((e) => setMessage(fail(e)));
   }, [api, today, version]);
 
-  const send = useCallback(async () => {
-    try {
-      setMessage({ tone: "ok", text: await api.sendReminders(today) });
-    } catch (error) {
-      setMessage(fail(error));
-    }
-  }, [api, today]);
+  const send = () =>
+    guard(async () => {
+      try {
+        setMessage({ tone: "ok", text: await api.sendReminders(today) });
+      } catch (error) {
+        setMessage(fail(error));
+      }
+    });
 
   return (
     <section data-slot="panel" role="tabpanel" aria-labelledby="t-deadlines">
@@ -173,7 +205,9 @@ export function DeadlinesPanel({ api, today, version }: { api: Api; today: strin
         lede="Computed in code from accepted fields, soonest first. Held fields never produce a date."
       />
       <div data-slot="controls">
-        <button data-slot="button" data-primary onClick={send}>Send due reminders</button>
+        <button data-slot="button" data-primary disabled={busy} aria-busy={busy} onClick={send}>
+          Send due reminders
+        </button>
         <span data-slot="panel-lede">Treating {formatDay(today)} as today.</span>
       </div>
       <Notice message={message} />
@@ -207,16 +241,18 @@ export function AskPanel({ api }: { api: Api }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [message, setMessage] = useState<Message>(null);
+  const [busy, guard] = useBusy();
 
-  const ask = async () => {
-    setMessage(null);
-    try {
-      setAnswer(await api.ask(question));
-    } catch (error) {
-      setAnswer(null);
-      setMessage(fail(error));
-    }
-  };
+  const ask = () =>
+    guard(async () => {
+      setMessage(null);
+      try {
+        setAnswer(await api.ask(question));
+      } catch (error) {
+        setAnswer(null);
+        setMessage(fail(error));
+      }
+    });
 
   return (
     <section data-slot="panel" role="tabpanel" aria-labelledby="t-ask">
@@ -235,7 +271,15 @@ export function AskPanel({ api }: { api: Api }) {
             onChange={(e) => setQuestion(e.target.value)}
           />
         </div>
-        <button data-slot="button" data-primary disabled={!question.trim()} onClick={ask}>Ask</button>
+        <button
+          data-slot="button"
+          data-primary
+          disabled={!question.trim() || busy}
+          aria-busy={busy}
+          onClick={ask}
+        >
+          Ask
+        </button>
       </div>
       <Notice message={message} />
       {answer && (

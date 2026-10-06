@@ -31,3 +31,26 @@ Deferred work agreed in planning. Each item says what, why, and when to pick it 
     refusals leave no log line.
 - **Why:** none blocks TASK-002; each is a clearer message or log, not wrong data.
 - **Depends on:** nothing. **Source:** TASK-001 branch review, 2026-10-01.
+
+## Branch review of TASK-008, findings not fixed (2026-10-06)
+
+Source: `bearing:branch-review` of feature/TASK-008-OneDayScope. Fixed in the same task: 1, 2, 3, 4, 6,
+9, 10, 11, 15. Left, each with the reviewer's evidence in `.scratch/review/TASK-008/`:
+
+- **5** Fetch effects in `web/src/panels.tsx` have no stale-response guard (an older answer can
+  overwrite a newer one); loading shows the empty state. Pick it up with the next UI change.
+- **7** Citation check keys clauses by (contract title, clause number); two contracts with the same title
+  collide. Key by contract id and make titles unique at ingest.
+- **8** `clauses` is capped at 12000 characters in the answer prompt; real clause sets can exceed it
+  and answer 422. Drop the lowest-ranked hits until the block fits.
+- **12** Filenames `..` or over 255 bytes return 500; write uploads under a fixed temp name.
+- **13** Migration 0003: add `SET lock_timeout`, drop the stale Streamlit line, note the index decision
+  for `clauses WHERE embedding IS NULL`.
+- **14** Docstrings in `app/llm/gateway.py` and `app/extraction/cli.py` still say USD 9 and 10 fields.
+- **16** `web/src/api.ts` casts responses (`as T`) instead of validating them.
+- **17** Tabs lack `aria-controls` and arrow-key handling; the answer has no `aria-live`.
+- **18** `tests/api/fakes.py` still has an unused `NotAvailableError`; the reminders route has no test for
+  its 502 envelope. Also `evals/qa/run.py` counts an unreadable reply as a refusal, which the app does
+  not (the app returns 502).
+- `make check` rewrites `evals/*/last-run.*` on every run; `web/tsconfig.tsbuildinfo` is committed.
+

@@ -158,10 +158,13 @@ async def _main(live: bool) -> int:
                     budget_stop_usd=settings.llm_budget_stop_usd,
                     run_id=uuid.uuid4(),
                 )
-                code, lines = await run(
-                    embedder=embedder, gateway=gateway, floor=settings.qa_similarity_floor
-                )
-                await session.commit()
+                try:
+                    code, lines = await run(
+                        embedder=embedder, gateway=gateway, floor=settings.qa_similarity_floor
+                    )
+                finally:
+                    # Spend that was really paid is recorded even if the run is interrupted.
+                    await session.commit()
         finally:
             await engine.dispose()
     sys.stdout.write("\n".join(lines) + "\n")

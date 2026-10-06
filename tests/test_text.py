@@ -5,6 +5,7 @@ import pytest
 from app.core.text import normalise_for_match
 
 
+# TC-0040
 def test_tc0040_line_breaks_and_runs_of_spaces_fold_to_one_space() -> None:
     assert normalise_for_match("ninety (90)\n  days") == normalise_for_match("ninety (90) days")
     assert normalise_for_match("ninety (90)\n  days") == "ninety (90) days"
@@ -20,6 +21,7 @@ def test_tc0040_line_breaks_and_runs_of_spaces_fold_to_one_space() -> None:
         ("thirty\u00a0days", "thirty days"),  # non-breaking space
     ],
 )
+# TC-0041
 def test_tc0041_layout_characters_are_unified(raw: str, expected: str) -> None:
     assert normalise_for_match(raw) == expected
 
@@ -33,6 +35,7 @@ def test_tc0041_layout_characters_are_unified(raw: str, expected: str) -> None:
         ("self-insured", "selfinsured"),  # a real hyphen inside a line is kept
     ],
 )
+# TC-0042
 def test_tc0042_different_numbers_or_words_never_match(a: str, b: str) -> None:
     assert normalise_for_match(a) != normalise_for_match(b)
 

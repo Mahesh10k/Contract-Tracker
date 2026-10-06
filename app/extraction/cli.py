@@ -82,7 +82,9 @@ async def extract_one(
     async with factory() as session, session.begin():
         if reply is None:
             rows = service.invalid_reply_rows()
-            result = await service.store_rows(session, prepared, rows, model_id=gateway.model)
+            result = await service.store_rows(
+                session, prepared, rows, model_id=gateway.model, keep_accepted=True
+            )
         else:
             result = await service.store(session, prepared, reply, model_id=gateway.model)
     return result

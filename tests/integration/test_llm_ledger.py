@@ -74,6 +74,7 @@ async def test_recorded_calls_add_up_to_the_spend(session: AsyncSession) -> None
     assert await ledger.spent_usd() == Decimal("1.263500")
 
 
+# TC-0049
 async def test_tc0049_spend_at_nine_dollars_stops_the_call(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -88,6 +89,7 @@ async def test_tc0049_spend_at_nine_dollars_stops_the_call(
     assert await session.scalar(select(func.count()).select_from(llm_calls)) == 1
 
 
+# TC-0051
 async def test_tc0051_the_call_that_crosses_nine_is_recorded_and_the_next_is_refused(
     session: AsyncSession, tmp_path: Path
 ) -> None:
@@ -104,6 +106,7 @@ async def test_tc0051_the_call_that_crosses_nine_is_recorded_and_the_next_is_ref
     assert len(sent) == 1
 
 
+# TC-0090
 async def test_tc0090_spend_before_the_budget_window_does_not_count(session: AsyncSession) -> None:
     # TASK-008, ADR-0014: USD 2 for the day, counted from LLM_BUDGET_SINCE.
     await LlmCallLedger(session).record(earlier_spend("5.00"))

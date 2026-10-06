@@ -11,7 +11,7 @@ import structlog
 from starlette.datastructures import Headers, MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from app.core.errors import unhandled_response
+from app.core.errors import error_response, unhandled_response
 
 log = structlog.get_logger()
 
@@ -59,3 +59,33 @@ class RequestIdMiddleware:
             duration_ms = round((time.perf_counter() - start) * 1000, 1)
             log.info("request", status=status, duration_ms=duration_ms)
             structlog.contextvars.clear_contextvars()
+
+
+class UploadLimitMiddleware:
+    """Refuse an oversized upload from its Content-Length, before any of the body is read.
+
+    FastAPI parses a multipart body before the route runs, and Starlette spools file parts to disk
+    without a cap, so a size check inside the route comes too late. Browsers and curl always send
+    Content-Length for a form upload; a chunked upload with no length is refused with 411.
+    """
+
+    def __init__(self, app: ASGIApp, *, path: str, max_bytes: int) -> None:
+        self.app = app
+        self.path = path
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != self.path:
+            await self.app(scope, receive, send)
+            return
+        declared = Headers(scope=scope).get("content-length")
+        if declared is None or not declared.isdigit():
+            await error_response(411, "length_required", "The upload needs a Content-Length")(
+                scope, receive, send
+            )
+        elif int(declared) > self.max_bytes:
+            await error_response(413, "upload_too_large", "File is larger than 5 MB")(
+                scope, receive, send
+            )
+        else:
+            await self.app(scope, receive, send)

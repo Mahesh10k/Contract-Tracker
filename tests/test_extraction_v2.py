@@ -47,6 +47,7 @@ def test_extraction_uses_prompt_v2() -> None:
     assert PROMPT_VERSION == 2
 
 
+# TC-0080
 def test_tc0080_a_valid_v2_reply_gives_five_accepted_rows() -> None:
     reply = v2_reply_from_key("lease-01")
 
@@ -56,6 +57,7 @@ def test_tc0080_a_valid_v2_reply_gives_five_accepted_rows() -> None:
     assert {r.status for r in rows} == {"accepted"}
 
 
+# TC-0081
 def test_tc0081_a_reply_missing_notice_period_fails_the_schema() -> None:
     fields = {n: {"value": None, "quote": None, "clause_id": None} for n in ANSWER_FIELDS[:-1]}
 
@@ -65,6 +67,7 @@ def test_tc0081_a_reply_missing_notice_period_fails_the_schema() -> None:
         )
 
 
+# TC-0082
 def test_tc0082_a_reply_with_payment_terms_fails_the_schema() -> None:
     fields: dict[str, dict[str, str | None]] = {
         n: {"value": None, "quote": None, "clause_id": None} for n in ANSWER_FIELDS
@@ -77,6 +80,7 @@ def test_tc0082_a_reply_with_payment_terms_fails_the_schema() -> None:
         )
 
 
+# TC-0084
 def test_tc0084_an_invalid_reply_holds_all_five_fields() -> None:
     rows = invalid_reply_rows()
 
@@ -85,6 +89,7 @@ def test_tc0084_an_invalid_reply_holds_all_five_fields() -> None:
     assert {r.value_text for r in rows} == {None}
 
 
+# TC-0087
 def test_tc0087_notice_quote_cited_as_clause_2_3_is_accepted() -> None:
     clauses = clauses_of("vendor-07")
     reply = FieldReply(
@@ -102,6 +107,7 @@ def test_tc0087_notice_quote_cited_as_clause_2_3_is_accepted() -> None:
     )
 
 
+# TC-0088
 def test_tc0088_the_same_quote_cited_as_clause_7_is_held() -> None:
     reply = FieldReply(
         value="three (3) months",

@@ -3,7 +3,7 @@
 import re
 import uuid
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pytest
@@ -35,6 +35,7 @@ async def post_pdf(
     )
 
 
+# TC-0126
 async def test_tc0126_a_valid_pdf_with_a_type_is_accepted(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -45,6 +46,7 @@ async def test_tc0126_a_valid_pdf_with_a_type_is_accepted(
     assert service.calls == [("upload", "lease-01.pdf", PDF, "lease")]
 
 
+# TC-0127
 async def test_tc0127_a_file_over_five_megabytes_is_refused(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -68,6 +70,7 @@ async def test_a_file_of_exactly_five_megabytes_is_accepted(
     assert len(service.calls) == 1
 
 
+# TC-0128
 async def test_tc0128_a_file_that_is_not_a_pdf_is_refused(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -88,6 +91,7 @@ async def test_an_unknown_contract_type_is_a_validation_error(
     assert service.calls == []
 
 
+# TC-0129
 async def test_tc0129_a_path_in_the_file_name_is_reduced_to_its_base(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -120,6 +124,7 @@ async def test_contracts_are_listed(client: AsyncClient, service: FakeService) -
     ]
 
 
+# TC-0130
 async def test_tc0130_fields_carry_status_reason_quote_and_clause(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -138,6 +143,7 @@ async def test_tc0130_fields_carry_status_reason_quote_and_clause(
     )
 
 
+# TC-0131
 async def test_tc0131_deadlines_have_iso_dates_and_integer_days(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -150,6 +156,7 @@ async def test_tc0131_deadlines_have_iso_dates_and_integer_days(
     assert rows[0]["kind"] == "notice_deadline"
 
 
+# TC-0132
 async def test_tc0132_a_bad_today_is_422_and_an_absent_one_means_today(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -184,6 +191,7 @@ async def test_extract_reports_the_counts(client: AsyncClient, service: FakeServ
     assert response.json() == {"message": "4 accepted, 1 need review"}
 
 
+# TC-0133
 async def test_tc0133_an_unknown_contract_is_a_404_envelope(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -216,6 +224,7 @@ async def test_ask_returns_the_answer_with_each_citation_and_its_clause_text(
     }
 
 
+# TC-0134
 async def test_tc0134_an_empty_question_is_422_and_a_service_failure_is_the_envelope(
     client: AsyncClient, service: FakeService
 ) -> None:
@@ -242,3 +251,14 @@ async def test_reminders_surface_the_services_message(
 
     assert response.status_code == 400
     assert response.json()["error"]["message"] == "Reminder emails arrive with Checkpoint 5."
+
+
+# TC-0180
+async def test_a_deadlines_request_without_today_honours_pretend_today_from_the_settings(
+    app: FastAPI, client: AsyncClient, service: FakeService
+) -> None:
+    app.state.settings = app.state.settings.model_copy(update={"pretend_today": date(2028, 10, 1)})
+
+    await client.get("/api/deadlines")
+
+    assert service.calls == [("deadlines", date(2028, 10, 1))]

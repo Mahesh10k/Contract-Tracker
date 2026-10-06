@@ -21,6 +21,7 @@ from app.api.ui.schemas import (
 )
 from app.core.errors import ErrorEnvelope
 from app.domain.contracts import StoredField
+from app.reminders.plan import resolve_today
 from app.ui.service import (
     MAX_UPLOAD_BYTES,
     UiApi,
@@ -96,9 +97,9 @@ async def extract_contract(contract_id: uuid.UUID, service: Service) -> MessageO
 
 @router.get("/deadlines", response_model=list[DeadlineOut])
 async def deadlines(
-    service: Service, today: Annotated[date | None, Query()] = None
+    request: Request, service: Service, today: Annotated[date | None, Query()] = None
 ) -> list[DeadlineOut]:
-    on = today or datetime.now(UTC).date()
+    on = resolve_today(today, request.app.state.settings.pretend_today, datetime.now(UTC).date())
     rows = await service.deadlines(on)
     return [
         DeadlineOut(

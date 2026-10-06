@@ -78,6 +78,7 @@ async def statuses(session: AsyncSession) -> dict[str, int]:
     return {row[0]: row[1] for row in result}
 
 
+# TC-0171
 async def test_tc0171_accepted_fields_become_obligations_and_reminders_sent_once(
     session: AsyncSession, factory: async_sessionmaker[AsyncSession]
 ) -> None:
@@ -91,6 +92,17 @@ async def test_tc0171_accepted_fields_become_obligations_and_reminders_sent_once
 
     assert await session.scalar(text("SELECT count(*) FROM obligations")) == 2
     assert await session.scalar(text("SELECT count(*) FROM reminders")) == 6
+    # TC-0104: each obligation has its date and points at the field it was computed from.
+    dates = await session.execute(
+        text(
+            "SELECT o.kind::text, o.due_on, e.field_name::text FROM obligations o "
+            "JOIN extractions e ON e.id = o.source_extraction_id ORDER BY o.due_on"
+        )
+    )
+    assert [tuple(r) for r in dates] == [
+        ("notice_deadline", date(2026, 12, 1), "notice_period"),
+        ("expiry", date(2026, 12, 31), "term"),
+    ]
     assert (first.sent, second.sent) == (1, 0)
     assert "2026-12-01" in mailer.sent[0].get_content()
     assert "clause 7" in mailer.sent[0].get_content()
@@ -118,6 +130,7 @@ async def test_a_run_after_the_deadline_skips_instead_of_emailing(
     assert await statuses(session) == {"skipped": 6}
 
 
+# TC-0174
 async def test_tc0174_an_unreachable_mail_server_leaves_every_reminder_pending(
     session: AsyncSession, factory: async_sessionmaker[AsyncSession]
 ) -> None:
@@ -161,3 +174,27 @@ async def test_a_corrected_date_replaces_the_obligation_and_keeps_the_unchanged_
         await session.scalar(text("SELECT id FROM obligations WHERE kind = 'notice_deadline'"))
         == before
     )
+
+
+# TC-0183
+async def test_tc0183_sync_all_holds_the_advisory_lock_and_two_syncs_leave_one_set(
+    session: AsyncSession,
+) -> None:
+    # Review 6: the lock makes a second concurrent sync wait and then find the work done.
+    from app.reminders.sync import SYNC_LOCK_KEY
+
+    await extracted_lease_01(session)
+
+    await sync_all(session)
+    await sync_all(session)
+
+    held = await session.scalar(
+        text(
+            "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND granted "
+            "AND pid = pg_backend_pid() AND objid = :key"
+        ),
+        {"key": SYNC_LOCK_KEY},
+    )
+    assert held == 1
+    assert await session.scalar(text("SELECT count(*) FROM obligations")) == 2
+    assert await session.scalar(text("SELECT count(*) FROM reminders")) == 6

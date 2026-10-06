@@ -38,6 +38,7 @@ async def load_golden(session: AsyncSession) -> int:
     return int(await session.scalar(text("SELECT count(*) FROM clauses")) or 0)
 
 
+# TC-0141
 async def test_tc0141_every_clause_gets_a_384_number_vector_and_a_second_run_writes_nothing(
     session: AsyncSession,
 ) -> None:
@@ -56,6 +57,7 @@ async def test_tc0141_every_clause_gets_a_384_number_vector_and_a_second_run_wri
     assert embedder.documents[0].startswith("Lease Agreement 01 | 1 ")
 
 
+# TC-0140
 async def test_tc0140_pgvector_returns_the_same_top_five_and_scores_as_the_memory_ranking(
     session: AsyncSession,
 ) -> None:
@@ -74,6 +76,7 @@ async def test_tc0140_pgvector_returns_the_same_top_five_and_scores_as_the_memor
     assert [round(h.score, 5) for h in from_db] == [round(h.score, 5) for h in in_memory]
 
 
+# TC-0158
 async def test_tc0158_an_unretrieved_citation_is_refused_through_the_real_database(
     session: AsyncSession,
 ) -> None:
@@ -97,6 +100,7 @@ async def test_tc0158_an_unretrieved_citation_is_refused_through_the_real_databa
     assert len(gateway.requests) == 1
 
 
+# TC-0159
 async def test_tc0159_a_stored_injection_clause_reaches_the_model_as_data_inside_the_block(
     session: AsyncSession,
 ) -> None:

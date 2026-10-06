@@ -254,6 +254,24 @@ Not applicable: Security: no user input beyond a date; the recipient comes from 
 Performance: a few dozen reminders per run.
 Invariants: a reminder is sent at most once; a reminder is never marked sent without a successful SMTP call.
 
+## Review fixes (branch-review of 2026-10-06, US-00-006 and US-00-007)
+
+Requirements: REQ-016, REQ-042, REQ-044, REQ-052
+Acceptance criteria: AC-US-00-006-3, AC-US-00-006-7, AC-US-00-007-1, AC-US-00-007-3
+
+| Scenario | Category | What happens | Proves that | ACs | Cases |
+| --- | --- | --- | --- | --- | --- |
+| TS-RF-1 | Security | An upload declares a length over the limit, or none | it is refused before any of the body is read | AC-US-00-007-1 | TC-0175, TC-0176 |
+| TS-RF-2 | Edge | A "today" ahead of the real clock | the emails go to MailHog and nothing is recorded or retired | AC-US-00-006-7 | TC-0177, TC-0183 |
+| TS-RF-3 | Error | The embedding model was never fetched | the error names make fetch-model and nothing is downloaded | AC-US-00-007-4 | TC-0178 |
+| TS-RF-4 | Error | An unreadable reply after fields were accepted | the accepted fields stay | AC-US-00-006-3 | TC-0179 |
+| TS-RF-5 | Alternate | No date given to the deadlines API | PRETEND_TODAY is honoured | AC-US-00-007-3 | TC-0180 |
+| TS-RF-6 | Alternate | A double click on a slow action | the work runs once and the button says it is busy | AC-US-00-006-3 | TC-0181 |
+| TS-RF-7 | Edge | Late evening or early morning away from UTC | the page uses the owner's own calendar day | AC-US-00-007-3 | TC-0182 |
+
+Not applicable: Performance, Accessibility beyond aria-busy.
+Invariants: a preview never changes reminder status; an unreadable reply never lowers an accepted field.
+
 ## Needs rewording
 
 Criteria with no testable expected result. Each one counts as uncovered

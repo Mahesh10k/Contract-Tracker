@@ -14,17 +14,20 @@ def at_degrees(degrees: float) -> list[float]:
     return [math.cos(math.radians(degrees)), math.sin(math.radians(degrees))]
 
 
+# TC-0136
 def test_tc0136_clause_text_is_title_number_heading_then_body() -> None:
     text = embedding_text("Lease Agreement 01", "2.2", "Duration", "The term is two (2) years.")
 
     assert text == "Lease Agreement 01 | 2.2 Duration | The term is two (2) years."
 
 
+# TC-0137
 def test_tc0137_a_question_gets_the_bge_instruction_and_a_clause_does_not() -> None:
     assert query_text("Who pays?") == f"{QUERY_INSTRUCTION}Who pays?"
     assert not embedding_text("T", "1", "H", "B").startswith(QUERY_INSTRUCTION)
 
 
+# TC-0138
 def test_tc0138_the_five_nearest_clauses_come_back_highest_similarity_first() -> None:
     clauses = [candidate(str(n), at_degrees(n * 10)) for n in range(8)]
 
@@ -35,6 +38,7 @@ def test_tc0138_the_five_nearest_clauses_come_back_highest_similarity_first() ->
     assert [h.score for h in hits] == sorted((h.score for h in hits), reverse=True)
 
 
+# TC-0139
 def test_tc0139_fewer_clauses_than_k_all_come_back_and_none_gives_nothing() -> None:
     three = [candidate(str(n), at_degrees(n * 10)) for n in range(3)]
 

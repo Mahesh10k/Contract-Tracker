@@ -94,6 +94,7 @@ def test_lease_01_dates_follow_its_stated_terms(truths: dict[str, Truth]) -> Non
 
 
 @pytest.mark.parametrize("contract_id", CONTRACT_IDS)
+# TC-0004
 def test_tc0004_pdf_round_trip_gives_the_truth_clauses(out_dir: Path, contract_id: str) -> None:
     truth = load_truth(out_dir / f"{contract_id}.truth.json")
     pdf = read_pdf((out_dir / f"{contract_id}.pdf").read_bytes())

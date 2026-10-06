@@ -18,10 +18,10 @@ from app.api.ui.router import router as ui_router
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import configure_logging
-from app.core.middleware import RequestIdMiddleware
+from app.core.middleware import RequestIdMiddleware, UploadLimitMiddleware
 from app.core.telemetry import configure_tracing
 from app.db.session import make_engine, make_session_factory
-from app.ui.service import UiService
+from app.ui.service import MAX_UPLOAD_BYTES, UiService
 
 log = structlog.get_logger()
 
@@ -56,6 +56,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/openapi.json" if docs_enabled else None,
     )
     app.state.settings = settings
+    # Added first so the request id wraps it: the limit refuses before the body is read (REQ-044).
+    app.add_middleware(
+        UploadLimitMiddleware, path="/api/contracts", max_bytes=MAX_UPLOAD_BYTES + 64 * 1024
+    )
     app.add_middleware(RequestIdMiddleware)
     register_exception_handlers(app)
     app.include_router(health_router)

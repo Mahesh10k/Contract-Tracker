@@ -10,10 +10,18 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol
 
+from app.core.errors import DomainError
 from app.retrieval.text import query_text
 
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 DIMENSIONS = 384
+
+
+class ModelNotFetchedError(DomainError):
+    """The embedding model is not saved locally; embedding never downloads it (Q-016)."""
+
+    status_code = 503
+    code = "embedding_model_missing"
 
 
 class Embedder(Protocol):
@@ -33,13 +41,15 @@ class SentenceTransformerEmbedder:
 
     def _load(self) -> object:
         if self._model is None:
+            local = self.model_dir / MODEL_NAME.replace("/", "--")
+            if not local.exists():
+                raise ModelNotFetchedError(
+                    f"The embedding model is not in {self.model_dir}/. Run make fetch-model once."
+                )
             # Imported here so the app and its tests start without PyTorch.
             from sentence_transformers import SentenceTransformer
 
-            local = self.model_dir / MODEL_NAME.replace("/", "--")
-            self._model = SentenceTransformer(
-                str(local if local.exists() else MODEL_NAME), device="cpu"
-            )
+            self._model = SentenceTransformer(str(local), device="cpu")
         return self._model
 
     def _encode(self, texts: Sequence[str]) -> list[list[float]]:

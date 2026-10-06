@@ -13,9 +13,10 @@ PRD: docs/product/PRD.md   Questions: docs/product/questions.md   Built: 2026-10
 | US-00-003 | EP-02 | See the computed key dates and obligations | Contract owner | Must | TBD | REQ-003, REQ-004, REQ-007, REQ-008, REQ-009, REQ-013 | US-00-010 |
 | US-00-004 | EP-04 | Ask a question and get an answer cited to clauses | Contract owner | Must | TBD | REQ-017, REQ-019, REQ-040, REQ-047, REQ-048 | US-00-001 |
 | US-00-005 | EP-04 | Get a refusal when the contracts do not hold the answer | Contract owner | Must | TBD | REQ-020, REQ-048, REQ-049, REQ-050, REQ-051 | US-00-004 |
+| US-00-011 | EP-02 | Correct a held field | Contract owner | Should | TBD | REQ-013, REQ-015 | US-00-008, US-00-003 |
 | US-00-006 | EP-03 | Receive reminder emails before each deadline | Contract owner | Must | TBD | REQ-016, REQ-042, REQ-053 | US-00-003 |
 | US-00-007 | EP-05 | Work with contracts, deadlines and questions in the browser | Contract owner | Must | TBD | REQ-052 | US-00-003, US-00-004 |
-| US-00-008 | EP-02 | Correct a field in the review queue | Contract owner | Should | TBD | REQ-013, REQ-015, REQ-052 | US-00-003, US-00-007 |
+| US-00-008 | EP-02 | See every field held for review | Contract owner | Should | TBD | REQ-013, REQ-015, REQ-052 | US-00-003, US-00-007 |
 | US-02-001 | EP-06 | Measure extraction accuracy and quote grounding | Developer | Must | TBD | REQ-024, REQ-057 | US-00-003, US-02-006 |
 | US-02-002 | EP-06 | Measure retrieval, answer and refusal accuracy | Developer | Must | TBD | REQ-025, REQ-026, REQ-027, REQ-056 | US-00-005 |
 | US-02-003 | EP-06 | Gate every change on the evals in make check | Developer | Must | TBD | REQ-028, REQ-043 | US-02-001, US-02-002 |
@@ -25,7 +26,7 @@ PRD: docs/product/PRD.md   Questions: docs/product/questions.md   Built: 2026-10
 
 ## Hours by discipline
 
-tasks: 74 (46 development, 28 test), hours by discipline: none estimated; total 0 h, 74 TBD
+tasks: 75 (46 development, 29 test), hours by discipline: none estimated; total 0 h, 75 TBD
 
 ## Delivery tasks
 
@@ -287,20 +288,20 @@ Covers: REQ-003, REQ-004, REQ-007, REQ-008, REQ-009, REQ-013   Judgement: merged
 
 **Tasks.** US-00-003-D1 to D3, US-00-003-T1 to T2 in docs/product/tasks.md
 
-### US-00-008 Correct a field in the review queue
+### US-00-008 See every field held for review
 
 Epic: EP-02   Priority: Should   Points: TBD (estimate)
 Persona: Contract owner, group 00   Ticket: unassigned
 Covers: REQ-013, REQ-015, REQ-052   Judgement: story seeded by Q-005 on REQ-013, REQ-015; screen per REQ-052 (the web UI statement replaced 2026-10-05)
 
-**Narrative.** As a contract owner, I want to see every field held for review and enter the right value, so that contracts with unclear wording still get dates and reminders.
+**Narrative.** As a contract owner, I want to see every field held for review with the reason, so that I know which values nobody has checked. Entering the right value is the next story (US-00-011).
 
-**Why it matters.** B2: a field stuck in needs_review has no date and so no reminder; correcting it closes that hole.
+**Why it matters.** B3: a held field is shown with its reason instead of being hidden or shown as fact. B2: seeing which fields have no date is the first step to correcting them (US-00-011).
 
 **From the PRD.**
 - REQ-013: "The system places a field whose value cannot be parsed into the needs_review queue."
 - REQ-015: "The system places a field whose quote is not found in the source clause into the needs_review queue."
-- REQ-052: "The system provides a single Streamlit page with the tabs Upload, Contracts (fields and quotes), Deadlines, Ask and Needs review."
+- REQ-052: "The system provides a single-page web app (React since 2026-10-05, ADR-0016; Streamlit before) with the tabs Upload, Contracts (fields and quotes), Deadlines, Ask and Needs review."
 
 **Preconditions.**
 - At least one field is in needs_review (US-00-002 or US-00-003).
@@ -309,14 +310,8 @@ Covers: REQ-013, REQ-015, REQ-052   Judgement: story seeded by Q-005 on REQ-013,
 
 - AC-US-00-008-1. Given fields in needs_review, when the Needs review tab is opened, then each one shows its contract, field name, extracted value, quote and the reason it is held.
   Covers: REQ-013, REQ-015, REQ-052
-- AC-US-00-008-2. Given a held notice_period, when the owner enters "60 days" and saves, then the field leaves the queue and the notice deadline is recomputed from the corrected value.
-  Covers: REQ-013
-- AC-US-00-008-3. Given a corrected field, when extraction re-runs for that contract, then the corrected value is kept and not overwritten.
-  Covers: REQ-015
-- AC-US-00-008-4. Given a corrected value that still cannot be parsed, when it is saved, then it is refused with "could not parse" and the field stays in the queue.
-  Covers: REQ-013
-
 **Not in this story.**
+- Entering and saving a corrected value, recomputing dates from it, keeping it across re-extraction, and refusing an unparseable correction (US-00-011, proposed). Criteria 2 to 4 of this story were moved there on 2026-10-06 (Q-039); their ids are retired and never reused.
 - Editing fields that were accepted, outside the queue (not in the PRD).
 - The other screens of the web UI (US-00-007).
 
@@ -325,10 +320,50 @@ Covers: REQ-013, REQ-015, REQ-052   Judgement: story seeded by Q-005 on REQ-013,
 - US-00-007: the web app the review page lives in.
 
 **Assumptions.**
-- The user can enter a corrected value (Q-005).
-- A user correction always wins over re-extraction (Q-018).
+- The split is Q-039: this story is the read-only queue, US-00-011 the correction.
 
-**Tasks.** US-00-008-D1 to D2, US-00-008-T1 in docs/product/tasks.md
+**Tasks.** US-00-008-D1, US-00-008-T1 in docs/product/tasks.md
+
+### US-00-011 Correct a held field
+
+Epic: EP-02   Priority: Should   Points: TBD (estimate)
+Persona: Contract owner, group 00   Ticket: unassigned
+Status: proposed (not in TASK-008; split from US-00-008 on 2026-10-06, Q-039)
+Covers: REQ-013, REQ-015   Judgement: story split from US-00-008 (seeded by Q-005)
+
+**Narrative.** As a contract owner, I want to enter the right value for a field held for review, so that contracts with unclear wording still get dates and reminders.
+
+**Why it matters.** B2: a field stuck in needs_review has no date and so no reminder; correcting it closes that hole.
+
+**From the PRD.**
+- REQ-013: "The system places a field whose value cannot be parsed into the needs_review queue."
+- REQ-015: "The system places a field whose quote is not found in the source clause into the needs_review queue."
+
+**Preconditions.**
+- At least one field is in needs_review and shown on the Needs review tab (US-00-008).
+
+**Acceptance criteria.**
+
+- AC-US-00-011-1. Given a held notice_period, when the owner enters "60 days" and saves, then the field leaves the queue and the notice deadline is recomputed from the corrected value.
+  Covers: REQ-013
+- AC-US-00-011-2. Given a corrected field, when extraction re-runs for that contract, then the corrected value is kept and not overwritten.
+  Covers: REQ-015
+- AC-US-00-011-3. Given a corrected value that still cannot be parsed, when it is saved, then it is refused with "could not parse" and the field stays in the queue.
+  Covers: REQ-013
+
+**Not in this story.**
+- Listing held fields with their reasons (US-00-008).
+- Editing fields that were accepted, outside the queue (not in the PRD).
+
+**Depends on.**
+- US-00-008: the Needs review tab the correction form lives in.
+- US-00-003: the date computation the corrected value feeds.
+
+**Assumptions.**
+- The user can enter a corrected value (Q-005).
+- A user correction always wins over re-extraction (Q-018); the upsert already protects a corrected row, so AC-US-00-011-2 has a test today.
+
+**Tasks.** US-00-011-D1, US-00-011-T1 in docs/product/tasks.md
 
 ## EP-03 Never miss a contract deadline
 

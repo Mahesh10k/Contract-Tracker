@@ -147,4 +147,37 @@ describe("the page", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("2 reminders sent");
   });
+
+  it("TC-0181: disables Send due reminders while the request runs and sends it only once", async () => {
+    let finish: (message: string) => void = () => {};
+    const sendReminders = vi.fn().mockReturnValue(new Promise<string>((resolve) => (finish = resolve)));
+    const { user } = open({ sendReminders });
+
+    await user.click(screen.getByRole("tab", { name: "Deadlines" }));
+    const button = await screen.findByRole("button", { name: "Send due reminders" });
+    await user.click(button);
+    await user.click(button);
+
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-busy", "true");
+    expect(sendReminders).toHaveBeenCalledTimes(1);
+    finish("1 reminder sent");
+    expect(await screen.findByRole("status")).toHaveTextContent("1 reminder sent");
+    expect(button).toBeEnabled();
+  });
+
+  it("disables Extract fields while it runs so an uncached contract is not paid for twice", async () => {
+    let finish: (message: string) => void = () => {};
+    const extract = vi.fn().mockReturnValue(new Promise<string>((resolve) => (finish = resolve)));
+    const { user } = open({ extract });
+
+    await user.click(screen.getByRole("tab", { name: "Contracts" }));
+    const button = await screen.findByRole("button", { name: "Extract fields" });
+    await user.click(button);
+    await user.click(button);
+
+    expect(extract).toHaveBeenCalledTimes(1);
+    finish("5 accepted, 0 need review");
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+  });
 });

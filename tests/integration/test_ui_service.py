@@ -38,6 +38,7 @@ def service(factory: async_sessionmaker[AsyncSession]) -> UiService:
     return UiService(settings, factory)
 
 
+# TC-0135
 async def test_tc0135_golden_set_loads_lists_and_starts_without_deadlines(
     service: UiService,
 ) -> None:
@@ -52,6 +53,7 @@ async def test_tc0135_golden_set_loads_lists_and_starts_without_deadlines(
     assert await service.held() == []
 
 
+# TC-0160
 async def test_tc0160_ask_embeds_retrieves_answers_and_returns_citation_text(
     factory: async_sessionmaker[AsyncSession],
 ) -> None:

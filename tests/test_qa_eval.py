@@ -44,6 +44,7 @@ def question(i: int, expected: Expected | None) -> Question:
     )
 
 
+# TC-0157
 def test_tc0157_the_golden_file_has_seven_answerable_and_three_unanswerable_questions() -> None:
     questions = load_questions(GOLDEN)
 
@@ -72,6 +73,7 @@ def test_a_question_naming_a_clause_that_does_not_exist_is_refused_at_load(tmp_p
         load_questions(path)
 
 
+# TC-0153
 def test_tc0153_recall_counts_only_the_expected_contract_and_clause_pair() -> None:
     assert (
         recall_hit(EXPECT, [hit("Lease Agreement 01", "8"), hit("Supply Agreement 08", "8")])
@@ -83,6 +85,7 @@ def test_tc0153_recall_counts_only_the_expected_contract_and_clause_pair() -> No
     )
 
 
+# TC-0154
 def test_tc0154_an_answer_needs_the_value_and_the_expected_clause() -> None:
     right = answered("It is governed by the laws of the State of California.")
     wrong_clause = answered("California law.", clause="4")
@@ -96,6 +99,7 @@ def test_tc0154_an_answer_needs_the_value_and_the_expected_clause() -> None:
     assert answer_correct(EXPECT, Answer(REFUSAL, [], True)) is False
 
 
+# TC-0155
 def test_tc0155_refusal_accuracy_counts_wrong_refusals_and_wrong_answers() -> None:
     refused = Answer(REFUSAL, [], True)
     cases = [
@@ -110,6 +114,7 @@ def test_tc0155_refusal_accuracy_counts_wrong_refusals_and_wrong_answers() -> No
     assert verdicts == [True, False, True, False]
 
 
+# TC-0156
 def test_scores_are_hits_over_totals_and_the_gate_names_a_metric_under_its_threshold() -> None:
     qs = [question(i, EXPECT) for i in range(1, 8)] + [question(i, None) for i in range(8, 11)]
     ok = answered("California.")

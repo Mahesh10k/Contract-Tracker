@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Api } from "./api";
+import { localIso } from "./dates";
 import { AskPanel, ContractsPanel, DeadlinesPanel, ReviewPanel, UploadPanel } from "./panels";
 
 const TABS = ["Upload", "Contracts", "Deadlines", "Ask", "Needs review"] as const;
 type Tab = (typeof TABS)[number];
 
-const todayIso = () => new Date().toISOString().slice(0, 10);
+const todayIso = () => localIso(new Date());
 
 function useTheme() {
   const [dark, setDark] = useState(() => {

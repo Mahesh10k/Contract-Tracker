@@ -13,6 +13,7 @@ def test_the_same_inputs_give_the_same_key() -> None:
     )
 
 
+# TC-0047
 def test_tc0047_a_new_prompt_version_gives_a_new_key() -> None:
     v1 = cache_key("extract_fields@v1", "anthropic/claude-haiku-4.5", BODY)
     v2 = cache_key("extract_fields@v2", "anthropic/claude-haiku-4.5", BODY)
@@ -20,6 +21,7 @@ def test_tc0047_a_new_prompt_version_gives_a_new_key() -> None:
     assert v1 != v2
 
 
+# TC-0048
 def test_tc0048_a_different_model_gives_a_new_key() -> None:
     a = cache_key("extract_fields@v1", "anthropic/claude-haiku-4.5", BODY)
     b = cache_key("extract_fields@v1", "google/gemini-3.1-flash-lite", BODY)

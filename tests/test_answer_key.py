@@ -35,6 +35,7 @@ def truth_of(contracts_dir: Path, contract_id: str) -> Truth:
     return load_truth(contracts_dir / f"{contract_id}.truth.json")
 
 
+# TC-0072
 def test_tc0072_six_contracts_two_of_each_type(key: AnswerKey) -> None:
     contracts = key["contracts"]
     assert len(contracts) == 6
@@ -45,6 +46,7 @@ def test_tc0072_six_contracts_two_of_each_type(key: AnswerKey) -> None:
     }
 
 
+# TC-0073
 def test_tc0073_unknown_golden_id_is_refused(contracts_dir: Path, tmp_path: Path) -> None:
     target = tmp_path / "answer_key.json"
     with pytest.raises(ValueError, match="lease-99"):
@@ -52,11 +54,13 @@ def test_tc0073_unknown_golden_id_is_refused(contracts_dir: Path, tmp_path: Path
     assert not target.exists()
 
 
+# TC-0074
 def test_tc0074_no_golden_contract_is_a_holdout(contracts_dir: Path, key: AnswerKey) -> None:
     assert not set(key["contracts"]) & set(HOLDOUT)
     assert all(not truth_of(contracts_dir, cid)["holdout"] for cid in GOLDEN_IDS)
 
 
+# TC-0075
 def test_tc0075_both_hard_cases_are_in_the_set(key: AnswerKey) -> None:
     assert key["contracts"]["vendor-07"]["hard_case"] == "notice-elsewhere"
     assert key["contracts"]["vendor-08"]["hard_case"] == "no-renewal"
@@ -72,6 +76,7 @@ FIELD_CASES = [
 
 
 @pytest.mark.parametrize(("contract_id", "field"), FIELD_CASES)
+# TC-0076
 def test_tc0076_field_equals_truth(
     contracts_dir: Path, key: AnswerKey, contract_id: str, field: str
 ) -> None:
@@ -87,6 +92,7 @@ def test_tc0076_field_equals_truth(
 
 
 @pytest.mark.parametrize("contract_id", GOLDEN_IDS)
+# TC-0076
 def test_tc0076_dates_equal_truth(contracts_dir: Path, key: AnswerKey, contract_id: str) -> None:
     expected = truth_of(contracts_dir, contract_id)["expected"]
 
@@ -95,6 +101,7 @@ def test_tc0076_dates_equal_truth(contracts_dir: Path, key: AnswerKey, contract_
     assert got == {"expiry": expected["expiry"], "notice_deadline": expected["notice_deadline"]}
 
 
+# TC-0076
 def test_tc0076_lease_01_worked_example(key: AnswerKey) -> None:
     entry = key["contracts"]["lease-01"]
 
@@ -102,6 +109,7 @@ def test_tc0076_lease_01_worked_example(key: AnswerKey) -> None:
     assert entry["expected"]["notice_deadline"] == "2026-12-01"
 
 
+# TC-0077
 def test_tc0077_answer_fields_are_the_five_of_req_045() -> None:
     assert ANSWER_FIELDS == (
         "parties",
@@ -113,6 +121,7 @@ def test_tc0077_answer_fields_are_the_five_of_req_045() -> None:
 
 
 @pytest.mark.parametrize("contract_id", GOLDEN_IDS)
+# TC-0077
 def test_tc0077_each_contract_has_exactly_the_five_fields(key: AnswerKey, contract_id: str) -> None:
     fields = key["contracts"][contract_id]["fields"]
 
@@ -120,6 +129,7 @@ def test_tc0077_each_contract_has_exactly_the_five_fields(key: AnswerKey, contra
     assert "payment_terms" not in fields
 
 
+# TC-0078
 def test_tc0078_missing_renewal_clause_is_null(key: AnswerKey) -> None:
     assert key["contracts"]["vendor-08"]["fields"]["auto_renewal"] == {
         "value": None,
@@ -128,6 +138,7 @@ def test_tc0078_missing_renewal_clause_is_null(key: AnswerKey) -> None:
     }
 
 
+# TC-0079
 def test_tc0079_answer_key_is_byte_identical_across_runs(
     contracts_dir: Path, tmp_path: Path
 ) -> None:

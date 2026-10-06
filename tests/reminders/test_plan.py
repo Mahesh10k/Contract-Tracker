@@ -30,6 +30,7 @@ def due(
     )
 
 
+# TC-0161
 def test_tc0161_a_2028_11_30_deadline_is_reminded_at_60_30_and_7_days() -> None:
     plans = plan_reminders(date(2028, 11, 30))
 
@@ -40,6 +41,7 @@ def test_tc0161_a_2028_11_30_deadline_is_reminded_at_60_30_and_7_days() -> None:
     ]
 
 
+# TC-0162
 def test_tc0162_planning_across_a_month_and_year_end() -> None:
     plans = plan_reminders(date(2027, 1, 5))
 
@@ -51,6 +53,7 @@ def test_tc0162_planning_across_a_month_and_year_end() -> None:
     assert all(p.send_on < date(2027, 1, 5) for p in plans)
 
 
+# TC-0163
 def test_tc0163_a_deadline_three_days_away_sends_only_the_seven_day_reminder() -> None:
     obligation = uuid.uuid4()
     reminders = [due(lead, date(2026, 10, 8), obligation) for lead in (60, 30, 7)]
@@ -61,6 +64,7 @@ def test_tc0163_a_deadline_three_days_away_sends_only_the_seven_day_reminder() -
     assert sorted(r.lead_days for r in choice.skip) == [30, 60]
 
 
+# TC-0164
 def test_tc0164_a_deadline_that_has_already_passed_is_skipped_not_emailed() -> None:
     obligation = uuid.uuid4()
     reminders = [due(lead, date(2026, 10, 1), obligation) for lead in (30, 7)]
@@ -95,6 +99,7 @@ def test_two_obligations_are_chosen_independently() -> None:
     assert [r.lead_days for r in choice.skip] == [30]
 
 
+# TC-0169
 def test_tc0169_the_email_names_the_contract_the_obligation_the_date_and_the_clause() -> None:
     reminder = due(60, date(2026, 12, 1), uuid.uuid4())
 
@@ -121,6 +126,7 @@ def test_an_email_for_a_field_with_no_clause_does_not_print_an_empty_clause_line
     assert "Contract expires" in body
 
 
+# TC-0170
 def test_tc0170_an_explicit_date_beats_pretend_today_which_beats_the_real_clock() -> None:
     real = date(2026, 10, 5)
 
@@ -129,6 +135,7 @@ def test_tc0170_an_explicit_date_beats_pretend_today_which_beats_the_real_clock(
     assert resolve_today(None, None, real) == real
 
 
+# TC-0172
 def test_tc0172_a_changed_due_date_replaces_the_obligation_and_unchanged_ones_stay() -> None:
     existing = {("expiry", date(2026, 12, 31)), ("notice_deadline", date(2026, 12, 1))}
     desired = {("expiry", date(2027, 12, 31)), ("notice_deadline", date(2026, 12, 1))}

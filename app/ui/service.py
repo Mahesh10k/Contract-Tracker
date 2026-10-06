@@ -9,7 +9,7 @@ import json
 import tempfile
 import uuid
 from collections.abc import Callable
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Protocol
 
@@ -177,13 +177,21 @@ class UiService:
         async with self.factory() as session, session.begin():
             await sync_all(session)
         mailer = self._mailer or SmtpMailer(self.settings.smtp_host, self.settings.smtp_port)
+        preview = today > datetime.now(UTC).date()
         result = await send_due(
             PgReminderStore(self.factory),
             mailer,
             today,
             self.settings.reminder_to,
             self.settings.reminder_from,
+            record=not preview,
         )
+        if preview:
+            return (
+                f"Preview for {today.isoformat()}: {result.sent} email"
+                f"{'s' if result.sent != 1 else ''} sent to MailHog, nothing recorded "
+                "(that date has not happened yet)."
+            )
         if result.sent == 0 and result.skipped == 0:
             return "No reminders are due."
         parts = [f"{result.sent} reminder{'s' if result.sent != 1 else ''} sent"]

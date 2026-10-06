@@ -26,6 +26,7 @@ def fields_of(entry: AnswerEntry) -> dict[str, FieldText | None]:
     }
 
 
+# TC-0091
 def test_tc0091_expiry_is_the_day_before_the_anniversary() -> None:
     start = parse_date_text("1 March 2026")
     term = parse_duration("three (3) years")
@@ -35,6 +36,7 @@ def test_tc0091_expiry_is_the_day_before_the_anniversary() -> None:
     assert expiry_of(start, term) == date(2029, 2, 28)
 
 
+# TC-0092
 def test_tc0092_term_from_29_february_uses_the_clamped_anniversary() -> None:
     start = parse_date_text("29 February 2024")
     term = parse_duration("one (1) year")
@@ -44,6 +46,7 @@ def test_tc0092_term_from_29_february_uses_the_clamped_anniversary() -> None:
     assert expiry_of(start, term) == date(2025, 2, 27)
 
 
+# TC-0093
 def test_tc0093_unreadable_effective_date_is_not_guessed() -> None:
     fields = {
         "effective_date": FieldText("sometime next spring", "2.1"),
@@ -57,6 +60,7 @@ def test_tc0093_unreadable_effective_date_is_not_guessed() -> None:
     assert result.obligations == []
 
 
+# TC-0094
 def test_tc0094_ninety_days_prior_to_expiry() -> None:
     duration = parse_duration("ninety (90) days prior to expiry")
 
@@ -64,10 +68,12 @@ def test_tc0094_ninety_days_prior_to_expiry() -> None:
     assert notice_deadline(date(2029, 2, 28), duration) == date(2028, 11, 30)
 
 
+# TC-0095
 def test_tc0095_not_less_than_thirty_days_is_thirty_days() -> None:
     assert parse_duration("not less than thirty days") == Duration(30, "days")
 
 
+# TC-0096
 def test_tc0096_months_before_a_month_end_clamp() -> None:
     duration = parse_duration("three (3) months")
 
@@ -75,6 +81,7 @@ def test_tc0096_months_before_a_month_end_clamp() -> None:
     assert notice_deadline(date(2027, 5, 31), duration) == date(2027, 2, 28)
 
 
+# TC-0097
 def test_tc0097_months_and_days_give_different_deadlines() -> None:
     months = parse_duration("three (3) months")
     days = parse_duration("ninety (90) days")
@@ -85,6 +92,7 @@ def test_tc0097_months_and_days_give_different_deadlines() -> None:
     assert notice_deadline(date(2027, 2, 28), days) == date(2026, 11, 30)
 
 
+# TC-0098
 def test_tc0098_unparseable_notice_is_held_but_expiry_is_kept() -> None:
     fields = {
         "effective_date": FieldText("1 January 2025", "2.1"),
@@ -109,10 +117,12 @@ def test_tc0098_unparseable_notice_is_held_but_expiry_is_kept() -> None:
         ("a reasonable time", None),
     ],
 )
+# TC-0099
 def test_tc0099_duration_boundaries(text: str, expected: Duration | None) -> None:
     assert parse_duration(text) == expected
 
 
+# TC-0100
 def test_tc0100_lease_01_has_expiry_and_notice_with_clauses() -> None:
     result = compute_obligations(fields_of(KEY["contracts"]["lease-01"]))
 
@@ -122,6 +132,7 @@ def test_tc0100_lease_01_has_expiry_and_notice_with_clauses() -> None:
     ]
 
 
+# TC-0101
 def test_tc0101_notice_elsewhere_deadline_cites_clause_2_3() -> None:
     result = compute_obligations(fields_of(KEY["contracts"]["vendor-07"]))
 
@@ -131,6 +142,7 @@ def test_tc0101_notice_elsewhere_deadline_cites_clause_2_3() -> None:
 
 
 @pytest.mark.parametrize("contract_id", GOLDEN_IDS)
+# TC-0102
 def test_tc0102_golden_dates_equal_the_answer_key(contract_id: str) -> None:
     entry = KEY["contracts"][contract_id]
 

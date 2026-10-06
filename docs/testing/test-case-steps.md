@@ -26,3 +26,5 @@ TASK-001 had no manual or e2e case. TASK-008 adds the Streamlit page cases below
 | TC-0173.3 | TC-0173 | Reload http://localhost:8025 | A message per due reminder appears, subject naming the contract and the obligation |
 | TC-0173.4 | TC-0173 | Open one message | The body shows the contract, the obligation, the date and "clause 7" |
 | TC-0173.5 | TC-0173 | Run PRETEND_TODAY=2026-10-31 make remind again and reload MailHog | No new message appears |
+| TC-0181.1 | TC-0181 | On Deadlines press Send due reminders twice quickly while the request is slow | The button shows busy and is disabled after the first press |
+| TC-0181.2 | TC-0181 | Wait for the result | One success message shows and the button is enabled again |

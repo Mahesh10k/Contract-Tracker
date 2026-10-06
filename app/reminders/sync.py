@@ -8,6 +8,7 @@ an unchanged one keeps its reminders, and a field that has gone back to review r
 import uuid
 from datetime import date
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.repositories import contracts as contract_repo
@@ -38,8 +39,16 @@ async def sync_obligations(session: AsyncSession, contract_id: uuid.UUID) -> Non
         await repo.plan_for(session, existing[key], plan_reminders(key[1]))
 
 
+SYNC_LOCK_KEY = 7_240_801  # arbitrary, fixed: one sync at a time per database
+
+
 async def sync_all(session: AsyncSession) -> int:
-    """Sync every loaded contract; returns how many were looked at."""
+    """Sync every loaded contract; returns how many were looked at.
+
+    Two syncs at once (a double click on "Send due reminders") would both insert the same
+    obligation; the transaction-scoped advisory lock makes the second wait and find it done.
+    """
+    await session.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": SYNC_LOCK_KEY})
     ids = await contract_repo.all_contract_ids(session)
     for contract_id in ids:
         await sync_obligations(session, contract_id)

@@ -63,7 +63,9 @@ async def extract_contract(
     try:
         reply = (await gateway.parse(prepared.request, REPLY_SCHEMA)).value
     except InvalidReplyError:
-        return await store_rows(session, prepared, invalid_reply_rows(), model_id=gateway.model)
+        return await store_rows(
+            session, prepared, invalid_reply_rows(), model_id=gateway.model, keep_accepted=True
+        )
     return await store(session, prepared, reply, model_id=gateway.model)
 
 
@@ -114,9 +116,14 @@ async def store(
 
 
 async def store_rows(
-    session: AsyncSession, prepared: PreparedExtraction, rows: list[FieldRow], *, model_id: str
+    session: AsyncSession,
+    prepared: PreparedExtraction,
+    rows: list[FieldRow],
+    *,
+    model_id: str,
+    keep_accepted: bool = False,
 ) -> ExtractionResult:
-    """Store the checked rows of one contract in one savepoint."""
+    """Store the checked rows of one contract in one savepoint; report what is stored after."""
     async with session.begin_nested():
         await repo.upsert_extractions(
             session,
@@ -124,15 +131,18 @@ async def store_rows(
             rows,
             prompt_version=prepared.request.prompt_version,
             model_id=model_id,
+            keep_accepted=keep_accepted,
         )
-    accepted = sum(1 for r in rows if r.status == "accepted")
+    accepted, held = await repo.status_counts(
+        session, prepared.contract_id, [r.field_name for r in rows]
+    )
     log.info(
         "extraction_stored",
         contract_id=str(prepared.contract_id),
         accepted=accepted,
-        needs_review=len(rows) - accepted,
+        needs_review=held,
     )
-    return ExtractionResult(accepted=accepted, needs_review=len(rows) - accepted)
+    return ExtractionResult(accepted=accepted, needs_review=held)
 
 
 def check_fields(reply: Reply, by_number: dict[str, StoredClause]) -> list[FieldRow]:

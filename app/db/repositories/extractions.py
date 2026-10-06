@@ -18,11 +18,14 @@ async def upsert_extractions(
     *,
     prompt_version: str,
     model_id: str,
+    keep_accepted: bool = False,
 ) -> None:
     """Insert or refresh a contract's fields in one statement.
 
     A field the owner corrected keeps its row untouched (Q-018): the update
-    only applies where the stored status is not `corrected`.
+    only applies where the stored status is not `corrected`. With `keep_accepted`
+    an accepted row is kept too: a model reply that could not be read must not
+    wipe values that were already checked.
     """
     statement = insert(extractions).values(
         [
@@ -42,6 +45,7 @@ async def upsert_extractions(
         ]
     )
     excluded = statement.excluded
+    protected = ("corrected", "accepted") if keep_accepted else ("corrected",)
     await session.execute(
         statement.on_conflict_do_update(
             index_elements=[extractions.c.contract_id, extractions.c.field_name],
@@ -56,7 +60,7 @@ async def upsert_extractions(
                 "model_id": excluded.model_id,
                 "updated_at": func.now(),
             },
-            where=extractions.c.status != "corrected",
+            where=extractions.c.status.notin_(protected),
         )
     )
 
@@ -129,3 +133,16 @@ async def usable_fields(
         .limit(limit)
     )
     return _stored(await session.execute(query))
+
+
+async def status_counts(
+    session: AsyncSession, contract_id: uuid.UUID, names: Sequence[str]
+) -> tuple[int, int]:
+    """(accepted or corrected, held) among the contract's stored fields `names`."""
+    result = await session.execute(
+        select(extractions.c.status, func.count())
+        .where(extractions.c.contract_id == contract_id, extractions.c.field_name.in_(names))
+        .group_by(extractions.c.status)
+    )
+    counts = {r[0]: int(r[1]) for r in result}
+    return counts.get("accepted", 0) + counts.get("corrected", 0), counts.get("needs_review", 0)

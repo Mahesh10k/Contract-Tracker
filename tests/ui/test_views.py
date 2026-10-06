@@ -17,6 +17,7 @@ VENDOR_07_FIELDS = [
 ]
 
 
+# TC-0120
 def test_tc0120_deadlines_are_soonest_first_with_contract_and_clause() -> None:
     rows = deadlines_from([*VENDOR_07_FIELDS, *LEASE_01_FIELDS], TODAY)
 
@@ -29,6 +30,7 @@ def test_tc0120_deadlines_are_soonest_first_with_contract_and_clause() -> None:
     assert rows[0].days_left == 57
 
 
+# TC-0121
 def test_tc0121_without_a_usable_notice_period_only_expiry_is_listed() -> None:
     usable = [f for f in LEASE_01_FIELDS if f.field_name != "notice_period"]
 

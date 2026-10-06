@@ -140,7 +140,7 @@ From the one-day re-scope brief (2026-10-05); these replace the matching lines a
 
 ## 7. Open questions
 
-37 entries in docs/product/questions.md: 14 open, 3 need your confirmation (Q-033, Q-034, Q-036). Q-033 to Q-037 come from the one-day brief of 2026-10-05; Q-007, Q-013 and Q-020 were reversed by it and Q-010, Q-012 and Q-017 answered by it.
+39 entries in docs/product/questions.md: 14 open, 3 need your confirmation (Q-033, Q-034, Q-036). Q-033 to Q-037 come from the one-day brief of 2026-10-05; Q-007, Q-013 and Q-020 were reversed by it and Q-010, Q-012 and Q-017 answered by it.
 
 ## 8. Could not extract
 

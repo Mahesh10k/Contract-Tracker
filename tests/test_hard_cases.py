@@ -42,6 +42,7 @@ def test_five_hard_cases_are_added_beside_the_eighteen() -> None:
     assert (*BASE_IDS, *HARD_CASES) == CONTRACT_IDS
 
 
+# TC-0057
 def test_tc0057_three_contracts_start_relative_to_an_anchor(
     truths: dict[str, Truth],
 ) -> None:
@@ -56,6 +57,7 @@ def test_tc0057_three_contracts_start_relative_to_an_anchor(
     }
 
 
+# TC-0058
 def test_tc0058_notice_in_days_and_months_and_renewal_both_ways(
     truths: dict[str, Truth],
 ) -> None:
@@ -67,6 +69,7 @@ def test_tc0058_notice_in_days_and_months_and_renewal_both_ways(
     assert renewals == {True, False}
 
 
+# TC-0059
 def test_tc0059_notice_period_is_cited_outside_the_notice_clause(
     truths: dict[str, Truth],
 ) -> None:
@@ -79,6 +82,7 @@ def test_tc0059_notice_period_is_cited_outside_the_notice_clause(
     assert "Notice of Non-Renewal" in headings.values()
 
 
+# TC-0060
 def test_tc0060_the_amendment_sets_the_term_and_its_dates(
     truths: dict[str, Truth],
 ) -> None:
@@ -93,6 +97,7 @@ def test_tc0060_the_amendment_sets_the_term_and_its_dates(
     assert truth["expected"]["expiry"] == expiry.isoformat()
 
 
+# TC-0061
 def test_tc0061_one_clause_runs_from_page_1_onto_page_2(out: Path) -> None:
     cid = case("page-break")
     truth = load_truth(out / f"{cid}.truth.json")
@@ -106,6 +111,7 @@ def test_tc0061_one_clause_runs_from_page_1_onto_page_2(out: Path) -> None:
     assert normalise_for_match(spanning[0].body) == normalise_for_match(expected)
 
 
+# TC-0062
 def test_tc0062_the_no_renewal_contract_has_no_renewal_clause(
     truths: dict[str, Truth],
 ) -> None:
@@ -118,6 +124,7 @@ def test_tc0062_the_no_renewal_contract_has_no_renewal_clause(
 
 
 @pytest.mark.parametrize("contract_id", BASE_IDS)
+# TC-0063
 def test_tc0063_the_eighteen_are_byte_identical(out: Path, contract_id: str) -> None:
     for suffix in (".pdf", ".truth.json"):
         name = f"{contract_id}{suffix}"
@@ -125,6 +132,7 @@ def test_tc0063_the_eighteen_are_byte_identical(out: Path, contract_id: str) -> 
 
 
 @pytest.mark.parametrize("contract_id", list(HARD_CASES))
+# TC-0064
 def test_tc0064_every_hard_case_quote_is_inside_its_clause(
     truths: dict[str, Truth], contract_id: str
 ) -> None:
@@ -137,6 +145,7 @@ def test_tc0064_every_hard_case_quote_is_inside_its_clause(
 
 
 @pytest.mark.parametrize("contract_id", list(HARD_CASES))
+# TC-0065
 def test_tc0065_every_hard_case_pdf_splits_into_its_truth_clauses(
     out: Path, contract_id: str
 ) -> None:

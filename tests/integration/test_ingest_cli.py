@@ -19,6 +19,7 @@ async def factory(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(bind=connection, join_transaction_mode="create_savepoint")
 
 
+# TC-0002
 async def test_tc0002_missing_type_exits_2_with_the_message(
     factory: async_sessionmaker[AsyncSession], tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -31,6 +32,7 @@ async def test_tc0002_missing_type_exits_2_with_the_message(
     assert "Contract type required: --type lease, vendor or service" in capsys.readouterr().err
 
 
+# TC-0011
 async def test_tc0011_scanned_pdf_exits_1_with_the_message(
     factory: async_sessionmaker[AsyncSession], tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -43,6 +45,7 @@ async def test_tc0011_scanned_pdf_exits_1_with_the_message(
     assert "No text found" in capsys.readouterr().err
 
 
+# TC-0017
 async def test_tc0017_text_file_exits_1_with_the_message(
     factory: async_sessionmaker[AsyncSession], tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -55,6 +58,7 @@ async def test_tc0017_text_file_exits_1_with_the_message(
     assert "Not a readable PDF" in capsys.readouterr().err
 
 
+# TC-0014
 async def test_tc0014_second_load_reports_already_loaded(
     factory: async_sessionmaker[AsyncSession], tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

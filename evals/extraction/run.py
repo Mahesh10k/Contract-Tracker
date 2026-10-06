@@ -174,14 +174,17 @@ async def _main(live: bool) -> int:
         engine = make_engine(settings)
         try:
             async with make_session_factory(engine)() as session, httpx.AsyncClient() as client:
-                code, lines = await run(
-                    client=client,
-                    cache_dir=settings.llm_cache_dir,
-                    api_key=settings.openrouter_api_key,
-                    ledger=LlmCallLedger(session, since=settings.llm_budget_since),
-                    budget_stop_usd=settings.llm_budget_stop_usd,
-                )
-                await session.commit()
+                try:
+                    code, lines = await run(
+                        client=client,
+                        cache_dir=settings.llm_cache_dir,
+                        api_key=settings.openrouter_api_key,
+                        ledger=LlmCallLedger(session, since=settings.llm_budget_since),
+                        budget_stop_usd=settings.llm_budget_stop_usd,
+                    )
+                finally:
+                    # Spend that was really paid is recorded even if the run is interrupted.
+                    await session.commit()
         finally:
             await engine.dispose()
     sys.stdout.write("\n".join(lines) + "\n")

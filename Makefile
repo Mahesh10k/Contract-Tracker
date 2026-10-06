@@ -36,7 +36,7 @@ setup: ## Install Python 3.12, dependencies (writes uv.lock) and git hooks
 	@echo "setup done"
 
 dev: ## Run the API locally with reload (reads .env if present)
-	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run uvicorn app.main:create_app --factory --reload --host 0.0.0.0 --port "$${PORT:-8080}"
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run uvicorn app.main:create_app --factory --reload --host 127.0.0.1 --port "$${PORT:-8080}"
 
 contracts: ## Write the synthetic contracts, their truth.json files and data/answer_key.json for the 6 golden ones (deterministic)
 	$(UV) run python -m evals.contracts.generate data/contracts
@@ -86,7 +86,7 @@ web-check: ## Lint, typecheck and unit-test the React app (a gate of make check)
 	[ -d web/node_modules ] || $(call skip,web-check,web/node_modules: run make web-install); \
 	n=$$(git ls-files -co --exclude-standard 'web/src/*.test.ts' 'web/src/*.test.tsx' | wc -l | tr -d ' '); \
 	[ "$$n" -gt 0 ] || { echo "web-check: 0 test files, nothing checked" >&2; exit 1; }; \
-	cd web && npm run --silent lint && npm run --silent typecheck && npm test --silent 2>&1 | tail -6 && echo "web-check: $$n test files checked"
+	set -o pipefail; cd web && npm run --silent lint && npm run --silent typecheck && npm test --silent 2>&1 | tail -6 && echo "web-check: $$n test files checked"
 
 eval-extraction: ## Extraction eval over the 6 golden contracts, offline from llm_cache (no key, no spend)
 	$(UV) run python -m evals.extraction.run
