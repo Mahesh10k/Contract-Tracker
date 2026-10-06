@@ -10,7 +10,7 @@
 - Acceptance criteria: unknown
 
 ## Next
-- address review comments; commit the uncommitted fixes first
+- address review comments
 
 ## Done
 - none

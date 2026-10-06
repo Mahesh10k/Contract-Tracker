@@ -197,3 +197,7 @@ doctor: ## Environment diagnostics
 clean: ## Remove caches and build output
 	rm -rf .venv .ruff_cache .mypy_cache .pytest_cache .coverage htmlcov dist build $(STATE)/.check-passed $(SKIPPED)
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
+
+
+start:
+	make db && make migrate && make mail && make ui
