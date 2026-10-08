@@ -40,9 +40,19 @@ export default function App({ api }: { api: Api }) {
     <div data-slot="app">
       <div data-slot="shell">
         <header data-slot="masthead">
-          <div>
-            <h1 data-slot="brand">ContractTracker</h1>
-            <p data-slot="tagline">Every deadline, with the sentence that sets it.</p>
+          <div data-slot="identity">
+            <span data-slot="logo" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                <path d="M14 3v5h5" />
+                <path d="M9 13h6" />
+                <path d="M9 17h4" />
+              </svg>
+            </span>
+            <div>
+              <h1 data-slot="brand">ContractTracker</h1>
+              <p data-slot="tagline">Every deadline, with the sentence that sets it.</p>
+            </div>
           </div>
           <div data-slot="tools">
             <div data-slot="field-group">
@@ -50,6 +60,9 @@ export default function App({ api }: { api: Api }) {
               <input id="today" data-slot="input" type="date" value={today} onChange={(e) => e.target.value && setToday(e.target.value)} />
             </div>
             <button data-slot="button" onClick={toggleTheme} aria-pressed={dark}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+              </svg>
               {dark ? "Light theme" : "Dark theme"}
             </button>
           </div>
