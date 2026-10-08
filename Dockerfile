@@ -30,7 +30,7 @@ COPY llm_cache ./llm_cache
 RUN /app/.venv/bin/python -m app.retrieval.fetch
 
 FROM python:3.12-slim-bookworm
-RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --no-create-home app
+RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --create-home --home-dir /home/app app
 WORKDIR /app
 COPY --from=build --chown=app:app /app /app
 # One worker by default: each worker loads its own copy of the embedding model, and the free
