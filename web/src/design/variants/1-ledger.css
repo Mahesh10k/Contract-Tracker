@@ -1,5 +1,6 @@
 /* Direction 1, Ledger. Serves the owner at a desk reading deadlines top to bottom, in daylight.
-   Spectral display (serif) / Work Sans body. Warm grey-bone paper, ink text, one deep ink-green
+   Spectral display (serif) / Work Sans body (faces and colours are tokens: docs/design/tokens.json).
+   Warm grey-bone paper, ink text, one deep ink-green
    accent whose only job is the primary action and the current tab. Ruled rows, right-aligned
    figures, one wide left-aligned column. Weak for: scanning many contracts at once (low density). */
 @import "@fontsource/spectral/400.css";
@@ -8,57 +9,8 @@
 @import "@fontsource/work-sans/600.css";
 
 :root[data-variant="1-ledger"] {
-  --font-display: "Spectral", Georgia, serif;
-  --font-sans: "Work Sans", ui-sans-serif, sans-serif;
-
-  --background: oklch(0.955 0.009 85);
-  --foreground: oklch(0.22 0.02 60);
-  --card: oklch(0.975 0.007 85);
-  --card-foreground: oklch(0.22 0.02 60);
-  --primary: oklch(0.38 0.07 160);
-  --primary-foreground: oklch(0.97 0.01 85);
-  --muted: oklch(0.925 0.01 85);
-  --muted-foreground: oklch(0.42 0.02 70);
-  --accent: oklch(0.92 0.02 160);
-  --border: oklch(0.52 0.03 70);
-  --hairline: oklch(0.8 0.015 80);
-  --input: oklch(0.5 0.03 70);
-  --ring: oklch(0.38 0.07 160);
-
-  --ok-bg: oklch(0.92 0.04 160);
-  --ok-fg: oklch(0.33 0.07 160);
-  --warn-bg: oklch(0.93 0.06 90);
-  --warn-fg: oklch(0.36 0.07 70);
-  --bad-bg: oklch(0.93 0.04 25);
-  --bad-fg: oklch(0.4 0.14 25);
-
-  --radius: 2px;
-  --radius-inner: 2px;
   --space-row: 0.875rem;
   --measure: 58rem;
-}
-
-:root[data-variant="1-ledger"].dark {
-  --background: oklch(0.22 0.012 80);
-  --foreground: oklch(0.93 0.01 85);
-  --card: oklch(0.26 0.012 80);
-  --card-foreground: oklch(0.93 0.01 85);
-  --primary: oklch(0.78 0.09 160);
-  --primary-foreground: oklch(0.2 0.02 160);
-  --muted: oklch(0.29 0.012 80);
-  --muted-foreground: oklch(0.78 0.015 85);
-  --accent: oklch(0.32 0.03 160);
-  --border: oklch(0.64 0.02 80);
-  --hairline: oklch(0.36 0.012 80);
-  --input: oklch(0.64 0.02 80);
-  --ring: oklch(0.78 0.09 160);
-
-  --ok-bg: oklch(0.3 0.04 160);
-  --ok-fg: oklch(0.88 0.07 160);
-  --warn-bg: oklch(0.32 0.05 90);
-  --warn-fg: oklch(0.9 0.07 90);
-  --bad-bg: oklch(0.3 0.06 25);
-  --bad-fg: oklch(0.88 0.08 25);
 }
 
 :root[data-variant="1-ledger"] [data-slot="shell"] {
@@ -82,7 +34,7 @@
   height: 6px;
   border-top: 3px double var(--foreground);
   transform-origin: left;
-  animation: ledger-rule 600ms var(--ease-out) both;
+  animation: ledger-rule var(--duration-deliberate) var(--ease-enter) both;
 }
 
 @keyframes ledger-rule {

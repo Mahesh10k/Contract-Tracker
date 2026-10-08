@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ContractTracker</title>
+    <script>
+      // Set the theme before the bundle paints, so a dark-theme user never sees a light flash.
+      // Same rule as useTheme in src/App.tsx: the stored choice, else the system setting.
+      (function () {
+        var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved) dark = saved === "dark";
+        } catch (e) {
+          /* storage can be blocked; keep the system setting */
+        }
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

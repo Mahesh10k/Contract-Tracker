@@ -19,7 +19,7 @@ function useTheme() {
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   });
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
     try {
       localStorage.setItem("theme", dark ? "dark" : "light");
     } catch {

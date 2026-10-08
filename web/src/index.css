@@ -1,9 +1,7 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
 @import "./components.css";
 
-/* Colour roles use the shadcn names so every direction overrides the same variables.
-   The default look below is a neutral baseline; directions live in src/design/variants/
-   and apply only under :root[data-variant="..."] (dev switch: ?variant=). */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -18,61 +16,36 @@
   --font-display: var(--font-display);
 }
 
+/* Binding: the role names this app's CSS reads, each one a role of styles/tokens.css, which is
+   generated from docs/design/tokens.json. No colour is written here; change the token file and
+   run make design-tokens. --border and --input are the 3:1 field edge (token border-strong);
+   --hairline is the decorative rule (token border). */
 :root {
-  --font-sans: "Work Sans", ui-sans-serif, sans-serif;
-  --font-display: "Work Sans", ui-sans-serif, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", monospace;
+  --font-sans: var(--font-body);
 
-  --background: oklch(0.985 0.004 250);
-  --foreground: oklch(0.23 0.02 255);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.23 0.02 255);
-  --primary: oklch(0.48 0.15 255);
-  --primary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.955 0.006 250);
-  --muted-foreground: oklch(0.45 0.02 255);
-  --accent: oklch(0.93 0.02 255);
-  --border: oklch(0.62 0.02 255);
-  --hairline: oklch(0.9 0.008 250);
-  --input: oklch(0.55 0.02 255);
-  --ring: oklch(0.48 0.15 255);
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text);
+  --primary: var(--color-accent);
+  --primary-foreground: var(--color-on-accent);
+  --muted: var(--color-bg-subtle);
+  --muted-foreground: var(--color-text-muted);
+  --accent: var(--color-accent-subtle);
+  --border: var(--color-border-strong);
+  --hairline: var(--color-border);
+  --input: var(--color-border-strong);
+  --ring: var(--color-focus);
 
-  --ok-bg: oklch(0.94 0.05 155);
-  --ok-fg: oklch(0.35 0.08 155);
-  --warn-bg: oklch(0.95 0.07 85);
-  --warn-fg: oklch(0.38 0.08 70);
-  --bad-bg: oklch(0.94 0.04 25);
-  --bad-fg: oklch(0.4 0.14 25);
+  --ok-bg: var(--color-success-subtle);
+  --ok-fg: var(--color-success);
+  --warn-bg: var(--color-warning-subtle);
+  --warn-fg: var(--color-warning);
+  --bad-bg: var(--color-danger-subtle);
+  --bad-fg: var(--color-danger);
 
-  --radius: 0.5rem;
-  --radius-inner: 0.375rem;
-  --shadow-raised: 0 1px 2px oklch(0.2 0.02 255 / 0.08), 0 4px 12px oklch(0.2 0.02 255 / 0.06);
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --space-row: 0.75rem;
-  --measure: 72rem;
-}
-
-:root.dark {
-  --background: oklch(0.2 0.015 255);
-  --foreground: oklch(0.93 0.008 250);
-  --card: oklch(0.25 0.015 255);
-  --card-foreground: oklch(0.93 0.008 250);
-  --primary: oklch(0.72 0.12 255);
-  --primary-foreground: oklch(0.18 0.02 255);
-  --muted: oklch(0.28 0.015 255);
-  --muted-foreground: oklch(0.76 0.012 250);
-  --accent: oklch(0.32 0.03 255);
-  --border: oklch(0.62 0.02 255);
-  --hairline: oklch(0.33 0.015 255);
-  --input: oklch(0.62 0.02 255);
-  --ring: oklch(0.72 0.12 255);
-
-  --ok-bg: oklch(0.3 0.05 155);
-  --ok-fg: oklch(0.88 0.08 155);
-  --warn-bg: oklch(0.32 0.05 85);
-  --warn-fg: oklch(0.9 0.08 85);
-  --bad-bg: oklch(0.3 0.06 25);
-  --bad-fg: oklch(0.88 0.08 25);
+  --radius: var(--radius-container);
+  --radius-inner: var(--radius-control);
 }
 
 html {

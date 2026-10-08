@@ -6,7 +6,7 @@ STATE := .bearing/state
 SKIPPED := $(STATE)/.skipped
 # The gates `make check` runs, in order. test-integration needs Postgres, so
 # it is a CI job and a manual target, not part of check.
-GATES := format-check lint typecheck test vuln web-check eval-extraction eval-qa
+GATES := format-check lint typecheck test vuln web-check design-lint eval-extraction eval-qa
 POSTGRES_PORT ?= 5432
 DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(POSTGRES_PORT)/contract-tracker
 # psql takes the plain URL (no SQLAlchemy driver suffix).
@@ -22,7 +22,7 @@ define need_tool
 command -v $(UV) >/dev/null || $(call skip,$(1),uv); $(UV) run --quiet $(2) --version >/dev/null 2>&1 || $(call skip,$(1),$(2))
 endef
 
-.PHONY: web web-install web-check ui eval-extraction eval-qa eval-live fetch-model embed ask remind mail help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
+.PHONY: web web-install web-check design-lint design-tokens ui eval-extraction eval-qa eval-live fetch-model embed ask remind mail help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -87,6 +87,19 @@ web-check: ## Lint, typecheck and unit-test the React app (a gate of make check)
 	n=$$(git ls-files -co --exclude-standard 'web/src/*.test.ts' 'web/src/*.test.tsx' | wc -l | tr -d ' '); \
 	[ "$$n" -gt 0 ] || { echo "web-check: 0 test files, nothing checked" >&2; exit 1; }; \
 	set -o pipefail; cd web && npm run --silent lint && npm run --silent typecheck && npm test --silent 2>&1 | tail -6 && echo "web-check: $$n test files checked"
+
+# Colours only gate; spacing, font sizes and raw elements are reported, not gated (not agreed yet).
+# 2-panel and 3-grid are the rejected directions kept for the dev switch (?variant=); they are not shipped.
+design-lint: ## No hardcoded colour in web/src (colours live in docs/design/tokens.json only)
+	@DESIGN_LINT_ROOTS=web/src DESIGN_LINT_RULES=colour DESIGN_LINT_EXCLUDE='design/variants/(2-panel|3-grid)\.css$$' sh scripts/design-lint.sh
+
+BEARING ?= $(HOME)/Klaritics/bearing/plugins/bearing
+design-tokens: ## Regenerate web/src/styles/tokens.css and the design-system page from docs/design/tokens.json (needs the Bearing plugin)
+	python3 $(BEARING)/skills/design-system/scripts/contrast.py --tokens docs/design/tokens.json --strict-hex
+	python3 $(BEARING)/skills/design-system/scripts/system_page.py tokens-css --tokens docs/design/tokens.json --out web/src/styles/tokens.css
+	python3 $(BEARING)/skills/design-system/scripts/system_page.py tokens-css --tokens docs/design/tokens.json --out docs/design/tokens.css
+	python3 $(BEARING)/skills/design-system/scripts/system_page.py build --tokens docs/design/tokens.json --components docs/design/components.md --template $(BEARING)/skills/design-system/templates/design-system.html --out docs/design/design-system.html
+	python3 $(BEARING)/skills/design-system/scripts/system_page.py check --page docs/design/design-system.html --components docs/design/components.md
 
 eval-extraction: ## Extraction eval over the 6 golden contracts, offline from llm_cache (no key, no spend)
 	$(UV) run python -m evals.extraction.run
