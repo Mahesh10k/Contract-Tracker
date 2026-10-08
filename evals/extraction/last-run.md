@@ -1,6 +1,6 @@
 # Extraction eval, last run
 
-Run: 2026-10-06 08:57 UTC, prompt extract_fields v2, model anthropic/claude-haiku-4.5
+Run: 2026-10-08 08:53 UTC, prompt extract_fields v2, model anthropic/claude-haiku-4.5
 
 - parties 6/6
 - effective_date 6/6

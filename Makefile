@@ -213,4 +213,5 @@ clean: ## Remove caches and build output
 
 
 start:
+	# export POSTGRES_PORT=5433
 	make db && make migrate && make mail && make ui
