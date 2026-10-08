@@ -181,3 +181,25 @@ describe("the page", () => {
     expect(await screen.findByRole("status")).toBeInTheDocument();
   });
 });
+
+describe("the theme switch", () => {
+  it("sets data-theme on the page and remembers the choice", async () => {
+    localStorage.removeItem("theme");
+    const { user } = open();
+
+    expect(document.documentElement.dataset.theme).toBe("light");
+    await user.click(screen.getByRole("button", { name: "Dark theme" }));
+
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(localStorage.getItem("theme")).toBe("dark");
+    localStorage.removeItem("theme");
+  });
+
+  it("starts dark when the stored choice is dark", () => {
+    localStorage.setItem("theme", "dark");
+    open();
+
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    localStorage.removeItem("theme");
+  });
+});

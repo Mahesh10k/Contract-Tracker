@@ -1,6 +1,6 @@
 # Q&A eval, last run
 
-Run: 2026-10-06 08:47 UTC, prompt answer_question v1, model anthropic/claude-haiku-4.5, embeddings BAAI/bge-small-en-v1.5
+Run: 2026-10-08 08:53 UTC, prompt answer_question v1, model anthropic/claude-haiku-4.5, embeddings BAAI/bge-small-en-v1.5
 
 - recall@5 7/7
 - answer accuracy 7/7

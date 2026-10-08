@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import type { Answer, Api, Contract, Deadline, Field, HeldField } from "./api";
 import { Empty, formatDay, label, Notice, PanelHead, StatusBadge, type Message } from "./ui";
 
+/** Only colours the days-left badge: a deadline within 14 days is warned, within 30 is calm. */
+const urgency = (daysLeft: number) => (daysLeft <= 14 ? "warn" : daysLeft <= 30 ? "ok" : undefined);
+
 const fail = (error: unknown): Message => ({
   tone: "bad",
   text: error instanceof Error ? error.message : "Something went wrong.",
@@ -211,6 +214,18 @@ export function DeadlinesPanel({ api, today, version }: { api: Api; today: strin
         <span data-slot="panel-lede">Treating {formatDay(today)} as today.</span>
       </div>
       <Notice message={message} />
+      {rows.length > 0 && (
+        <div data-slot="stats">
+          <div data-slot="stat" data-primary>
+            <strong>{rows.filter((r) => r.days_left <= 30).length}</strong>
+            <span>due in the next 30 days</span>
+          </div>
+          <div data-slot="stat">
+            <strong>{rows.length}</strong>
+            <span>deadlines across {new Set(rows.map((r) => r.contract)).size} contracts</span>
+          </div>
+        </div>
+      )}
       {rows.length === 0 ? (
         <Empty title="No deadlines yet">Extract a contract that states an effective date and a term.</Empty>
       ) : (
@@ -225,7 +240,7 @@ export function DeadlinesPanel({ api, today, version }: { api: Api; today: strin
                   <th scope="row">{r.contract}</th>
                   <td>{r.kind === "expiry" ? "Contract expires" : "Notice deadline"}</td>
                   <td>{formatDay(r.due)}</td>
-                  <td className="num">{r.days_left}</td>
+                  <td className="num"><span data-slot="badge" data-tone={urgency(r.days_left)}>{r.days_left}</span></td>
                   <td><span data-slot="clause">{r.clause ?? "none"}</span></td>
                 </tr>
               ))}
