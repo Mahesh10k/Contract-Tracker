@@ -87,12 +87,12 @@ Use this when a Docker Space is not available to you. `render.yaml` at the repos
 3. Render asks for the two secret values: `DATABASE_URL` (the Supabase session pooler form from step 1)
    and `OPENROUTER_API_KEY` (the new key). Do not set `PORT`: Render sets it and the container reads it.
 4. Create. The first build downloads the CPU torch wheel and the embedding model and takes several minutes.
-5. Open `https://contracttracker-api.onrender.com/api/contracts` (use the address Render shows).
+5. Open `https://contract-tracker-8x5u.onrender.com/api/contracts` (use the address Render shows).
    A list or `[]` means the backend reaches the database.
 6. In the service's **Metrics** tab, watch memory while you press "Load the 6 golden contracts" and ask one
    question. The free instance has 512 MB. A log line "Ran out of memory" means the embedding model does
    not fit: move to the Starter instance, or use another host.
-7. In `web/public/_redirects` use `https://contracttracker-api.onrender.com/api/:splat`.
+7. In `web/public/_redirects` use `https://contract-tracker-8x5u.onrender.com/api/:splat`.
 
 Render-specific notes:
 - A free service sleeps after about 15 minutes without traffic and needs about a minute to wake. Netlify
