@@ -76,6 +76,30 @@ setting exist (see Known limits).
 
 To redeploy after a change: merge to `main`, then repeat step 3 (the throwaway branch is rebuilt from `main`).
 
+## 2b. Backend on Render (instead of a Hugging Face Space)
+
+Use this when a Docker Space is not available to you. `render.yaml` at the repository root describes the service.
+
+1. Merge the branch that holds `render.yaml` and the Dockerfile into `main`, so GitHub has them.
+2. Render dashboard, New, **Blueprint**, connect the GitHub repository, choose `main`. Render reads `render.yaml`.
+   (Without a blueprint: New, Web Service, runtime Docker, instance type Free, region Singapore,
+   health check path `/api/contracts`, and add the same variables by hand.)
+3. Render asks for the two secret values: `DATABASE_URL` (the Supabase session pooler form from step 1)
+   and `OPENROUTER_API_KEY` (the new key). Do not set `PORT`: Render sets it and the container reads it.
+4. Create. The first build downloads the CPU torch wheel and the embedding model and takes several minutes.
+5. Open `https://contracttracker-api.onrender.com/api/contracts` (use the address Render shows).
+   A list or `[]` means the backend reaches the database.
+6. In the service's **Metrics** tab, watch memory while you press "Load the 6 golden contracts" and ask one
+   question. The free instance has 512 MB. A log line "Ran out of memory" means the embedding model does
+   not fit: move to the Starter instance, or use another host.
+7. In `web/public/_redirects` use `https://contracttracker-api.onrender.com/api/:splat`.
+
+Render-specific notes:
+- A free service sleeps after about 15 minutes without traffic and needs about a minute to wake. Netlify
+  cuts a proxied request after about 26 seconds, so open the backend address once to wake it before using
+  the Netlify page.
+- `autoDeploy` is off: deploy by hand (Manual Deploy) after you merge, so a push cannot ship by surprise.
+
 ## 3. Frontend (Netlify)
 
 1. Open `web/public/_redirects` and replace `YOUR-USER-YOUR-SPACE.hf.space` with your Space host.
