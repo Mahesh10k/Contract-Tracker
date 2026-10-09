@@ -1,0 +1,4 @@
+# Netlify: forward the browser's /api calls to the backend, so the page and the API share one origin
+# (the backend has no CORS settings, ADR-0016). The host is the Render backend (docs/runbooks/deploy.md)
+# before the first deploy. The host is public, not a secret.
+/api/*  https://contract-tracker-8x5u.onrender.com/api/:splat  200

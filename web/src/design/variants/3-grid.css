@@ -36,7 +36,7 @@
   --measure: 80rem;
 }
 
-:root[data-variant="3-grid"].dark {
+:root[data-variant="3-grid"][data-theme="dark"] {
   --background: oklch(0.19 0.012 255);
   --foreground: oklch(0.95 0.004 250);
   --card: oklch(0.23 0.012 255);
@@ -131,7 +131,7 @@
   height: 1px;
   background: var(--foreground);
   transform-origin: left;
-  animation: grid-draw 650ms var(--ease-out) both;
+  animation: grid-draw 650ms var(--ease-enter) both;
 }
 
 @keyframes grid-draw {
