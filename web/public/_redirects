@@ -1,0 +1,4 @@
+# Netlify: forward the browser's /api calls to the backend, so the page and the API share one origin
+# (the backend has no CORS settings, ADR-0016). Replace the host with your Hugging Face Space URL
+# before the first deploy. The host is public, not a secret.
+/api/*  https://YOUR-USER-YOUR-SPACE.hf.space/api/:splat  200
