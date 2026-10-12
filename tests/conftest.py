@@ -20,6 +20,17 @@ from app.main import create_app
 TEST_USER = UserRecord(uuid.uuid4(), "owner@example.com", "x", 0, None, None)
 
 
+@pytest.fixture(autouse=True)
+def _settings_come_from_the_test_not_the_shell(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A shell that exported .env (`set -a; . ./.env`) must not change what a test expects.
+
+    DATABASE_URL stays: the integration tests read it on purpose.
+    """
+    for name in Settings.model_fields:
+        if name != "database_url":
+            monkeypatch.delenv(name.upper(), raising=False)
+
+
 @pytest.fixture
 def settings() -> Settings:
     """Test settings, independent of any .env file on the machine."""
