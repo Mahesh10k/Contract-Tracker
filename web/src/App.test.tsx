@@ -203,3 +203,50 @@ describe("the theme switch", () => {
     localStorage.removeItem("theme");
   });
 });
+
+describe("loading states", () => {
+  const never = <T,>() => {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((r) => (resolve = r));
+    return { promise, resolve };
+  };
+
+  it("shows placeholder rows, not an empty message, while the deadlines are loading", async () => {
+    const pending = never<Awaited<ReturnType<Api["deadlines"]>>>();
+    const { user } = open({ deadlines: () => pending.promise });
+
+    await user.click(screen.getByRole("tab", { name: "Deadlines" }));
+
+    expect(screen.getByText("Loading deadlines")).toBeInTheDocument();
+    expect(screen.queryByText("No deadlines yet")).not.toBeInTheDocument();
+    pending.resolve([]);
+    expect(await screen.findByText("No deadlines yet")).toBeInTheDocument();
+  });
+
+  it("shows a progress bar while a PDF is being loaded, then removes it", async () => {
+    const pending = never<string>();
+    const { user } = open({ upload: () => pending.promise });
+
+    await user.upload(screen.getByLabelText("Contract PDF"), new File(["%PDF-1.4"], "a.pdf", { type: "application/pdf" }));
+    await user.click(screen.getByRole("button", { name: "Load contract" }));
+
+    expect(screen.getByRole("progressbar", { name: /uploading/i })).toBeInTheDocument();
+    pending.resolve("a.pdf");
+    expect(await screen.findByRole("status")).toHaveTextContent("Loaded a.pdf");
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("shows a thinking card while a question is answered, then the answer", async () => {
+    const pending = never<Awaited<ReturnType<Api["ask"]>>>();
+    const { user } = open({ ask: () => pending.promise });
+
+    await user.click(screen.getByRole("tab", { name: "Ask" }));
+    await user.type(screen.getByLabelText(/Question about/), "Who pays?");
+    await user.click(screen.getByRole("button", { name: "Ask" }));
+
+    expect(screen.getByText(/Searching the contracts/)).toBeInTheDocument();
+    pending.resolve({ text: "The tenant.", refused: false, citations: [] });
+    expect(await screen.findByText("The tenant.")).toBeInTheDocument();
+    expect(screen.queryByText(/Searching the contracts/)).not.toBeInTheDocument();
+  });
+});

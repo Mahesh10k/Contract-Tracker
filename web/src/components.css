@@ -489,3 +489,152 @@
     font-size: 2rem;
   }
 }
+
+/* ---------- Loading and motion ----------
+   Every duration and easing is a token (docs/design/tokens.json). index.css shortens all of them
+   to nothing under prefers-reduced-motion. */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(350%); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40% { transform: translateY(-0.375rem); opacity: 1; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* A button whose request is running shows a spinner before its label. */
+[data-slot="button"][aria-busy="true"]::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin var(--duration-slow) linear infinite;
+}
+
+[data-slot="button"][aria-busy="true"] {
+  cursor: progress;
+}
+
+/* Panels and their rows ease in when they appear. */
+[data-slot="panel"] {
+  animation: rise var(--duration-base) var(--ease-enter) both;
+}
+
+[data-slot="table"] tbody tr {
+  animation: rise var(--duration-base) var(--ease-enter) both;
+}
+
+[data-slot="table"] tbody tr:nth-child(2) { animation-delay: calc(var(--stagger, 40ms) * 1); }
+[data-slot="table"] tbody tr:nth-child(3) { animation-delay: calc(var(--stagger, 40ms) * 2); }
+[data-slot="table"] tbody tr:nth-child(4) { animation-delay: calc(var(--stagger, 40ms) * 3); }
+[data-slot="table"] tbody tr:nth-child(5) { animation-delay: calc(var(--stagger, 40ms) * 4); }
+[data-slot="table"] tbody tr:nth-child(n + 6) { animation-delay: calc(var(--stagger, 40ms) * 5); }
+
+[data-slot="stat"] {
+  animation: rise var(--duration-base) var(--ease-enter) both;
+}
+
+[data-slot="stat"]:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+/* A table being refreshed by a button (Extract fields) breathes. */
+[data-slot="table-wrap"][data-busy] {
+  animation: breathe var(--duration-deliberate) ease-in-out infinite;
+}
+
+/* Skeleton: grey rows with a light sweep, for a panel's first request. */
+[data-slot="skeleton"] {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+[data-slot="skeleton-row"] {
+  display: grid;
+  grid-template-columns: 1.4fr 2fr 1fr;
+  gap: 1rem;
+}
+
+[data-slot="skeleton-row"] span {
+  height: 1.125rem;
+  border-radius: var(--radius-inner);
+  background: linear-gradient(90deg, var(--muted) 30%, var(--hairline) 50%, var(--muted) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1400ms linear infinite;
+}
+
+/* Progress: an indeterminate bar under the controls while a request runs. */
+[data-slot="progress"] {
+  position: relative;
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+[data-slot="progress"] span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  border-radius: inherit;
+  background: var(--primary);
+  animation: slide 1100ms var(--ease-standard) infinite;
+}
+
+/* Thinking: shown in place of an answer while a question is being worked on. */
+[data-slot="thinking"] {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--muted-foreground);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+}
+
+[data-slot="dots"] {
+  display: inline-flex;
+  gap: 0.3125rem;
+}
+
+[data-slot="dots"] i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: bounce 1000ms ease-in-out infinite;
+}
+
+[data-slot="dots"] i:nth-child(2) { animation-delay: 150ms; }
+[data-slot="dots"] i:nth-child(3) { animation-delay: 300ms; }
