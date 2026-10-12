@@ -4,7 +4,7 @@ import App from "./App";
 import { httpApi } from "./api";
 import "./design/variants/1-ledger.css";
 import "./index.css";
-import { mockApi } from "./mockApi";
+import { mockApi, slow } from "./mockApi";
 
 // 1-ledger is the chosen direction (docs/design/variants/react-ui/approved.json). In development
 // only, ?variant=2-panel|3-grid renders the other directions and ?mock=1 uses sample data.
@@ -16,11 +16,12 @@ const requested = params.get("variant");
 const load = requested ? alternatives[`./design/variants/${requested}.css`] : undefined;
 document.documentElement.dataset.variant = requested && load ? requested : "1-ledger";
 const useMock = import.meta.env.DEV && params.has("mock");
+const delay = Number(params.get("delay") ?? 0);
 
 void (load ? load() : Promise.resolve()).then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <App api={useMock ? mockApi : httpApi} />
+      <App api={useMock ? (delay > 0 ? slow(mockApi, delay) : mockApi) : httpApi} />
     </StrictMode>,
   );
 });

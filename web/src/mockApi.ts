@@ -57,3 +57,11 @@ export const mockApi: Api = {
     }),
   sendReminders: () => wait("1 reminder sent, 2 skipped (older or expired)"),
 };
+
+/** Dev only: wrap an API so every call takes `ms`, to look at loading states (?mock=1&delay=900). */
+export function slow(api: Api, ms: number): Api {
+  const later = <T,>(work: Promise<T>) => new Promise<T>((resolve, reject) => setTimeout(() => work.then(resolve, reject), ms));
+  return Object.fromEntries(
+    Object.entries(api).map(([name, fn]) => [name, (...args: unknown[]) => later((fn as (...a: unknown[]) => Promise<unknown>)(...args))]),
+  ) as unknown as Api;
+}
