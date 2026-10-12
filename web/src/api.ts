@@ -37,7 +37,12 @@ export type HeldField = {
 export type Citation = { contract: string; clause: string; text: string };
 export type Answer = { text: string; citations: Citation[]; refused: boolean };
 
+export type User = { email: string };
+
 export interface Api {
+  me(): Promise<User>;
+  login(email: string, password: string): Promise<User>;
+  logout(): Promise<void>;
   contracts(): Promise<Contract[]>;
   upload(file: File, contractType: Contract["contract_type"]): Promise<string>;
   loadGolden(): Promise<string[]>;
@@ -49,7 +54,38 @@ export interface Api {
   sendReminders(today: string): Promise<string>;
 }
 
-export class ApiError extends Error {}
+export class ApiError extends Error {
+  /** The HTTP status when the server answered, 0 when it could not be reached. */
+  readonly status: number;
+
+  constructor(message: string, status = 0) {
+    super(message);
+    this.status = status;
+  }
+}
+
+/**
+ * Wraps every call so a 401 from the server (the session ended) runs `onExpired` once and still
+ * reaches the panel that asked. Login and logout answer their own errors, so they are left alone.
+ */
+export function guard(api: Api, onExpired: () => void): Api {
+  const own = new Set<keyof Api>(["me", "login", "logout"]);
+  const wrapped = {} as Record<string, unknown>;
+  for (const name of Object.keys(api) as (keyof Api)[]) {
+    const original = api[name] as (...args: unknown[]) => Promise<unknown>;
+    wrapped[name] = own.has(name)
+      ? original
+      : async (...args: unknown[]) => {
+          try {
+            return await original(...args);
+          } catch (error) {
+            if (error instanceof ApiError && error.status === 401) onExpired();
+            throw error;
+          }
+        };
+  }
+  return wrapped as unknown as Api;
+}
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
@@ -60,7 +96,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
-    throw new ApiError(body?.error?.message ?? `The server answered ${response.status}.`);
+    throw new ApiError(body?.error?.message ?? `The server answered ${response.status}.`, response.status);
   }
   return (await response.json()) as T;
 }
@@ -72,6 +108,11 @@ const json = (body: unknown): RequestInit => ({
 });
 
 export const httpApi: Api = {
+  me: () => call("/auth/me"),
+  login: (email, password) => call("/auth/login", json({ email, password })),
+  logout: async () => {
+    await call("/auth/logout", { method: "POST" });
+  },
   contracts: () => call("/contracts"),
   upload: async (file, contractType) => {
     const form = new FormData();
