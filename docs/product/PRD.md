@@ -16,11 +16,12 @@ deadlines and auto-renewals buried in clauses); it is not used as a source here.
 | B1 | The developer learns to build a grounded LLM application end to end: ingestion, extraction, retrieval, evals. | target: unconfirmed | "a learning project, and I'm new to AI projects" |
 | B2 | inferred: No contract deadline passes without a reminder being sent first. | target: unconfirmed | "emails reminders before deadlines" |
 | B3 | inferred: Every answer about the contracts can be checked against its source, or is refused. | target: unconfirmed | "answers questions ... with clause citations, refusing when the answer is not in the contracts" |
+| B4 | inferred: Only people the owner has given an account can use the app and spend the model budget. | target: unconfirmed | 2026-10-12: "add login page" |
 
 ## 3. Non-goals
 
 - OCR of scanned PDFs (brief, "Out of scope").
-- Login or user accounts (brief, "Out of scope").
+- Login or user accounts (brief, "Out of scope"). Withdrawn 2026-10-12: the developer asked for a login page (Q-040, ADR-0017, REQ-058 to REQ-062). Sign-up and password reset stay out of scope.
 - Real email delivery; MailHog only (brief, "Out of scope").
 - Multi-turn chat; each question is answered on its own (brief, "Out of scope").
 - Real contract data; synthetic contracts only (brief, "no real data").
@@ -94,6 +95,11 @@ One testable statement per id. Ids are never reused or renumbered.
 | REQ-055 | data/answer_key.json holds the expected value of each of the 5 fields for every golden contract. | inferred: Developer | 2026-10-05: "Golden sets: data/answer_key.json for extraction" | none |
 | REQ-056 | The Q&A golden set holds 10 questions: 7 answerable and 3 not answerable from the contracts. | inferred: Developer | 2026-10-05: "10 questions (7 answerable, 3 not) for Q&A" | none |
 | REQ-057 | The evaluation reports extraction accuracy for each of the 5 fields. | inferred: Developer | 2026-10-05: "extraction accuracy per field" | none |
+| REQ-058 | The system requires a signed-in user for every API route except login and the health checks. | Contract owner | 2026-10-12: "add login page" | none |
+| REQ-059 | The system lets only users created from the command line sign in; there is no sign-up. | Contract owner | 2026-10-12: "no sign-up, I create users" | none |
+| REQ-060 | The system stores each password only as a salted hash, and refuses to start in production without a session signing secret of at least 32 characters. | inferred: Developer | 2026-10-12: "add login page" | none |
+| REQ-061 | The system locks an account for 15 minutes after 5 wrong passwords, and answers every failed sign-in with the same message. | inferred: Developer | 2026-10-12: "made the validations for it" | none |
+| REQ-062 | The sign-in form and the server both check the email and password before accepting them. | Contract owner | 2026-10-12: "made the validations for it" | none |
 
 ## 6. Constraints
 
@@ -135,12 +141,12 @@ From the one-day re-scope brief (2026-10-05); these replace the matching lines a
 - Single-page UI: Streamlit per the brief (ADR-0012), then React from 2026-10-05 (ADR-0016).
 - Vector-only retrieval (replaces hybrid, ADR-0005).
 - reportlab named for PDF generation; the generator stays on fpdf2 under the "keep code" choice (Q-027).
-- Out of scope: OCR, login, hybrid search, scheduler, prompt comparisons.
+- Out of scope: OCR, login (withdrawn 2026-10-12, Q-040), hybrid search, scheduler, prompt comparisons.
 - Cut rule: a checkpoint 30 minutes over cuts contracts or fields, never the evals.
 
 ## 7. Open questions
 
-39 entries in docs/product/questions.md: 14 open, 3 need your confirmation (Q-033, Q-034, Q-036). Q-033 to Q-037 come from the one-day brief of 2026-10-05; Q-007, Q-013 and Q-020 were reversed by it and Q-010, Q-012 and Q-017 answered by it.
+40 entries in docs/product/questions.md: 14 open, 3 need your confirmation (Q-033, Q-034, Q-036). Q-033 to Q-037 come from the one-day brief of 2026-10-05; Q-007, Q-013 and Q-020 were reversed by it and Q-010, Q-012 and Q-017 answered by it.
 
 ## 8. Could not extract
 

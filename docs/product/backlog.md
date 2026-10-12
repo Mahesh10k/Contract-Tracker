@@ -14,6 +14,7 @@ PRD: docs/product/PRD.md   Questions: docs/product/questions.md   Built: 2026-10
 | US-00-004 | EP-04 | Ask a question and get an answer cited to clauses | Contract owner | Must | TBD | REQ-017, REQ-019, REQ-040, REQ-047, REQ-048 | US-00-001 |
 | US-00-005 | EP-04 | Get a refusal when the contracts do not hold the answer | Contract owner | Must | TBD | REQ-020, REQ-048, REQ-049, REQ-050, REQ-051 | US-00-004 |
 | US-00-011 | EP-02 | Correct a held field | Contract owner | Should | TBD | REQ-013, REQ-015 | US-00-008, US-00-003 |
+| US-00-012 | EP-06 | Sign in before using the app | Contract owner | Must | TBD | REQ-058, REQ-059, REQ-060, REQ-061, REQ-062 | US-00-007 |
 | US-00-006 | EP-03 | Receive reminder emails before each deadline | Contract owner | Must | TBD | REQ-016, REQ-042, REQ-053 | US-00-003 |
 | US-00-007 | EP-05 | Work with contracts, deadlines and questions in the browser | Contract owner | Must | TBD | REQ-052 | US-00-003, US-00-004 |
 | US-00-008 | EP-02 | See every field held for review | Contract owner | Should | TBD | REQ-013, REQ-015, REQ-052 | US-00-003, US-00-007 |
@@ -26,7 +27,7 @@ PRD: docs/product/PRD.md   Questions: docs/product/questions.md   Built: 2026-10
 
 ## Hours by discipline
 
-tasks: 75 (46 development, 29 test), hours by discipline: none estimated; total 0 h, 75 TBD
+tasks: 77 (47 development, 30 test), hours by discipline: none estimated; total 0 h, 77 TBD
 
 ## Delivery tasks
 
@@ -364,6 +365,58 @@ Covers: REQ-013, REQ-015   Judgement: story split from US-00-008 (seeded by Q-00
 - A user correction always wins over re-extraction (Q-018); the upsert already protects a corrected row, so AC-US-00-011-2 has a test today.
 
 **Tasks.** US-00-011-D1, US-00-011-T1 in docs/product/tasks.md
+
+### US-00-012 Sign in before using the app
+
+Epic: EP-06   Priority: Must   Points: TBD (estimate)
+Persona: Contract owner, group 00   Ticket: unassigned
+Status: built in TASK-013 (login requested by the developer on 2026-10-12, Q-040)
+Covers: REQ-058, REQ-059, REQ-060, REQ-061, REQ-062   Judgement: story added after the one-day brief
+
+**Narrative.** As a contract owner, I want the app to ask for an email and password, so that only people I created accounts for can use it and spend the model budget.
+
+**Why it matters.** B4: the app is deployed on public addresses and every Ask or extraction can call a paid model. Without a login anyone who finds the address can use it.
+
+**From the PRD.**
+- REQ-058: "The system requires a signed-in user for every API route except login and the health checks."
+- REQ-059: "The system lets only users created from the command line sign in; there is no sign-up."
+- REQ-060: "The system stores each password only as a salted hash, and refuses to start in production without a session signing secret of at least 32 characters."
+- REQ-061: "The system locks an account for 15 minutes after 5 wrong passwords, and answers every failed sign-in with the same message."
+- REQ-062: "The sign-in form and the server both check the email and password before accepting them."
+
+**Preconditions.**
+- Migration 0004 is applied and at least one user was created with `make user`.
+
+**Acceptance criteria.**
+
+- AC-US-00-012-1. Given nobody is signed in, the cookie is forged or expired, or the user pressed Log out, when any API route except login and the health checks is called, then the server answers 401, and whenever a call answers 401 the page shows the login form.
+  Covers: REQ-058
+- AC-US-00-012-2. Given a user created from the command line, when they enter the right email and password, then the app opens, the session cookie is HttpOnly and lasts 12 hours, and their email is shown beside a Log out button.
+  Covers: REQ-058, REQ-059
+- AC-US-00-012-3. Given a wrong password, an unknown email, a locked account or a disabled account, when they sign in, then the same message is shown, no session is created and the password field is cleared.
+  Covers: REQ-061
+- AC-US-00-012-4. Given an account with 5 wrong passwords in a row, when the fifth is entered, then the account is locked for 15 minutes even for the right password, and unlocks afterwards.
+  Covers: REQ-061
+- AC-US-00-012-5. Given an empty or malformed email or an empty or over-long password, when the form is submitted, then a message appears under the field, nothing is sent, and the server also refuses such a request with 422.
+  Covers: REQ-062
+- AC-US-00-012-6. Given the owner at the command line, when they run `make user`, then the account is stored with a hashed password, and a weak, mismatched or duplicate entry is refused.
+  Covers: REQ-059, REQ-060
+- AC-US-00-012-7. Given ENV=production, when the server starts without a SESSION_SECRET of at least 32 characters, then it refuses to start and names the setting.
+  Covers: REQ-060
+
+**Not in this story.**
+- Sign-up, password reset by email, "remember me" and roles (no mailer for resets; one kind of user).
+- Revoking a session before it expires (the cookie is a signed token with no server-side list; ADR-0017).
+- Per-IP rate limits.
+
+**Depends on.**
+- US-00-007: the JSON API and the React page the login protects.
+
+**Assumptions.**
+- Users are few and created by the owner (Q-040).
+- The page and the API share one origin (the Vite proxy in development, the Netlify rule in production), so the cookie is first-party.
+
+**Tasks.** US-00-012-D1, US-00-012-T1 in docs/product/tasks.md
 
 ## EP-03 Never miss a contract deadline
 
