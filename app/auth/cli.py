@@ -14,6 +14,7 @@ import sys
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.auth.passwords import hash_password
@@ -76,6 +77,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         sys.stdout.write(asyncio.run(go()) + "\n")
     except (ValueError, ConflictError) as error:
         sys.stderr.write(f"{error}\n")
+        return 1
+    except SQLAlchemyError as error:
+        # Usually the database is unreachable or migration 0004 has not been applied yet.
+        sys.stderr.write(
+            f"Database error ({type(error).__name__}). Check DATABASE_URL, and run make migrate "
+            "so the users table exists, then try again.\n"
+        )
         return 1
     return 0
 
