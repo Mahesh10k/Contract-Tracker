@@ -4,6 +4,7 @@ No database is needed. The engine is created but never connects; routes that
 touch it are exercised through dependency overrides.
 """
 
+import uuid
 from collections.abc import AsyncIterator
 
 import pytest
@@ -11,8 +12,12 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
+from app.api.auth.deps import require_user
 from app.core.config import Settings
+from app.db.repositories.users import UserRecord
 from app.main import create_app
+
+TEST_USER = UserRecord(uuid.uuid4(), "owner@example.com", "x", 0, None, None)
 
 
 @pytest.fixture
@@ -30,6 +35,8 @@ def settings() -> Settings:
 async def app(settings: Settings) -> AsyncIterator[FastAPI]:
     """The application with its lifespan run, so `app.state` is populated."""
     application = create_app(settings)
+    # Route tests are about the routes; the login tests remove this override.
+    application.dependency_overrides[require_user] = lambda: TEST_USER
     async with LifespanManager(application):
         yield application
 
