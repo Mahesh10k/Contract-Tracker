@@ -38,7 +38,7 @@
   --measure: 90rem;
 }
 
-:root[data-variant="2-panel"].dark {
+:root[data-variant="2-panel"][data-theme="dark"] {
   --background: oklch(0.21 0.016 250);
   --foreground: oklch(0.92 0.008 240);
   --card: oklch(0.26 0.018 250);
@@ -157,7 +157,7 @@
 
 /* The motion moment: readout rows settle in once, top to bottom. */
 :root[data-variant="2-panel"] [data-slot="table"] tbody tr {
-  animation: panel-settle 320ms var(--ease-out) both;
+  animation: panel-settle 320ms var(--ease-enter) both;
 }
 
 :root[data-variant="2-panel"] [data-slot="table"] tbody tr:nth-child(2) { animation-delay: 60ms; }

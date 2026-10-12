@@ -54,6 +54,19 @@ clauses = Table(
     Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
 )
 
+users = Table(
+    "users",
+    metadata,
+    Column("id", Uuid, primary_key=True, server_default=func.gen_random_uuid()),
+    Column("email", Text, nullable=False, unique=True),
+    Column("password_hash", Text, nullable=False),
+    Column("failed_attempts", Integer, nullable=False, server_default="0"),
+    Column("locked_until", DateTime(timezone=True)),
+    Column("disabled_at", DateTime(timezone=True)),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+)
+
 llm_calls = Table(
     "llm_calls",
     metadata,

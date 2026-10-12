@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { Answer, Api, Contract, Deadline, Field, HeldField } from "./api";
-import { Empty, formatDay, label, Notice, PanelHead, StatusBadge, type Message } from "./ui";
+import { Empty, formatDay, label, Notice, PanelHead, Progress, Skeleton, StatusBadge, Thinking, type Message } from "./ui";
+
+/** Only colours the days-left badge: a deadline within 14 days is warned, within 30 is calm. */
+const urgency = (daysLeft: number) => (daysLeft <= 14 ? "warn" : daysLeft <= 30 ? "ok" : undefined);
 
 const fail = (error: unknown): Message => ({
   tone: "bad",
@@ -92,17 +95,19 @@ export function UploadPanel({ api, onChanged }: { api: Api; onChanged: () => voi
         </button>
         <span data-slot="panel-lede">The set the evals use, with their real titles.</span>
       </div>
+      {busy && <Progress label="Uploading and reading the contract" />}
       <Notice message={message} />
     </section>
   );
 }
 
 export function ContractsPanel({ api, version, onChanged }: { api: Api; version: number; onChanged: () => void }) {
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [contracts, setContracts] = useState<Contract[] | null>(null);
   const [pickedId, setPickedId] = useState("");
   const [fields, setFields] = useState<Field[]>([]);
+  const [fieldsFor, setFieldsFor] = useState("");
   const [message, setMessage] = useState<Message>(null);
-  const picked = contracts.find((c) => c.id === pickedId) ?? contracts[0];
+  const picked = contracts?.find((c) => c.id === pickedId) ?? contracts?.[0];
   const [busy, guard] = useBusy();
 
   useEffect(() => {
@@ -112,7 +117,11 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
   const pickedKey = picked?.id;
   useEffect(() => {
     if (!pickedKey) return;
-    api.fields(pickedKey).then(setFields).catch((e) => setMessage(fail(e)));
+    api
+      .fields(pickedKey)
+      .then(setFields)
+      .catch((e) => setMessage(fail(e)))
+      .finally(() => setFieldsFor(pickedKey));
   }, [api, pickedKey, version]);
 
   const extract = () =>
@@ -126,7 +135,16 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
       }
     });
 
-  if (contracts.length === 0) {
+  if (contracts === null && !message) {
+    return (
+      <section data-slot="panel" role="tabpanel" aria-labelledby="t-contracts">
+        <PanelHead title="Contracts" lede="Every field comes with the sentence it was taken from." />
+        <Skeleton what="contracts" rows={3} />
+      </section>
+    );
+  }
+
+  if (!contracts || contracts.length === 0) {
     return (
       <section data-slot="panel" role="tabpanel" aria-labelledby="t-contracts">
         <PanelHead title="Contracts" lede="Every field comes with the sentence it was taken from." />
@@ -154,10 +172,12 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
         <span data-slot="panel-lede">{picked?.contract_type}, loaded from {picked?.source_filename}</span>
       </div>
       <Notice message={message} />
-      {fields.length === 0 ? (
+      {fieldsFor !== picked?.id ? (
+        <Skeleton what="fields" rows={5} />
+      ) : fields.length === 0 ? (
         <Empty title="Not extracted yet">Press Extract fields to read this contract.</Empty>
       ) : (
-        <div data-slot="table-wrap">
+        <div data-slot="table-wrap" data-busy={busy || undefined}>
           <table data-slot="table">
             <thead>
               <tr><th>Field</th><th>Value</th><th>Quote</th><th>Clause</th><th>Status</th></tr>
@@ -181,7 +201,7 @@ export function ContractsPanel({ api, version, onChanged }: { api: Api; version:
 }
 
 export function DeadlinesPanel({ api, today, version }: { api: Api; today: string; version: number }) {
-  const [rows, setRows] = useState<Deadline[]>([]);
+  const [rows, setRows] = useState<Deadline[] | null>(null);
   const [message, setMessage] = useState<Message>(null);
   const [busy, guard] = useBusy();
 
@@ -211,7 +231,21 @@ export function DeadlinesPanel({ api, today, version }: { api: Api; today: strin
         <span data-slot="panel-lede">Treating {formatDay(today)} as today.</span>
       </div>
       <Notice message={message} />
-      {rows.length === 0 ? (
+      {rows && rows.length > 0 && (
+        <div data-slot="stats">
+          <div data-slot="stat" data-primary>
+            <strong>{rows.filter((r) => r.days_left <= 30).length}</strong>
+            <span>due in the next 30 days</span>
+          </div>
+          <div data-slot="stat">
+            <strong>{rows.length}</strong>
+            <span>deadlines across {new Set(rows.map((r) => r.contract)).size} contracts</span>
+          </div>
+        </div>
+      )}
+      {rows === null ? (
+        message ? null : <Skeleton what="deadlines" rows={4} />
+      ) : rows.length === 0 ? (
         <Empty title="No deadlines yet">Extract a contract that states an effective date and a term.</Empty>
       ) : (
         <div data-slot="table-wrap">
@@ -225,7 +259,7 @@ export function DeadlinesPanel({ api, today, version }: { api: Api; today: strin
                   <th scope="row">{r.contract}</th>
                   <td>{r.kind === "expiry" ? "Contract expires" : "Notice deadline"}</td>
                   <td>{formatDay(r.due)}</td>
-                  <td className="num">{r.days_left}</td>
+                  <td className="num"><span data-slot="badge" data-tone={urgency(r.days_left)}>{r.days_left}</span></td>
                   <td><span data-slot="clause">{r.clause ?? "none"}</span></td>
                 </tr>
               ))}
@@ -282,7 +316,8 @@ export function AskPanel({ api }: { api: Api }) {
         </button>
       </div>
       <Notice message={message} />
-      {answer && (
+      {busy && <Thinking>Searching the contracts and writing an answer…</Thinking>}
+      {!busy && answer && (
         <div data-slot="answer">
           <p role={answer.refused ? "alert" : undefined}>{answer.text}</p>
           {answer.citations.map((c) => (
@@ -312,6 +347,7 @@ export function ReviewPanel({ api, version }: { api: Api; version: number }) {
         lede="Fields the system would not trust: no quote found in the cited clause, or a value no parser could read."
       />
       <Notice message={message} />
+      {rows === null && !message && <Skeleton what="held fields" rows={3} />}
       {rows && rows.length === 0 && <Empty title="Nothing is waiting for review.">Every extracted field has a checked quote.</Empty>}
       {rows && rows.length > 0 && (
         <div data-slot="table-wrap">

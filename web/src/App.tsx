@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Api } from "./api";
+import { guard, type Api, type User } from "./api";
+import { LoginPage } from "./login";
+import { Progress } from "./ui";
 import { localIso } from "./dates";
 import { AskPanel, ContractsPanel, DeadlinesPanel, ReviewPanel, UploadPanel } from "./panels";
 
@@ -19,7 +21,7 @@ function useTheme() {
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   });
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
     try {
       localStorage.setItem("theme", dark ? "dark" : "light");
     } catch {
@@ -29,7 +31,42 @@ function useTheme() {
   return [dark, () => setDark((d) => !d)] as const;
 }
 
+/** Decides between the login page and the app; the app below only ever renders for a signed-in user. */
 export default function App({ api }: { api: Api }) {
+  // undefined: asking the server. null: nobody signed in. A 401 from any call ends the session.
+  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [guarded] = useState(() => guard(api, () => setUser(null)));
+
+  useEffect(() => {
+    let current = true;
+    api
+      .me()
+      .then((found) => {
+        if (current) setUser(found);
+      })
+      .catch(() => {
+        if (current) setUser(null);
+      });
+    return () => {
+      current = false;
+    };
+  }, [api]);
+
+  if (user === undefined) {
+    return (
+      <main data-slot="login">
+        <div data-slot="login-card">
+          <p data-slot="panel-lede">Checking your session…</p>
+          <Progress label="Checking your session" />
+        </div>
+      </main>
+    );
+  }
+  if (user === null) return <LoginPage api={api} onSignedIn={setUser} />;
+  return <Tracker api={guarded} user={user} onSignedOut={() => setUser(null)} />;
+}
+
+function Tracker({ api, user, onSignedOut }: { api: Api; user: User; onSignedOut: () => void }) {
   const [tab, setTab] = useState<Tab>("Upload");
   const [today, setToday] = useState(todayIso);
   const [version, setVersion] = useState(0);
@@ -40,17 +77,34 @@ export default function App({ api }: { api: Api }) {
     <div data-slot="app">
       <div data-slot="shell">
         <header data-slot="masthead">
-          <div>
-            <h1 data-slot="brand">ContractTracker</h1>
-            <p data-slot="tagline">Every deadline, with the sentence that sets it.</p>
+          <div data-slot="identity">
+            <span data-slot="logo" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                <path d="M14 3v5h5" />
+                <path d="M9 13h6" />
+                <path d="M9 17h4" />
+              </svg>
+            </span>
+            <div>
+              <h1 data-slot="brand">ContractTracker</h1>
+              <p data-slot="tagline">Every deadline, with the sentence that sets it.</p>
+            </div>
           </div>
           <div data-slot="tools">
             <div data-slot="field-group">
               <label data-slot="label" htmlFor="today">Treat today as</label>
               <input id="today" data-slot="input" type="date" value={today} onChange={(e) => e.target.value && setToday(e.target.value)} />
             </div>
+            <span data-slot="whoami">{user.email}</span>
             <button data-slot="button" onClick={toggleTheme} aria-pressed={dark}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+              </svg>
               {dark ? "Light theme" : "Dark theme"}
+            </button>
+            <button data-slot="button" onClick={() => void api.logout().catch(() => undefined).then(onSignedOut)}>
+              Log out
             </button>
           </div>
         </header>

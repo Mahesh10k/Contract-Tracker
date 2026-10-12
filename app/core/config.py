@@ -10,7 +10,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import PostgresDsn, SecretStr, field_validator
+from pydantic import Field, PostgresDsn, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Below this top-1 cosine similarity a question is refused with no LLM call (ADR-0013). Set by the
@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     smtp_port: int = 1025
     reminder_to: str = "owner@contracttracker.test"
     reminder_from: str = "reminders@contracttracker.test"
+    # Login (ADR-0017): a signed session cookie. The secret has no default in production; in
+    # development and tests a random one is made per process, so sessions end with the process.
+    session_secret: SecretStr | None = None
+    session_ttl_hours: int = Field(default=12, ge=1, le=168)
+    login_max_attempts: int = Field(default=5, ge=1, le=20)
+    login_lock_minutes: int = Field(default=15, ge=1, le=1440)
     # Treat this date as today for reminders and `make remind` (REQ-042); empty means the real date.
     pretend_today: date | None = None
 
@@ -66,6 +72,22 @@ class Settings(BaseSettings):
     def _blank_key_is_no_key(cls, value: object) -> object:
         """`OPENROUTER_API_KEY=` left empty means replay only, never a call with a blank key."""
         return None if value == "" else value
+
+    @field_validator("session_secret", mode="before")
+    @classmethod
+    def _blank_secret_is_none(cls, value: object) -> object:
+        """`SESSION_SECRET=` left empty means no secret was set."""
+        return None if value == "" else value
+
+    @model_validator(mode="after")
+    def _production_needs_a_session_secret(self) -> "Settings":
+        """A guessable or missing signing key would let anyone forge a session."""
+        if self.env == "production" and (
+            self.session_secret is None or len(self.session_secret.get_secret_value()) < 32
+        ):
+            msg = "SESSION_SECRET must be set to at least 32 characters when ENV=production"
+            raise ValueError(msg)
+        return self
 
     @field_validator("database_url")
     @classmethod

@@ -63,6 +63,11 @@ PRD: docs/product/PRD.md   Backlog: docs/product/backlog.md   Built: 2026-10-01 
 | REQ-055 | data/answer_key.json | criterion-of US-02-006 | the file the golden set is written to | US-02-006 | AC-US-02-006-3, AC-US-02-006-4 |
 | REQ-056 | 10 golden questions, 7 answerable, 3 not | criterion-of US-02-002 | the dataset of the same Q&A report | US-02-002 | AC-US-02-002-5 |
 | REQ-057 | Extraction accuracy per 5 fields | story | the developer gets the extraction report | US-02-001 | AC-US-02-001-1, AC-US-02-001-2, AC-US-02-001-4 |
+| REQ-058 | Signed-in user for every API route | story | the owner signs in before using the app | US-00-012 | AC-US-00-012-1, AC-US-00-012-2 |
+| REQ-059 | Only users made from the command line sign in | story | the owner signs in before using the app | US-00-012 | AC-US-00-012-2, AC-US-00-012-6 |
+| REQ-060 | Salted hashes and a production session secret | story | the owner signs in before using the app | US-00-012 | AC-US-00-012-6, AC-US-00-012-7 |
+| REQ-061 | Lockout and one failure message | story | the owner signs in before using the app | US-00-012 | AC-US-00-012-3, AC-US-00-012-4 |
+| REQ-062 | Form and server validation | story | the owner signs in before using the app | US-00-012 | AC-US-00-012-5 |
 
 ## Gaps
 

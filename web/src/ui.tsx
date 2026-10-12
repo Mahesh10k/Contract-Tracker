@@ -50,3 +50,42 @@ export function StatusBadge({ status, reason }: { status: FieldStatus; reason: s
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 export const formatDay = (iso: string) => day.format(new Date(`${iso}T00:00:00Z`));
+
+/** Placeholder rows shown while a panel's first request is in flight. The text is for screen readers. */
+export function Skeleton({ what, rows = 4 }: { what: string; rows?: number }) {
+  return (
+    <div data-slot="skeleton" aria-busy="true">
+      <span className="sr-only">Loading {what}</span>
+      {Array.from({ length: rows }, (_, i) => (
+        <div data-slot="skeleton-row" key={i} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** An indeterminate bar for work with no known length (an upload, a model call). */
+export function Progress({ label }: { label: string }) {
+  return (
+    <div data-slot="progress" role="progressbar" aria-label={label}>
+      <span />
+    </div>
+  );
+}
+
+/** Shown in place of the answer while the question is being worked on. */
+export function Thinking({ children }: { children: ReactNode }) {
+  return (
+    <div data-slot="thinking" aria-live="polite">
+      <span data-slot="dots" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      {children}
+    </div>
+  );
+}
