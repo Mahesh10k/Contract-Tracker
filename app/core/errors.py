@@ -36,6 +36,19 @@ class NotFoundError(DomainError):
     code = "not_found"
 
 
+class UnauthorizedError(DomainError):
+    """No valid session: the caller must sign in."""
+
+    status_code = 401
+    code = "unauthorized"
+
+
+class InvalidCredentialsError(UnauthorizedError):
+    """Wrong email or password, or a locked or disabled account. One message for all of them."""
+
+    code = "invalid_credentials"
+
+
 class ConflictError(DomainError):
     """The request conflicts with the current state (duplicate, stale version)."""
 

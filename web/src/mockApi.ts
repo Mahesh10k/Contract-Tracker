@@ -36,6 +36,9 @@ const HELD: HeldField[] = [
 const wait = <T,>(value: T): Promise<T> => Promise.resolve(value);
 
 export const mockApi: Api = {
+  me: () => wait({ email: "owner@example.com" }),
+  login: (email) => wait({ email }),
+  logout: () => wait(undefined),
   contracts: () => wait(CONTRACTS),
   upload: (file) => wait(`Loaded ${file.name}`),
   loadGolden: () => wait(["Lease Agreement 01", "Supply Agreement 07 (already loaded)"]),

@@ -7,6 +7,7 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 
+from app.api.auth.deps import require_user
 from app.api.ui.schemas import (
     AnswerOut,
     AskIn,
@@ -29,7 +30,13 @@ from app.ui.service import (
     UploadTooLargeError,
 )
 
-router = APIRouter(prefix="/api", tags=["ui"], responses={"default": {"model": ErrorEnvelope}})
+# Every route here needs a signed-in user (ADR-0017); login itself lives in app/api/auth.
+router = APIRouter(
+    prefix="/api",
+    tags=["ui"],
+    dependencies=[Depends(require_user)],
+    responses={"default": {"model": ErrorEnvelope}},
+)
 
 
 def get_ui_service(request: Request) -> UiApi:

@@ -13,8 +13,10 @@ import structlog
 from fastapi import FastAPI
 
 from app import __version__
+from app.api.auth.router import router as auth_router
 from app.api.health.router import router as health_router
 from app.api.ui.router import router as ui_router
+from app.auth.service import AuthService
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import configure_logging
@@ -34,6 +36,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
     app.state.ui_service = UiService(settings, app.state.session_factory)
+    app.state.auth_service = AuthService(settings, app.state.session_factory)
     log.info("startup", env=settings.env, version=__version__)
     try:
         yield
@@ -63,6 +66,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
     register_exception_handlers(app)
     app.include_router(health_router)
+    app.include_router(auth_router)
     app.include_router(ui_router)
     configure_tracing(app, settings.app_name, __version__)
     return app

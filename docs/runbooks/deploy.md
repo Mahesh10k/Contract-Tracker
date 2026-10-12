@@ -19,7 +19,7 @@ The browser calls `/api` on the Netlify address. Netlify forwards those calls to
 1. The repository on GitHub holds the Dockerfile and `web/public/_redirects` (merge their pull request).
 2. Rotate any key or password that was ever pasted into a chat, an issue or a screenshot.
 3. Create the OpenRouter key for this deploy and set a credit limit on it in the OpenRouter dashboard.
-   The app has no login: anyone who finds the URL can trigger paid model calls.
+   The app asks for a login (ADR-0017), and the credit limit is the backstop if an account is misused.
 
 ## Secrets (set in the host's settings, never in git)
 
@@ -31,6 +31,7 @@ The browser calls `/api` on the Netlify address. Netlify forwards those calls to
 | `LLM_BUDGET_SINCE` | the day the budget starts, for example `2026-10-05` |
 | `LLM_MODEL` | `anthropic/claude-haiku-4.5` |
 | `ENV` | `production` |
+| `SESSION_SECRET` | at least 32 random characters that sign the login cookie; create one with `python3 -c "import secrets; print(secrets.token_urlsafe(48))"`. The server refuses to start in production without it. |
 | `REMINDER_TO`, `REMINDER_FROM` | the addresses for reminders (email is not sent anywhere real yet) |
 
 Do not set `PRETEND_TODAY` in production. `SMTP_HOST` stays unset until a mail provider and an SMTP login
@@ -49,7 +50,13 @@ setting exist (see Known limits).
    set -a; . ./.env; set +a
    make migrate
    ```
-   Expected: `Running upgrade` for 0001, 0002 and 0003.
+   Expected: `Running upgrade` for 0001, 0002, 0003 and 0004 (the users table).
+6. Create your first login, from your machine, with the same `.env`:
+   ```
+   make user EMAIL=you@example.com
+   ```
+   It asks for the password twice (at least 10 characters, nothing echoed). Use `CMD=set-password` to
+   change one and `CMD=disable` to stop an account. There is no sign-up page.
 
 ## 2. Backend (Hugging Face Space)
 
@@ -71,8 +78,8 @@ setting exist (see Known limits).
    (huggingface.co, Settings, Access Tokens). Do not put the token in the remote URL.
 4. Watch the build log in the Space. The build downloads the CPU torch wheel and the embedding model
    and takes several minutes.
-5. Check `https://<user>-<space>.hf.space/api/contracts`. A `[]` or a list of contracts means the
-   backend reaches the database.
+5. Check `https://<user>-<space>.hf.space/readyz`: it answers 200 when the database is reachable.
+   `/api/contracts` answers 401 until you sign in.
 
 To redeploy after a change: merge to `main`, then repeat step 3 (the throwaway branch is rebuilt from `main`).
 
@@ -83,12 +90,12 @@ Use this when a Docker Space is not available to you. `render.yaml` at the repos
 1. Merge the branch that holds `render.yaml` and the Dockerfile into `main`, so GitHub has them.
 2. Render dashboard, New, **Blueprint**, connect the GitHub repository, choose `main`. Render reads `render.yaml`.
    (Without a blueprint: New, Web Service, runtime Docker, instance type Free, region Singapore,
-   health check path `/api/contracts`, and add the same variables by hand.)
+   health check path `/healthz`, and add the same variables by hand.)
 3. Render asks for the two secret values: `DATABASE_URL` (the Supabase session pooler form from step 1)
    and `OPENROUTER_API_KEY` (the new key). Do not set `PORT`: Render sets it and the container reads it.
 4. Create. The first build downloads the CPU torch wheel and the embedding model and takes several minutes.
-5. Open `https://contract-tracker-8x5u.onrender.com/api/contracts` (use the address Render shows).
-   A list or `[]` means the backend reaches the database.
+5. Open `https://contract-tracker-8x5u.onrender.com/healthz` (use the address Render shows): `ok`.
+   `/api/contracts` now answers 401 until you sign in, which also proves the guard is on.
 6. In the service's **Metrics** tab, watch memory while you press "Load the 6 golden contracts" and ask one
    question. The free instance has 512 MB. A log line "Ran out of memory" means the embedding model does
    not fit: move to the Starter instance, or use another host.
@@ -110,6 +117,7 @@ Render-specific notes:
 
 ## Verify (about five minutes)
 
+0. Open the Netlify address: the login form appears. Sign in with the account from step 1.6.
 1. Upload tab: press "Load the 6 golden contracts". Expect the six contract titles.
 2. Contracts tab: pick "Lease Agreement 01", press "Extract fields". It replays from `llm_cache`
    and costs nothing.
@@ -138,7 +146,7 @@ Render-specific notes:
 
 ## Known limits
 
-- There is no login. Keep the URLs private or put basic auth in front before sharing.
+- Login is by email and password, created by you with `make user`. A copied session cookie works until it expires (12 hours); changing `SESSION_SECRET` signs everyone out. Five wrong passwords lock an account for 15 minutes.
 - Reminder email is not delivered: the mailer has no SMTP login setting, and free mail providers need one.
 - The Dockerfile runs as uid 10001. If the Space logs a permission error when the app writes
   `llm_cache` (a live model call), the container user needs write access to that folder.

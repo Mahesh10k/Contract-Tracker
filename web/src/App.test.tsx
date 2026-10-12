@@ -5,15 +5,16 @@ import App from "./App";
 import { ApiError, type Api } from "./api";
 import { mockApi } from "./mockApi";
 
-const open = (overrides: Partial<Api> = {}) => {
+const open = async (overrides: Partial<Api> = {}) => {
   const api: Api = { ...mockApi, ...overrides };
   render(<App api={api} />);
+  await screen.findByRole("tab", { name: "Upload" });
   return { api, user: userEvent.setup() };
 };
 
 describe("the page", () => {
-  it("TC-0115: has the five tabs in order", () => {
-    open();
+  it("TC-0115: has the five tabs in order", async () => {
+    await open();
 
     const tabs = screen.getAllByRole("tab").map((t) => t.textContent);
 
@@ -22,7 +23,7 @@ describe("the page", () => {
 
   it("TC-0116: uploading a PDF with its type loads it", async () => {
     const upload = vi.fn().mockResolvedValue("lease-01.pdf");
-    const { user } = open({ upload });
+    const { user } = await open({ upload });
     const file = new File(["%PDF-1.4"], "lease-01.pdf", { type: "application/pdf" });
 
     await user.selectOptions(screen.getByLabelText("Contract type"), "lease");
@@ -35,7 +36,7 @@ describe("the page", () => {
 
   it("TC-0117: a refused upload shows the reason and no success message", async () => {
     const upload = vi.fn().mockRejectedValue(new ApiError("No text found; scanned PDFs are not supported"));
-    const { user } = open({ upload });
+    const { user } = await open({ upload });
 
     await user.upload(screen.getByLabelText("Contract PDF"), new File(["x"], "scan.pdf", { type: "application/pdf" }));
     await user.click(screen.getByRole("button", { name: "Load contract" }));
@@ -44,14 +45,14 @@ describe("the page", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("keeps Load contract disabled until a file is chosen", () => {
-    open();
+  it("keeps Load contract disabled until a file is chosen", async () => {
+    await open();
 
     expect(screen.getByRole("button", { name: "Load contract" })).toBeDisabled();
   });
 
   it("TC-0118: a contract shows its fields with value, quote and clause", async () => {
-    const { user } = open();
+    const { user } = await open();
 
     await user.click(screen.getByRole("tab", { name: "Contracts" }));
     const row = (await screen.findByRole("rowheader", { name: "Notice period" })).closest("tr")!;
@@ -63,7 +64,7 @@ describe("the page", () => {
   });
 
   it("TC-0119: a held field is marked with its reason", async () => {
-    const { user } = open();
+    const { user } = await open();
 
     await user.click(screen.getByRole("tab", { name: "Contracts" }));
     await user.selectOptions(await screen.findByLabelText("Contract"), "Supply Agreement 08");
@@ -74,7 +75,7 @@ describe("the page", () => {
   });
 
   it("TC-0120: deadlines are listed soonest first with contract and clause", async () => {
-    const { user } = open();
+    const { user } = await open();
 
     await user.click(screen.getByRole("tab", { name: "Deadlines" }));
     const rows = await screen.findAllByRole("row");
@@ -91,7 +92,7 @@ describe("the page", () => {
       refused: false,
       citations: [{ contract: "Lease Agreement 01", clause: "7", text: "Either party may end this Lease at expiry." }],
     });
-    const { user } = open({ ask });
+    const { user } = await open({ ask });
 
     await user.click(screen.getByRole("tab", { name: "Ask" }));
     await user.type(screen.getByLabelText("Question about the loaded contracts"), "What notice does lease 01 need?");
@@ -104,7 +105,7 @@ describe("the page", () => {
 
   it("shows the server's message when a question cannot be answered", async () => {
     const ask = vi.fn().mockRejectedValue(new ApiError("Questions cannot be answered right now."));
-    const { user } = open({ ask });
+    const { user } = await open({ ask });
 
     await user.click(screen.getByRole("tab", { name: "Ask" }));
     await user.type(screen.getByLabelText("Question about the loaded contracts"), "Who pays?");
@@ -114,7 +115,7 @@ describe("the page", () => {
   });
 
   it("TC-0123: needs review lists each held field with its reason", async () => {
-    const { user } = open();
+    const { user } = await open();
 
     await user.click(screen.getByRole("tab", { name: "Needs review" }));
     const row = (await screen.findByRole("rowheader", { name: "Services Agreement 02" })).closest("tr")!;
@@ -124,7 +125,7 @@ describe("the page", () => {
   });
 
   it("TC-0124: an empty review queue says so", async () => {
-    const { user } = open({ review: () => Promise.resolve([]) });
+    const { user } = await open({ review: () => Promise.resolve([]) });
 
     await user.click(screen.getByRole("tab", { name: "Needs review" }));
 
@@ -132,7 +133,7 @@ describe("the page", () => {
   });
 
   it("shows the empty state before any contract is loaded", async () => {
-    const { user } = open({ contracts: () => Promise.resolve([]) });
+    const { user } = await open({ contracts: () => Promise.resolve([]) });
 
     await user.click(screen.getByRole("tab", { name: "Contracts" }));
 
@@ -140,7 +141,7 @@ describe("the page", () => {
   });
 
   it("send due reminders reports the count", async () => {
-    const { user } = open({ sendReminders: () => Promise.resolve("2 reminders sent") });
+    const { user } = await open({ sendReminders: () => Promise.resolve("2 reminders sent") });
 
     await user.click(screen.getByRole("tab", { name: "Deadlines" }));
     await user.click(screen.getByRole("button", { name: "Send due reminders" }));
@@ -151,7 +152,7 @@ describe("the page", () => {
   it("TC-0181: disables Send due reminders while the request runs and sends it only once", async () => {
     let finish: (message: string) => void = () => {};
     const sendReminders = vi.fn().mockReturnValue(new Promise<string>((resolve) => (finish = resolve)));
-    const { user } = open({ sendReminders });
+    const { user } = await open({ sendReminders });
 
     await user.click(screen.getByRole("tab", { name: "Deadlines" }));
     const button = await screen.findByRole("button", { name: "Send due reminders" });
@@ -169,7 +170,7 @@ describe("the page", () => {
   it("disables Extract fields while it runs so an uncached contract is not paid for twice", async () => {
     let finish: (message: string) => void = () => {};
     const extract = vi.fn().mockReturnValue(new Promise<string>((resolve) => (finish = resolve)));
-    const { user } = open({ extract });
+    const { user } = await open({ extract });
 
     await user.click(screen.getByRole("tab", { name: "Contracts" }));
     const button = await screen.findByRole("button", { name: "Extract fields" });
@@ -185,7 +186,7 @@ describe("the page", () => {
 describe("the theme switch", () => {
   it("sets data-theme on the page and remembers the choice", async () => {
     localStorage.removeItem("theme");
-    const { user } = open();
+    const { user } = await open();
 
     expect(document.documentElement.dataset.theme).toBe("light");
     await user.click(screen.getByRole("button", { name: "Dark theme" }));
@@ -195,9 +196,9 @@ describe("the theme switch", () => {
     localStorage.removeItem("theme");
   });
 
-  it("starts dark when the stored choice is dark", () => {
+  it("starts dark when the stored choice is dark", async () => {
     localStorage.setItem("theme", "dark");
-    open();
+    await open();
 
     expect(document.documentElement.dataset.theme).toBe("dark");
     localStorage.removeItem("theme");
@@ -213,7 +214,7 @@ describe("loading states", () => {
 
   it("shows placeholder rows, not an empty message, while the deadlines are loading", async () => {
     const pending = never<Awaited<ReturnType<Api["deadlines"]>>>();
-    const { user } = open({ deadlines: () => pending.promise });
+    const { user } = await open({ deadlines: () => pending.promise });
 
     await user.click(screen.getByRole("tab", { name: "Deadlines" }));
 
@@ -225,7 +226,7 @@ describe("loading states", () => {
 
   it("shows a progress bar while a PDF is being loaded, then removes it", async () => {
     const pending = never<string>();
-    const { user } = open({ upload: () => pending.promise });
+    const { user } = await open({ upload: () => pending.promise });
 
     await user.upload(screen.getByLabelText("Contract PDF"), new File(["%PDF-1.4"], "a.pdf", { type: "application/pdf" }));
     await user.click(screen.getByRole("button", { name: "Load contract" }));
@@ -238,7 +239,7 @@ describe("loading states", () => {
 
   it("shows a thinking card while a question is answered, then the answer", async () => {
     const pending = never<Awaited<ReturnType<Api["ask"]>>>();
-    const { user } = open({ ask: () => pending.promise });
+    const { user } = await open({ ask: () => pending.promise });
 
     await user.click(screen.getByRole("tab", { name: "Ask" }));
     await user.type(screen.getByLabelText(/Question about/), "Who pays?");

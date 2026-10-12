@@ -1,7 +1,7 @@
 # Open questions: ContractTracker
 
 PRD: docs/product/PRD.md   Updated: 2026-10-01
-Entries: 39   Open: 14   Needs your confirmation: 3
+Entries: 40   Open: 14   Needs your confirmation: 3
 
 Basis, for every entry:
 - stated: the input answers it elsewhere; the passage that wins is named.
@@ -69,4 +69,4 @@ On 2026-10-05 the one-day re-scope brief reversed Q-007 (budget), Q-013 (UI) and
 | Q-037 | open | contradiction | US-02-005 criteria for withdrawn statements | stated | US-02-005 (in progress, TASK-007) plants relative dates, an amendment and a page-break clause (REQ-031, REQ-034, REQ-035), which the 2026-10-05 brief withdrew. | (a) keep what TASK-007 built, outside the golden 6, and do no more work on those three criteria; (b) remove the three planted cases from the generator and tests | (a) | the code and tests already exist on feature/TASK-007-HardCases; removing them costs time and buys nothing for the brief | US-02-005, US-02-006 |
 | Q-038 | confirmed | gap | REQ-042, REQ-016 | convention | What does sending reminders for a "today" ahead of the real date do? | (a) record it like a real run (it retires and marks reminders for a date that has not happened); (b) refuse; (c) a preview that emails MailHog and records nothing | (c), found in the branch review of 2026-10-06 and approved with "fix" | (a) would hide real reminders later; (b) would break the demo of a future date | US-00-006 |
 | Q-039 | confirmed | gap | REQ-013, REQ-015 | convention | TASK-008 builds the Needs review list but not the correction form; what happens to AC-US-00-008-2 to AC-US-00-008-4? | (a) move them to a new proposed story and retire the three ids; (b) leave them in US-00-008 as unbuilt; (c) build the form now | (a), chosen by the developer on 2026-10-06 ("split and note") after the traceability check; the deferral is also stated in the MR | (b) leaves a story promising four criteria and delivering one | US-00-008, US-00-011 |
-
+| Q-040 | confirmed | gap | REQ-058, REQ-059 | convention | The brief put login out of scope; the app is about to be public (Render, Netlify) and every call can spend the OpenRouter key. What kind of login? | (a) accounts with sign-up; (b) one shared password; (c) Google or GitHub sign-in; and who may create accounts: anyone, a list of emails, or only the owner by command | accounts stored in Postgres, no sign-up, the owner creates users with make user (chosen by the developer on 2026-10-12); ADR-0017 | (b) has no per-person accounts; (c) needs an OAuth app and redirect URLs on two hosts | US-00-012 |
