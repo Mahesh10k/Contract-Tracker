@@ -8,8 +8,8 @@ services:
     plan: free
     region: singapore
     autoDeploy: false
-    # The API has no health route of its own; this one answers 200 when the database is reachable.
-    healthCheckPath: /api/contracts
+    # Open without a login (every /api route needs one now); answers 200 when the process is up.
+    healthCheckPath: /healthz
     envVars:
       - key: ENV
         value: production
@@ -22,6 +22,9 @@ services:
       - key: REMINDER_TO
         value: owner@contracttracker.test
       - key: DATABASE_URL
+        sync: false
+      # Signs the login cookie: at least 32 random characters, set in the Render dashboard.
+      - key: SESSION_SECRET
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false

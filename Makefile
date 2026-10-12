@@ -22,7 +22,7 @@ define need_tool
 command -v $(UV) >/dev/null || $(call skip,$(1),uv); $(UV) run --quiet $(2) --version >/dev/null 2>&1 || $(call skip,$(1),$(2))
 endef
 
-.PHONY: web web-install web-check design-lint design-tokens ui eval-extraction eval-qa eval-live fetch-model embed ask remind mail help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
+.PHONY: user web web-install web-check design-lint design-tokens ui eval-extraction eval-qa eval-live fetch-model embed ask remind mail help setup dev contracts ingest extract check check-file fix test test-integration lint typecheck format format-check migrate migrate-verify migrate-down migrate-new vuln doctor db db-reset clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -69,6 +69,10 @@ typecheck: ## mypy strict
 	[ "$$n" -gt 0 ] || { echo "typecheck: 0 python files, nothing checked" >&2; exit 1; }; \
 	$(call need_tool,typecheck,mypy); \
 	$(UV) run mypy app evals tests && echo "typecheck: $$n files checked"
+
+user: ## Create a login: make user EMAIL=you@example.com (also CMD=set-password or CMD=disable); asks for the password
+	@[ -n "$(EMAIL)" ] || { echo "user: give EMAIL=you@example.com" >&2; exit 1; }
+	@set -a; [ -f .env ] && . ./.env; set +a; $(UV) run python -m app.auth.cli $(or $(CMD),create) "$(EMAIL)"
 
 ui: ## API on :8080 plus the React page on http://localhost:5173 (reads .env; needs make db and make migrate)
 	@set -a; [ -f .env ] && . ./.env; set +a; trap 'kill 0' EXIT; \
